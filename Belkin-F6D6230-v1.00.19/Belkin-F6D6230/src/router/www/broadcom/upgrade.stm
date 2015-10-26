@@ -1,0 +1,50 @@
+<html>
+<head>
+	
+
+<% char_set(); %>
+<title>Writing Program Image & Rebooting</title>
+<script language='javascript'>	
+//var my_time = <% exec cmd="RestartTimeout"; %>/100;
+var my_time = 75000/100;
+var mybar = '';
+var cur_time = 0;
+
+function zero_run() {
+	for (var i = 0 ; i < 100 ; i++) {
+		mybar = mybar + '>';
+		window.status = i + '%' + ' ' + mybar;
+		for (var j = 0 ; j < 10000 ; j++) ;
+	}
+	window.status="";
+	document.location.href="/";
+}
+
+function timebegin() {
+	if (my_time == 0) {
+		setTimeout("zero_run()", 100);
+	}
+	else if (cur_time < 100) {
+		mybar = mybar + '>';
+		window.status = cur_time + '%' + ' ' + mybar;
+		setTimeout("timebegin()", my_time);
+		cur_time++;
+	}
+	else {
+		window.status="";
+		document.location.href="/";
+	}
+}
+timebegin();
+</script>
+</head>
+
+<body>
+
+<table height=100% width=100% border=0><tr><td><p valign=center align=center>
+<b><font face="Arial" color="#ff0000" size=4><% Fid_str(691); %></font></b>
+</p></td></tr>
+</table>
+
+</body>
+</html>

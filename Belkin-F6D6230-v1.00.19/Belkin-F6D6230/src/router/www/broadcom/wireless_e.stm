@@ -1,0 +1,139 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script src="mootools.js" type="text/javascript" charset="utf-8"></script>
+<script src="ajax_submit.js" type="text/javascript" charset="utf-8"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+<% exec cmd="my_function"; %>
+<% getWirelessSecurity(); %>
+<% get5GWirelessSecurity(); %>
+</script>
+</head>
+
+<SCRIPT LANGUAGE="JavaScript">
+function Submit24()
+{
+	document.tF.submit();	//submit here.
+}
+function Submit5()
+{
+	//no submit here. do nothing.
+}
+
+function DualSubmit()
+{
+	var ifr, ifr2;
+
+	ifr=window.frames['wireless_24G_sec'];
+	ifr2=window.frames['wireless_5G_sec'];
+	
+	if(ifr.evaltF())
+	{
+		if(ifr2.evaltF())
+		{
+			DoSubmit(GetAllElements(ifr2.document.tF), Submit5);
+			DoSubmit(GetAllElements(ifr.document.tF), Submit24);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+function frmload()
+{
+	var ifr, ifr2;
+
+	//2.4G default security.
+	ifr=window.frames['wireless_24G_sec'];
+	if(enableOS) 
+	{
+		ifr.location.href = "wireless_no_encryption.stm";
+	} 
+	else if(enableWEP) 
+	{
+		if(WEPKEYTYPE) { ifr.location.href = "wireless_128bitwep.stm"; } 
+		else { ifr.location.href = "wireless_64bitwep.stm"; }
+	} 
+	else 
+	{
+		if(enableSSNPSK) {ifr.location.href = "wireless_PSK.stm";}
+		else {ifr.location.href = "wireless_WPA.stm";}
+	}
+
+	//5G default security.
+	ifr2=window.frames['wireless_5G_sec'];
+	if(enableOS_5G) 
+	{
+		ifr2.location.href = "wireless_no_encryption_5.stm";
+	} 
+	else if(enableWEP_5G) 
+	{
+		if(WEPKEYTYPE_5G) { ifr2.location.href = "wireless_128bitwep_5.stm"; } 
+		else { ifr2.location.href = "wireless_64bitwep_5.stm"; }
+	} 
+	else 
+	{
+		if(enableSSNPSK_5G) {ifr2.location.href = "wireless_PSK_5.stm";}
+		else {ifr2.location.href = "wireless_WPA_5.stm";}
+	}
+}
+</SCRIPT>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload=frmload()>
+<% File_include("menu.stm"); %>
+<form name="tF" action="apply.cgi" method="post">
+<input type="hidden" name="location_page" value="wireless_e.stm">
+<input type="hidden" name="arc_action" value="<% Fid_str(49); %>">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(800); %><br>
+			<table border=0 class="copy_1" width=690>
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan=2>
+						<table border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+							<tr>
+								<td width=150></td>
+								<td width=280><b>2.4GHz</b></td>
+								<td><b>5GHz</b></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td valign=top>
+						<iframe height=320 width=440 name="wireless_24G_sec" id="wireless_24G_sec" border=0 frameborder=0 framespacing=0 marginheight=0 noResize scrolling=no></iframe>
+					</td>
+					<td valign=top>
+						<iframe height=320 width=290 name="wireless_5G_sec" id="wireless_5G_sec" border=0 frameborder=0 framespacing=0 marginheight=0 noResize scrolling=no></iframe>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align=center>
+						<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">&nbsp;&nbsp;
+						<input type="button" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onclick="return DualSubmit();">
+					</td>
+				</tr>
+			</table>						
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>		
+

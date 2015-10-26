@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+		<TITLE></TITLE>
+		
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+ </HEAD>
+  <SCRIPT LANGUAGE="JavaScript">
+ 	 if (window.name=="mainFrame")
+	 {
+		window.location.href="wan_dhpc_mac.stm";
+  top.topFrame.location.reload(true);
+	 }
+	 else
+	{
+	    document.write('<FRAMESET border="0" frameSpacing="0" rows="67,*" frameBorder="0">');
+	        document.write('<FRAME name="topFrame"  id="TOP" src="setup_top.htm" noResize scrolling="no">');
+	       document.write('<FRAMESET  name="right_frame" border="0" frameSpacing="0" frameBorder="0" cols="*,0">');
+        document.write(' <FRAME name="mainFrame" src="wan_dhpc_mac.stm">');    
+				document.write('<NOFRAMES>');
+		  			document.write('<body bgcolor="#FFFFFF" text="#000000"></body>');
+		  		document.write('</NOFRAMES>');
+		  document.write('</FRAMESET>');
+	  	document.write('</FRAMESET>');
+	}  	
+</SCRIPT>  	  	
+</HTML>
+

@@ -1,0 +1,10 @@
+prefix=/home/wind/Project/etc
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libtorrent
+Description: A BitTorrent library
+Version: 0.12.2
+Libs: -L${libdir} -ltorrent
+Cflags: -I${includedir}

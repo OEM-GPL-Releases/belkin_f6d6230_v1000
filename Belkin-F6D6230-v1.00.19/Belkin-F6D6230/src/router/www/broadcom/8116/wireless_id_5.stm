@@ -1,0 +1,457 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+
+<script language="JavaScript">
+<% get5GWirelessSecurity(); %>
+<% login_timeout(); %>
+
+var wl_mode="<% nvram_get("wl1_mode"); %>"; 
+var wireless_oper_mode=0;
+ssidvalue = "<% Fid_str(1201); %>";
+var skuid=<% nvram_get("gs_sku_id"); %>;
+var ch;
+var bss=<% nvram_get("wl1_bss_enabled"); %>;
+//<% exec cmd="ChannelRange"; %>
+//var SUPPORTED_CHANNEL_LO =36;
+//var SUPPORTED_CHANNEL = 165;
+
+<% gs_5G_ChannelRange(); %>
+
+function SSIDisSpecialChar(s){
+	var i;
+	var c,hh;
+	for(i=0;i<s.length;i++){
+		c = s.charAt(i);
+	      hh = c.charCodeAt(0);
+		if((hh > 47 && hh<58) || (hh > 64 && hh<91) || (hh > 96 && hh<123) ||(c=='+') ||(c=='-')||(c=='_') )
+		{
+
+		}
+		else	
+		{
+		       ch=c;
+			 return true;
+		}
+		
+	}
+	return false;
+}
+
+
+
+function evaltF()
+{
+	if (document.tF.ssid.value=='') {
+		alert(ssidvalue);
+		return false;
+	}
+
+	if(SSIDisSpecialChar(document.tF.ssid.value)){
+		alert('<% Fid_str(648); %>:'+ch);
+		return false;
+	}
+
+	onApply();
+	//document.forms[0].submit();
+	return true;
+}
+
+
+function onApply()
+{
+	if(document.tF.hidessid.checked == true)
+		document.tF.wl_closed.value=0;
+	else
+		document.tF.wl_closed.value=1;		
+
+	if(document.tF.wmmenable.selectedIndex ==0)
+		document.tF.wl_wme.value='off';
+	else
+	 	document.tF.wl_wme.value='on';
+	 	
+	if(document.tF.protectmode.selectedIndex ==0)
+	 	document.tF.wl_nmode_protection.value='off';
+	else
+	 	document.tF.wl_nmode_protection.value='auto';
+	 
+	document.tF.wl_ssid.value =document.tF.ssid.value;
+	document.tF.wl_channel.value=document.tF.wchan.options[document.tF.wchan.selectedIndex].value;
+
+	switch(parseInt(document.tF.wl_channel.value)) {
+		case 36:
+			document.tF.wl_nctrlsb.value="lower";//"lower";
+			break;
+		case 40:
+			document.tF.wl_nctrlsb.value="upper";//"upper";
+			break;
+		case 44:
+			document.tF.wl_nctrlsb.value="lower";//"lower";
+			break;
+		case 48:
+			document.tF.wl_nctrlsb.value="upper";//"upper";
+			break;
+		case 149:
+			document.tF.wl_nctrlsb.value="lower";//"lower";
+			break;
+		case 153:
+			document.tF.wl_nctrlsb.value="upper";//"upper";
+			break;
+		case 157:
+			document.tF.wl_nctrlsb.value="lower";//"lower";
+			break;
+		case 161:
+			document.tF.wl_nctrlsb.value="upper";//"upper";
+			break;
+		default:
+			document.tF.wl_nctrlsb.value="upper";//"upper";
+			break;
+	}
+	
+	if(document.tF.wbr.selectedIndex==0) {//off
+		document.tF.wl_bss_enabled.value=0;
+		document.tF.wl_gmode.value=1; //g mode
+		document.tF.wl_nmode.value=-1;//auto
+		document.tF.wl_radio.value=0;//radio off
+	} else {
+		document.tF.wl_bss_enabled.value=1;//0;
+		if(document.tF.wbr.options[document.tF.wbr.selectedIndex].value==1)//802.11A
+		{
+			document.tF.wl_nmode.value=0;//off
+			document.tF.wl_gmode.value=1;//b only
+			document.tF.wl_nreqd.value=0;//off	
+			document.tF.wl_radio.value=1;//radio on		
+		}
+		if(document.tF.wbr.options[document.tF.wbr.selectedIndex].value==2)//802.11N
+		{
+			document.tF.wl_nmode.value=-1;//auto
+			document.tF.wl_gmode.value=1;//g auto
+			document.tF.wl_nreqd.value=1;//on
+			document.tF.wl_radio.value=1;//radio on				
+		}
+		if(document.tF.wbr.options[document.tF.wbr.selectedIndex].value==3)//802.11A&N
+		{
+			document.tF.wl_nmode.value=-1;//auto
+			document.tF.wl_gmode.value=1;//g auto
+			document.tF.wl_nreqd.value=0;//off
+			document.tF.wl_radio.value=1;//radio on
+		}
+	}	
+}
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+
+function wbrselectedchange(){
+	if(document.tF.wbr.selectedIndex <=1){
+		document.tF.ex_wchan.disabled = true;
+		document.tF.wl_nbw_cap.disabled = true;
+	}else{
+		if(document.tF.wl_nbw_cap.selectedIndex == 1)
+			document.tF.ex_wchan.disabled = true;
+		else 
+			document.tF.ex_wchan.disabled = false;
+		document.tF.wl_nbw_cap.disabled = false;
+	}
+	onChangeWirelessMode();
+		
+}
+
+
+function bandwidthselectedchange(){
+	onChangeWirelessMode();		
+}
+
+function onChangeWirelessMode()
+{
+	if( document.tF.wchan.selectedIndex > 0 &&
+		document.tF.wbr.selectedIndex > 1 &&
+		document.tF.wl_nbw_cap.selectedIndex>0) document.tF.ex_wchan.disabled = false;
+	else document.tF.ex_wchan.disabled = true;
+	
+	if((document.tF.wchan.options.length>4)) {
+		if(document.tF.wl_nbw_cap.selectedIndex==0) {
+			document.tF.wchan.options.length=9;
+			document.tF.wchan.options[8].value = 165;
+			document.tF.wchan.options[8].text = 165;
+		} else {
+			document.tF.wchan.options.length=8;
+		}
+	} 		
+}
+
+function frmload(){	
+
+	//var ex_channel='<% nvram_get("wl1_nctrlsb"); %>';
+
+	bandwidthselectedchange();
+	wbrselectedchange();
+	channelselectedchange();
+	onChangeWirelessMode();
+	
+	//if(ex_channel=='lower') document.tF.ex_wchan.selectedIndex=1;
+	//else document.tF.ex_wchan.selectedIndex=0;
+}
+
+
+function channelselectedchange()
+{
+
+	document.tF.ex_wchan.options.length = 1;
+	switch(parseInt(document.tF.wchan.options[document.tF.wchan.selectedIndex].value)) {
+		case 36:
+			document.tF.ex_wchan.options[0].value=40;
+			document.tF.ex_wchan.options[0].text=40;
+			break;
+		case 40:
+			document.tF.ex_wchan.options[0].value=36;
+			document.tF.ex_wchan.options[0].text=36;
+			break;
+		case 44:
+			document.tF.ex_wchan.options[0].value=48;
+			document.tF.ex_wchan.options[0].text=48;
+			break;
+		case 48:
+			document.tF.ex_wchan.options[0].value=44;
+			document.tF.ex_wchan.options[0].text=44;
+			break;
+		case 149:
+			document.tF.ex_wchan.options[0].value=153;
+			document.tF.ex_wchan.options[0].text=153;
+			break;
+		case 153:
+			document.tF.ex_wchan.options[0].value=149;
+			document.tF.ex_wchan.options[0].text=149;
+			break;
+		case 157:
+			document.tF.ex_wchan.options[0].value=161;
+			document.tF.ex_wchan.options[0].text=161;
+			break;
+		case 161:
+			document.tF.ex_wchan.options[0].value=157;
+			document.tF.ex_wchan.options[0].text=157;
+			break;
+		case 165:
+			document.tF.ex_wchan.options[0].value=161;
+			document.tF.ex_wchan.options[0].text=161;
+			break;
+		default:
+			document.tF.ex_wchan.options[0].value=40;
+			document.tF.ex_wchan.options[0].text=40;
+			break;		
+	}
+	
+	onChangeWirelessMode();
+}
+
+<% exec cmd="gateway_status"; %>
+//<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload = frmload()>
+<% File_include("menu.stm"); %>
+<FORM NAME=tF METHOD=POST ACTION="apply.cgi" onsubmit="return evaltF();">
+<input type="hidden" name="page" value="radio.asp">
+<input type="hidden" name="location_page" value="wireless_id_5.stm">
+
+<input type="hidden" name="wl_action" value="1">
+<input type="hidden" name="wl_unit", value="1">
+<input type="hidden" name="wl_bssid", value="0">
+
+<input type="hidden" name="wl_ssid">
+<input type="hidden" name="wl_nctrlsb"><!-- sideband(low,high)-->
+<input type="hidden" name="wl_channel">
+<input type="hidden" name="wl_bss_enabled">
+<input type="hidden" name="wl_nmode">
+<input type="hidden" name="wl_gmode">
+<input type="hidden" name="wl_closed"><!-- hide side-->
+<INPUT type="hidden" name="wl_wme"><!--WMM-->
+<input type="hidden" name="wl_nmode_protection"><!-- protected mode -->
+<input type="hidden" name="wl_nreqd">
+<input type="hidden" name="wl_country_code" value="US">
+<input type="hidden" name="wl_radio" value="1">
+<input type="hidden" name="wl_nband" value="1">
+<input type="hidden" name="wl_rate" value="1">
+<input type="hidden" name="wl_rateset" value="default">
+<input type="hidden" name="wl_mrate" value="0">
+<input type="hidden" name="wl_vlan_prio_mode" value="off">
+<input type="hidden" name="arc_action" value="<% Fid_str(49); %>"> 
+<!-- <% exec cmd="wireopt"; %> -->
+<script language="javascript">
+	if(wl_mode=="ap" || wl_mode=="wds") wireless_oper_mode=1;
+	else wireless_oper_mode=0;
+</script>
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<script language="javascript">
+			if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+			    document.write('<br>&nbsp;&nbsp;<% Fid_str(786); %>');
+			else //client
+				document.write('<br>&nbsp;<% Fid_str(16); %> &gt; SSID');
+			</script>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="1">&nbsp;</td></tr>
+				<tr>					
+					<td>
+						<table width=550 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+							<tr align=left>
+								<td colspan=2 align=left class="body">
+							        <script language="javascript">
+									if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+									{
+											document.write('<% Fid_str(787); %>');
+									}
+									else
+									{
+											document.write('<% Fid_str(515); %>');
+											document.write('.&nbsp;<% Fid_str(1670); %>.');
+									}
+									</script>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#channel_ssid");>
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+								<br><br></td>
+							</tr>
+							<script language="javascript">
+								//<% exec cmd="WirelessG_get_para"; %>
+								if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+								{
+									document.write('<tr><td width="220" class="body"><b><% Fid_str(788); %> &gt;</b></td>');
+									document.write('<td width="335" class="body">');
+									document.write('<select size="1" name="wchan" class=selectList onchange= channelselectedchange()>');
+								 	document.write('<% gs_5gwchannels(); %>');
+									document.write('</select>');									
+									document.write('</td>');
+									document.write('</tr>');	
+									document.write('<tr><td width="174" class="body"><b><% Fid_str(1300); %> &gt;</b></td>');
+									document.write('<td width="335" class="body">');
+									document.write('<select size="1" name="ex_wchan" class=selectList>');
+									document.write('<option value="lower" <% nvram_match("wl1_nctrlsb", "lower", "selected"); %>>Lower </option>');
+									document.write('<option value="upper" <% nvram_match("wl1_nctrlsb", "upper", "selected"); %>>Upper </option>');													
+									document.write('</select>');									
+									document.write('</td>');
+									document.write('</tr>');	
+								}
+							</script>
+							
+
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(789); %> &gt;</b></td>
+								<td width="335" class="body">
+									<input type="text" class="textbox" name="ssid" size=27 maxlength=32 value="<% nvram_get("wl1_ssid"); %>"  >
+								</td>
+							</tr>
+					        	
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(790); %>&nbsp;&gt;</b></td>
+								<td width="335" class="body">
+								<select size="1" name="wbr" class=selectList onchange="wbrselectedchange()">								
+								<% gs_5gwl_mode(); %>						
+								</select>
+								<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#wireless_mode");>
+								<b><font color=#0066FF>&nbsp;<% Fid_str(47); %></font></b></a>								
+								</td>
+							</tr>
+								
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(1301); %>&nbsp;&gt;</b></td>
+								<td width="335" class="body">
+								<select size="1" name="wl_nbw_cap" class=selectList onchange= bandwidthselectedchange()>
+								
+		<option value="0" <% nvram_match("wl1_nbw_cap", "0", "selected"); %>>20 MHz</option>
+	  	<option value="1" <% nvram_match("wl1_nbw_cap", "1", "selected"); %>>20/40 MHz</option>
+								</select>
+								</td>
+							</tr>
+							
+							
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(794); %> &gt;</b></td>
+								<td width="335" class="body">
+								<input type="checkbox" name="hidessid" >
+								<script language="javascript">	
+									var iDOD = 1-<% nvram_get("wl1_closed"); %>;
+									if(iDOD)									
+										document.forms[0].hidessid.checked = true;
+									else
+										document.forms[0].hidessid.checked = false;
+								</script>
+								<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#broad_ssid");>
+								<b><font color=#0066FF>&nbsp;<% Fid_str(47); %></font></b></a>									
+								</td>
+							</tr>	
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(797); %>&nbsp;&gt;</b></td>
+								<td width="335" class="body">
+								<select size="1" name="protectmode" class=selectList>
+								<option value=0 selected><% Fid_str(488); %></option>
+								<option value=1 ><% Fid_str(487); %></option>								
+								</select>
+								<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#protected_mode");>
+								<b><font color=#0066FF>&nbsp;<% Fid_str(47); %></font></b></a>								
+
+								</td>
+							</tr>	
+								
+							<script language="javascript">
+								
+								var iDOD = '<% nvram_get("wl1_nmode_protection"); %>';
+								if (iDOD=='off')
+								document.forms[0].protectmode.selectedIndex = 0;							
+								else
+								document.forms[0].protectmode.selectedIndex = 1;	
+							</script>
+								
+							<tr>
+								<td width="174" class="body"><b><% Fid_str(1304); %>&nbsp;&gt;</b></td>
+								<td width="335" class="body">
+								<select size="1" name="wmmenable" class=selectList>
+								<option value=0 selected><% Fid_str(488); %></option>
+								<option value=1 ><% Fid_str(487); %></option>							
+								</select>
+								<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#Qos_mode");>
+								<b><font color=#0066FF>&nbsp;<% Fid_str(47); %></font></b></a>								
+
+								</td>
+							</tr>	
+							<script language="javascript">
+								var iDOD = '<% nvram_get("wl1_wme"); %>';
+								if(iDOD!='off') document.forms[0].wmmenable.selectedIndex = 1;
+								else document.forms[0].wmmenable.selectedIndex =0;						
+							</script>
+							
+							<tr>
+								<td colspan=3>&nbsp;</td>
+							</tr>
+							<tr>
+								
+								<td colspan="2" align=center>
+									<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+              						<input type="submit"  value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>
+

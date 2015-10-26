@@ -1,0 +1,78 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<% File_include("hyper.txt"); %>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode=1;// '<% nvram_get("gs_apMode"); %>';
+var pid2="<% nvram_get("project_id2"); %>";
+
+function evaltF()
+{
+	return true;
+}
+<% gs_gateway_stauts(); %>
+//<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF" action="/cgi-bin/wireless_eb.exe" method="post">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">		
+			<br><b><% Fid_str(823); %>&nbsp;&gt;</b>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width="600" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+							<tr>
+								<td class="body">
+									<% Fid_str(824); %>
+									<ul>
+									<li><a href="wireless_id.stm"><b><% Fid_str(825); %></b></a></li><br>
+									<% Fid_str(826); %><br>&nbsp;
+									<li><a href="wireless_e.stm"><b><% Fid_str(827); %></b></a></li><br>
+									<% Fid_str(828); %><br>&nbsp;
+										<li><a href="wireless_WPS.stm"><b><% Fid_str(1319); %></b></a></li><br>
+										<% Fid_str(1368); %><br>&nbsp;	
+									<script>
+									if(pid2=="00n2")
+									document.write('<li><a href="wireless_guest2.stm"><b><% Fid_str(1613); %></b></a></li><br>');
+									else
+									document.write('<li><a href="wireless_guest.stm"><b><% Fid_str(1613); %></b></a></li><br>');
+									</script>
+										<% Fid_str(1614); %><br>&nbsp;		
+									<li><a href="wireless_apt.stm"><b><% Fid_str(19); %></b></a></li><br>
+									<% Fid_str(830); %><br>&nbsp;
+									<script>
+									if(pid2!="00n2")
+									document.write('<li><a href="wireless_mac.stm"><b><% Fid_str(833); %></b></a></li><br><% Fid_str(834); %><br>&nbsp;');
+									</script>
+									</ul>
+							
+
+								</td>
+							</tr>	
+							
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

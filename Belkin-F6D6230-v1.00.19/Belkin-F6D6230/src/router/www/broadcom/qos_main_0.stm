@@ -1,0 +1,68 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% gs_myFunction(); %>
+var pid2="<% nvram_get("project_id2"); %>";
+if(my_qos==1){
+    wan_bw_m='<% Fid_str(1539); %>';
+    minbwm="<% Fid_str(1540); %>\n <% Fid_str(1541); %>";
+    sumbwm='<% Fid_str(1542); %>';
+}
+else{
+    minbwm="<% Fid_str(1540); %>\n <% Fid_str(1543); %>";
+    sumbwm='<% Fid_str(1544); %>';
+}
+
+blockm="<% Fid_str(1545); %>";
+be_dscrpt='<% Fid_str(1546); %>';
+af_dscrpt="<% Fid_str(1547); %>";
+ef_dscrpt='<% Fid_str(1548); %>';
+</script>
+</head>
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1();">
+<% File_include("menu.stm"); %>
+<form name="tF" METHOD="POST" action="/cgi-bin/qos_eb.exe">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;
+			<script>
+			if(pid2=="00n2")
+			document.write("Play Features");
+			else
+			document.write("<% Fid_str(1488); %>");
+			</script>			
+			&nbsp;&gt;<br>
+
+			<table border="0" class="copy_1">
+				<tr>
+					<td width="5" height="25">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="10" height="25" >&nbsp;</td>
+					<td width="100%" colspan="2" height="25">
+						<table border="0" cellpadding="0" cellspacing="0" class="copy_1">
+							<tr>
+								<td colspan="2" class="body">
+								<% Fid_str(1549); %> <a href="javascript:void(0);" class="plaintext_bold" onClick="window.open('glossary.stm#Qos_mode','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');"><b><font color=#6464c3><% Fid_str(47); %></font></b></a>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<td width="5" height="25">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<HTML><HEAD>
+<% char_set(); %>
+
+<LINK href="main_router.css" type=text/css rel=stylesheet>
+<META http-equiv=Pragma content=no-cache>
+
+<SCRIPT language=javascript>
+
+<!-- hide
+
+function applyClick() {
+	var c, i;
+	message = 'Please input a number 0 - 255.';
+	if((document.tF.schedule_reboot_time.value > 255)||(document.tF.schedule_reboot_time.value < 0))
+	{
+		alert(message);
+		return false;
+	}
+	for(i=0; i<document.tF.schedule_reboot_time.value.length; i++)
+	{
+		c = document.tF.schedule_reboot_time.value.charCodeAt(i);
+		if((c < 48) || (c > 57))
+		{
+			alert(message);
+			return false;
+		}
+	}
+
+	document.tF.submit();
+}
+
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+// done hiding -->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+<FORM  name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="arc_action" value="schedule_reboot">
+<input type="hidden" name="location_page" value="reboot.stm">
+<TABLE width=600>
+	<TR>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+		<br><B>Count and Reboot</b></td>
+	</TR>
+	<tr>
+		<td class="body">
+			<FONT color=#004263>
+			<BR>
+			This device will reboot after you set counter a number which is between 0 and 255.
+			</FONT>
+			<BR>
+			<BR>
+			<table width=550 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+				<tr>
+					<td width="174" class="body"><b>Enable Auto Reboot&nbsp;&gt;</b></td>
+					<td width="335" class="body">
+						<input type="checkbox" name="schedule_reboot_status" value="1">
+					</td>
+					<script language="javascript">	
+						var iDOD = <% nvram_get("schedule_reboot_status"); %>;
+						if(iDOD)									
+							document.tF.schedule_reboot_status.checked = true;
+						else
+							document.tF.schedule_reboot_status.checked = false;
+					</script>
+				</tr>
+				<tr>
+					<td width="174" class="body"><b>Order Reboot after&nbsp;&gt;</b></td>
+					<td width="335" class="body">
+						<input type=text name="schedule_reboot_time" size=4 maxlength=3 value="<% nvram_get("schedule_reboot_time"); %>"> <b> minutes.</b>
+					</td>
+				</tr>
+				<tr>
+					<td colspan=3>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="2" align=center>
+						<input  type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+						&nbsp;&nbsp;
+						<input class=submitBtn style=" height: 22px;width:150px;" onclick=applyClick() type=button value="<% Fid_str(49); %>">
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</TABLE>	
+</FORM>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table>
+</BODY>
+</HTML>

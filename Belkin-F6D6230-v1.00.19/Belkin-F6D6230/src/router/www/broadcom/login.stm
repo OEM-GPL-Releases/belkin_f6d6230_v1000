@@ -1,0 +1,134 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+
+<style type="text/css">
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; color: #003366; text-decoration: none}
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.section {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 15px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #0000ff; text-decoration: none}
+.body{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #003366}
+a {  text-decoration: none; color: #003366}
+a:link{ color: #cccccc;text-decoration: none;}
+a:visited {color: #cccccc;text-decoration: none;}
+a:active{color: #cccccc;text-decoration: none;}
+a:hover {  text-decoration: underline; color: #0000ff}
+a.menuharf{FONT: 8pt Arial,Helvetica, sans-serif; text-decoration: none; color: #cccccc}
+a.menuharf:link{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+   }
+a.menuharf:visited{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+a.menuharf:active{
+     color: #cccccc;
+     font-size: 8pt;
+     text-decoration: none;
+    }
+a.menuharf:hover{  text-decoration: underline; color: #0000ff}
+.copy_1 {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 14px; color: #003366}
+.submitBtn {  font-family: Arial, Helvetica, sans-serif; font-size: 11px;border-color: #cccccc; background-color: #cccccc; color: #000000}
+.Menu_section {  FONT: bold 9pt Arial, Helvetica, sans-serif; text-decoration: none;}
+</style>
+
+<script type="text/javascript" src="md5.js"></script>
+<script language="JavaScript">
+	var ap_mode= '<% nvram_get("gs_apMode"); %>';
+	<% gs_gateway_stauts(); %>
+	var auto_check = <% nvram_get("remote_auto_fw"); %>;
+	var auto_check2 = '<% nvram_get("health_auto_fw"); %>';
+	var password = "<% nvram_get("http_passwd");  %>";
+	function checkfwVersion()
+	{
+		var newwin;
+		if((auto_check||(auto_check2=='1')) && (password==document.tF.pws_temp.value)){
+			newwin=window.open("FwAuto.stm","Firmware","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,width=395,height=200,resizable=0");
+			newwin.focus();
+		}
+		//else{
+		//	alert("Auto update firmware disabled.");
+		//	return false;
+		//}
+		var curTime = new Date();
+		document.tF.totalMSec.value= curTime.getTime()/1000-curTime.getTimezoneOffset()*60;	
+		
+		//added by Lichen using MD5 encoding, 07/10/08
+		document.tF.pws.value = hex_md5(document.tF.pws_temp.value);
+		document.tF.pws_temp.value = "";
+	}
+	
+	function refreshload(){
+		//document.location.reload(true);
+		top.topFrame.location.reload(true);
+		//document.tF.pws.focus();
+	}
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="refreshload();">
+<% File_include("menu.stm"); %>
+<form action="login.cgi" method="post" name="tF" onSubmit="checkfwVersion()">
+<INPUT type="hidden" name="totalMSec" value="">
+<INPUT type="hidden" name="pws" value="">
+<INPUT type="hidden" name="arc_action" value="login">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+	<td valign="top" width="99%" height="100%" class="head_bold">
+	<br><font color=#0000ff>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <% Fid_str(3); %></font><br>
+	<!--This is Login.stm-->
+		<table border=0 class="copy_1">
+			<tr>
+				<td width="5" colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td width="5">&nbsp;</td>
+				<td>
+					<table width="480" border="0" cellspacing="5" cellpadding="0" align=left class="copy_1">
+						<tr>
+							<td width="69" height="41">&nbsp;</td>
+							<td height="41" class="body" colspan="2">
+								<% Fid_str(408); %>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=3>&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="69">&nbsp;</td>
+							<td width="146" class="body"><b><% Fid_str(409); %></b></td>
+							<td width="250"><INPUT type="password" maxLength="16" size="16" name="pws_temp"></td>
+						</tr>
+						<tr><td width="69" class="body">&nbsp;</td>
+							<td colspan="2"><font color="#6F4AFD"><b><% Fid_str(410); %></b></font></td>
+						</tr>
+						<tr><td width="69" colspan="3">&nbsp;</td></tr>
+						<tr>
+							<td width="69">&nbsp;</td>
+							<td colspan="2" align=center>
+								<nobr>
+								<input type="button" onClick="javascript:document.tF.reset();" value="<% Fid_str(127); %>" style="{width=120px;height=22px;}" class="submitBtn" onMouseOver="window.status='Clear'; return true;" onMouseOut="window.status=''; return true;">
+								&nbsp;&nbsp;
+								<input type="submit" name="action" value="<% Fid_str(412); %>" style="{width=120px;height=22px;}" class="submitBtn">
+							</td>
+								</nobr>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

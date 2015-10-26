@@ -1,0 +1,139 @@
+<html>
+<head>
+<title><% Fid_str(1600); %></title>
+<% char_set(); %>		
+<link rel="stylesheet" href="main_router.css" type="text/css">
+</head>		
+
+<script language="JavaScript">			
+	<% wps_get_key(); %>	
+	var wpsCurrentCount=<% get_wps_count(); %>;	
+	
+	function frmload(){	
+		if(wpsCurrentCount >= 200){
+			window.close();
+		}
+	}
+	
+	function wpscancel(){
+		document.tF2.submit();
+		//setTimeout("window.close()", 2000);
+		//window.close();
+		return true;
+	}
+
+</script>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload = frmload()>
+<font color=#003366>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" align="middle">
+	<tr align="center" valign="bottom">
+		<td colspan="2" height="50%">
+			<script language="JavaScript">
+				var status='<% nvram_get("wps_show_status"); %>';
+				var f_configure=<% nvram_get("wl_wps_config_state"); %>;
+				var i;
+				var n;
+				n = wpsCurrentCount % 4;
+				if(wpsCurrentCount<4) status='10';
+			  	switch (status) {
+			    	case '1':	//PBCPIN_INPROGRESS_STATUS
+						document.write("<% Fid_str(1363); %> ");
+						if(n == 0)
+							n = 1;
+						for(i = 0; i < n; i++){
+							document.write(".");
+						}
+						for(i; i < 4; i++){
+							document.write("&nbsp;");
+						}
+						break;
+			    	case '3':	//PBCPIN_FAILURE_STATUS
+						document.write("<% Fid_str(1364); %>");
+						clearTimeout(timeout_id);
+						break;
+			    	case '8':	//PBCPIN_OVERLAP_STATUS
+						document.write("<% Fid_str(1365); %>");
+						clearTimeout(timeout_id);
+						break;
+			    	case '2':	//the value equal the status of led
+						document.write("<% Fid_str(1366); %>");
+						clearTimeout(timeout_id);
+						break;	
+			    	case '10':	//the value initial
+						document.write("<% Fid_str(1400); %>");
+						break;												
+				default:
+						document.write("<% Fid_str(1363); %> ");
+						if(n == 0)
+							n = 1;
+						for(i = 0; i < n; i++){
+							document.write(".");
+						}	
+						for(i; i < 4; i++){
+							document.write("&nbsp;");
+						}																			
+						break;										
+			     }
+			</script>		</td>
+	</tr>
+	<form name="tF2" action="apply.cgi" method="post">
+	<input type="hidden" name="action" value="Arc_WpsStop">
+	<input type="hidden" name="location_page" value="WPS_statusShow.stm">
+		<tr valign="top" height="50%">
+		<td width="75%">&nbsp;		</td>
+		<td width="25%">
+			<br>									
+			<script language="JavaScript">
+				switch (status) {
+				    case '2':
+				    case '3':
+				    case '8':
+				             document.write('<input type="button" value="<% Fid_str(1398); %>" onClick="javascript:window.close();return false">');
+						break;
+				    case '6':	//PBCPIN_INPROGRESS_STATUS
+						document.write('&nbsp;');
+						break;									
+				    case '9':	//the value equal the status of led
+						document.write('<input type="button" value="<% Fid_str(1398); %>" onClick="javascript:window.close();return false">');
+						break;
+				    //case 10:	//the value initial
+					//	document.write('<input type="button" value="<% Fid_str(1399); %>" onClick="return wpscancel();">');
+					//	break;	
+					default:
+					 // document.write('<input type="button" value="<% Fid_str(1298); %>" onClick="return wpscancel();">');
+						document.write('<input type="button" value="<% Fid_str(1399); %>" onClick="return wpscancel();">');
+						//document.write('<input type="button" value="<% Fid_str(1298); %>" onClick="javascript:window.close();return false">');
+						break;	
+				}
+			</script>
+		  <br></td>
+	</tr>
+	<tr valign="bottom">
+	  	<td colspan="2"><center>
+			<% gs_wps_display(); %><br></center>
+		</td>
+	</tr>
+	</form>
+</table>
+</body>
+<script>
+
+function timedelay(){
+	window.location.reload(true);
+}		
+function timebegin() {	
+var timeout_id;   
+	if( wpsCurrentCount >= 200 ){
+		window.close();
+	}		
+	if((status==2  || status==3 || status==8) && wpsCurrentCount>=30)
+	{}	
+	else
+	timeout_id=setTimeout("timedelay()", 1000);				
+}
+timebegin();
+
+
+</script>
+</html>

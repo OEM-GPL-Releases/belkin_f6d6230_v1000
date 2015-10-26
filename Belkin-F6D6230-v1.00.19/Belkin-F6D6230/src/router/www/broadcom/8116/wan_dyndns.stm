@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+  <title><!-- UI Caption Begin -->Gigaset [Product Name]<!-- UI Caption End --></title>
+
+<% char_set(); %>
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <!-- page transition blend (Internet Explorer) -->
+  <meta http-equiv="Page-Enter" content="blendTrans(Duration=0.3)" />
+  <!-- external scripts for common tasks -->
+  <script src="scripts/main.js" language="JavaScript" type="text/javascript"></script>
+  <script src="scripts/navigation.js" language="JavaScript" type="text/javascript"></script>
+  <!-- additional scripts for special tasks -->
+  <script language="JavaScript">
+<% login_timeout(); %>
+
+<% include file="routine.txt"; %>
+
+  var backgroundStyle = ''; // '': normal page style; 'Wizard': wizard page style
+  var current_service_provider = '0'; // ID of current DynDNS service provider
+  var array_current_provider_settings = new Array();
+  array_current_provider_settings['domain_name'] = '<% echo var="ddns_domainame"; %>'; // current domain name of current provider
+  array_current_provider_settings['user_name'] = '<% echo var="ddns_account"; %>'; // current user name of current provider
+  array_current_provider_settings['password'] = '<% echo var="ddns_password"; %>'; // current password of current provider - 'PaSsWoRdAlReAdYsEt': valid password set (do NOT display the password here, only this static text / '': no password set so far
+
+  var array_dynamic_page_controls = new Array();
+  array_dynamic_page_controls[0] = 'domain_name';
+  array_dynamic_page_controls[1] = 'user_name';
+  array_dynamic_page_controls[2] = 'password';
+  var lib_dyndns_providers = new Array();
+  lib_dyndns_providers[0] = new Array();
+  lib_dyndns_providers[0]['name'] = "<!-- UI Caption Begin -->DynDNS.org<!-- UI Caption End -->";
+  lib_dyndns_providers[0]['controls'] = new Array(); // sub array of all controls to be displayed for this provider
+  lib_dyndns_providers[0]['controls'][0] = 'domain_name'; // control name as in name / id tag
+  lib_dyndns_providers[0]['controls'][1] = 'user_name';
+  lib_dyndns_providers[0]['controls'][2] = 'password';
+  lib_dyndns_providers[0]['defaults'] = new Array(); // sub array of all default values for this provider
+  lib_dyndns_providers[0]['defaults'][0] = new Array();
+  lib_dyndns_providers[0]['defaults'][0]['control'] = 'domain_name'; // control name as in name / id tag
+  lib_dyndns_providers[0]['defaults'][0]['value'] = ''; // value: text to be displayed / id of list entry to be selected
+  lib_dyndns_providers[0]['defaults'][1] = new Array();
+  lib_dyndns_providers[0]['defaults'][1]['control'] = 'user_name';
+  lib_dyndns_providers[0]['defaults'][1]['value'] = '';
+  lib_dyndns_providers[0]['defaults'][2] = new Array();
+  lib_dyndns_providers[0]['defaults'][2]['control'] = 'password';
+  lib_dyndns_providers[0]['defaults'][2]['value'] = '';
+  lib_dyndns_providers[1] = new Array();
+  lib_dyndns_providers[1]['name'] = "<!-- UI Caption Begin -->TZO.com<!-- UI Caption End -->";
+  lib_dyndns_providers[1]['controls'] = new Array();
+  lib_dyndns_providers[1]['controls'][0] = 'domain_name';
+  lib_dyndns_providers[1]['controls'][1] = 'user_name';
+  lib_dyndns_providers[1]['controls'][2] = 'password';
+  lib_dyndns_providers[1]['defaults'] = new Array();
+  lib_dyndns_providers[1]['defaults'][0] = new Array();
+  lib_dyndns_providers[1]['defaults'][0]['control'] = 'domain_name';
+  lib_dyndns_providers[1]['defaults'][0]['value'] = '';
+  lib_dyndns_providers[1]['defaults'][1] = new Array();
+  lib_dyndns_providers[1]['defaults'][1]['control'] = 'user_name';
+  lib_dyndns_providers[1]['defaults'][1]['value'] = '';
+  lib_dyndns_providers[1]['defaults'][2] = new Array();
+  lib_dyndns_providers[1]['defaults'][2]['control'] = 'password';
+  lib_dyndns_providers[1]['defaults'][2]['value'] = '';
+  function focus_gigaset_form() {
+
+    for (var i=0;i<array_dynamic_page_controls.length;i++) {
+      document.getElementById(array_dynamic_page_controls[i]).value = array_current_provider_settings[array_dynamic_page_controls[i]];
+    }
+    repaint_gigaset_form();
+	if (document.gigaset.dynamic_dns[0].checked==true)  
+    	document.gigaset.dynamic_dns_on.focus();
+    else	
+    	document.gigaset.dynamic_dns_off.focus();
+  }
+  
+  function show_control4provider(provider_id, control_name) {
+    provider_controls = lib_dyndns_providers[provider_id]['controls'];
+    for (var i=0;i<provider_controls.length;i++) {
+      if (provider_controls[i] == control_name) return true;
+    }
+    return false;
+  }
+  
+  function repaint_gigaset_form() {
+    var row_display = ((browserDetectBrowser == 'Internet Explorer') ? 'block' : 'table-row');
+    var tmp_selected_provider = document.gigaset.service_provider.value;
+    document.getElementById('tr_service_provider').style.visibility = ((document.gigaset.dynamic_dns[0].checked == true) ? 'visible' : 'hidden');
+    document.getElementById('tr_service_provider').style.display = ((document.gigaset.dynamic_dns[0].checked == true) ? row_display : 'none');
+    for (var i=0;i<array_dynamic_page_controls.length;i++) {
+      document.getElementById('tr_'+array_dynamic_page_controls[i]).style.visibility = (((document.gigaset.dynamic_dns[0].checked == true) && (show_control4provider(tmp_selected_provider,array_dynamic_page_controls[i]))) ? 'visible' : 'hidden');
+      document.getElementById('tr_'+array_dynamic_page_controls[i]).style.display = (((document.gigaset.dynamic_dns[0].checked == true) && (show_control4provider(tmp_selected_provider,array_dynamic_page_controls[i]))) ? row_display : 'none');
+    }
+  }
+  
+  function set_gigaset_provider_defaults(force_defaults) {
+    if ((document.gigaset.service_provider.value == current_service_provider) && (!force_defaults)) {
+      for (var i=0;i<array_dynamic_page_controls.length;i++) {
+        document.getElementById(array_dynamic_page_controls[i]).value = array_current_provider_settings[array_dynamic_page_controls[i]];
+      }
+    }
+    else {
+      provider_defaults = lib_dyndns_providers[document.gigaset.service_provider.value]['defaults'];
+      for (var j=0;j<provider_defaults.length;j++) {
+        if (typeof(document.getElementById(provider_defaults[j]['control'])) == 'object') document.getElementById(provider_defaults[j]['control']).value = provider_defaults[j]['value'];
+      }
+    }
+  }
+
+  function submit_gigaset_form() {
+    if (document.gigaset.dynamic_dns[0].checked == true) {
+      var tmp_selected_provider = document.gigaset.service_provider.value;
+      if (show_control4provider(tmp_selected_provider, 'domain_name')) {
+        if (isBlank(document.gigaset.domain_name.value) || !isPrintable(document.gigaset.domain_name.value) || !isValidInternetDomain(document.gigaset.domain_name.value)) {
+          alert('<% Fid_str(1196); %>');
+          document.gigaset.domain_name.focus();
+          return false;
+        }
+      }
+      if (show_control4provider(tmp_selected_provider, 'user_name')) {
+        if (isBlank(document.gigaset.user_name.value) || !isPrintable(document.gigaset.user_name.value)) {
+          alert('<% Fid_str(1197); %>');
+          document.gigaset.user_name.focus();
+          return false;
+        }
+      }
+      if (show_control4provider(tmp_selected_provider, 'password')) {
+        if (isBlank(document.gigaset.dpassword.value) || !isPrintable(document.gigaset.dpassword.value)) {
+          alert('<% Fid_str(1198); %>');
+          document.gigaset.dpassword.focus();
+          document.gigaset.dpassword.value = '';
+          return false;
+        }
+      }
+    }
+    document.gigaset.submit(); // CGI --> relink to advanced_internet.stm
+    
+  }
+  
+  function cancel_gigaset_form() {
+    /* go one level up in the navigation hierarchy, usually equal to form relink page */
+    document.location.href="advanced_internet.stm";
+  }
+
+  </script>
+  <!-- external stylesheet for common elements -->
+  <link rel="stylesheet" type="text/css" media="screen" href="styles/main.css" />
+  <!-- additional styles for special elements -->
+  <style type="text/css" media="screen">
+  </style>
+</head>
+
+<body onLoad="javascript:focus_gigaset_form();">
+<% include file="header.stm"; %>
+      <div id="content">
+      <form name="gigaset" action="/cgi-bin/setup_ddns.exe" onsubmit="javascript:submit_gigaset_form(); return false;" method="post">
+        <div class="contentColumn">
+          <table border="0" cellspacing="0" cellpadding="0" style="width:100%;">
+            <tr>
+              <td class="label"><h1><!-- UI Caption Begin --><% Fid_str(195); %><!-- UI Caption End --></h1></td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="label"><!-- UI Caption Begin --><% Fid_str(195); %>:<!-- UI Caption End --></td>
+              <td class="rightSide">
+                <input type="radio" name="dynamic_dns" id="dynamic_dns_on" value="enabled" class="radio<% Fid_str(491); %>" onclick="repaint_gigaset_form();" /><!-- UI Caption Begin -->on<!-- UI Caption End -->
+                &nbsp;&nbsp;&nbsp;<input type="radio" name="dynamic_dns" id="dynamic_dns_Off" value="disabled" class="radio<% Fid_str(491); %>" onclick="repaint_gigaset_form();" /><!-- UI Caption Begin -->Off<!-- UI Caption End -->
+              </td>
+            </tr>
+            <SCRIPT LANGUAGE="JavaScript">
+            var iDOD = 1 - <% echo var="ddns_enable"; %>;
+            document.gigaset.dynamic_dns[iDOD].defaultChecked = true;
+            document.gigaset.dynamic_dns[iDOD].checked = true;
+            </SCRIPT>
+            <tr id="tr_service_provider" style="visibility: hidden; display: none;">
+              <td class="label"><!-- UI Caption Begin --><% Fid_str(953); %>:<!-- UI Caption End --></td>
+              <td class="rightSide">
+                <select name="service_provider" id="service_provider" onchange="javascript:repaint_gigaset_form(); set_gigaset_provider_defaults(false);">
+					<% exec cmd="DDNS_Provider_selected"; %>                
+				</select>
+              </td>
+            </tr>
+            <tr id="tr_domain_name" style="visibility: hidden; display: none;">
+              <td class="label"><!-- UI Caption Begin --><% Fid_str(75); %>:<!-- UI Caption End --></td>
+              <td class="rightSide"><input type="text" maxlength="50" size="32" class="textfield" value="<% echo var="ddns_domainame"; %>" name="domain_name" id="domain_name" onkeypress="return check_gigaset_internet_domain(event,this);" /></td>
+            </tr>
+            <tr id="tr_user_name" style="visibility: hidden; display: none;">
+              <td class="label"><!-- UI Caption Begin --><% Fid_str(955); %>:<!-- UI Caption End --></td>
+              <td class="rightSide"><input type="text" maxlength="50" size="32" class="textfield" value="<% echo var="ddns_account"; %>" name="user_name" id="user_name" /></td>
+            </tr>
+            <tr id="tr_password" style="visibility: hidden; display: none;">
+              <td class="label"><!-- UI Caption Begin --><% Fid_str(164); %>:<!-- UI Caption End --></td>
+              <td class="rightSide"><input type="password" maxlength="50" size="32" class="textfield" value="<% echo var="ddns_password"; %>" name="dpassword" id="password" /></td>
+            </tr>
+            <!-- buttons -->
+            <tr>
+              <td>&nbsp;</td>
+              <td class="separatorButton">
+                <table border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td><a href=" " onclick="javascript:submit_gigaset_form(); return false;" class="buttonLink100"><!-- UI Caption Begin -->OK<!-- UI Caption End --></a></td>
+                    <td><a href=" " onclick="javascript:cancel_gigaset_form(); return false;" class="buttonLink100"><!-- UI Caption Begin -->Cancel<!-- UI Caption End --></a></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- fixes the width of the first column -->
+            <tr>
+              <td style="padding:0;"><img src="images/spacer.gif" alt="" width="200" height="1" border="0" /></td>
+              <td style="padding:0;"><img src="images/spacer.gif" alt="" width="360" height="1" border="0" /></td>
+            </tr>
+          </table>
+        </div>
+      </form>
+      </div>
+<% include file="footer.stm"; %>
+</body>
+
+</html>

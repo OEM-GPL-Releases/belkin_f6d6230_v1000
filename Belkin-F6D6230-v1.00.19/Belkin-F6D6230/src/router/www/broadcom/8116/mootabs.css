@@ -1,0 +1,48 @@
+.mootabs_title {
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	height: 24px;
+	
+}
+
+.mootabs_title li {
+	float: left;
+	background-color: #cccccc;
+	padding: 2px 8px 2px 8px;
+	margin-right: 2px;
+	cursor: pointer;
+	color: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	height: 24px;
+	line-height: 24px;
+}
+
+.mootabs_title li.active {
+	background-color: #666262;
+}
+
+.mootabs_panel {
+	display: none;
+	position: relative;
+	width: 100%;
+	top: -1px;
+	font-family: Arial, Helvetica, sans-serif;
+	clear: both;
+	color: #fff;
+	overflow: auto;
+	padding: 5px;
+}
+
+.mootabs_panel.active {
+	background-color: #FFFFFF;
+	border: 1px solid #666262;
+	display: block;
+	
+}
+
+.mootabs_title li.over {
+	font-weight: bold;
+}

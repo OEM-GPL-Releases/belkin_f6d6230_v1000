@@ -1,0 +1,47 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+function evaltF()
+{
+	return true;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" align="center">
+<form name="tF" action="/cgi-bin/dnsproxy_eb.exe" method="post">
+	<tr>
+		<td>
+            <p><b class=subtitle><% Fid_str(107); %></b></p>
+            <p class=normalText></p>
+			<p class=txt1>
+			<% Fid_str(87); %> &nbsp;&nbsp;
+			<input type="radio" name="dnsproxy_enable" value=1><% Fid_str(27); %>&nbsp;&nbsp;
+			<input type="radio" name="dnsproxy_enable" value=0><% Fid_str(28); %>
+			<SCRIPT LANGUAGE="JavaScript">
+				var iDOD = 1 - <% echo var="dns_proxy_enable_var"; %>;
+				document.tF.dnsproxy_enable[iDOD].defaultChecked = true;
+				document.tF.dnsproxy_enable[iDOD].checked = true;
+			</SCRIPT>
+			</p>
+		</td>
+	</tr>
+</table>
+<br><br>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td>
+		<div align="right">
+		<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+		</div>
+	</td></tr>
+</table>
+</form>
+</body>
+</html>

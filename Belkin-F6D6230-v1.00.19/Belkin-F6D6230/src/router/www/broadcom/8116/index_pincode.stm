@@ -1,0 +1,15 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+</head>
+
+<frameset cols="180,*" frameborder="0" border="0" framespacing="0">
+  <frame name="leftFrame" scrolling="auto" noresize src="menu.stm">
+  <frame name="main2" src="pin_code.stm">
+</frameset>
+<noframes><body bgcolor="#FFFFFF" text="#000000">
+
+</body></noframes>
+</html>

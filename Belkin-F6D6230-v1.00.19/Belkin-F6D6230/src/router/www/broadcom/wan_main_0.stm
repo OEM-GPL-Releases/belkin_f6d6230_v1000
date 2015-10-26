@@ -1,0 +1,67 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% include file="hyper.txt"; %>
+<% include file="refreshmenu.txt"; %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="multipppoeQConf"; %>
+<% include file="routine.txt"; %>
+var skuid=<% nvram_get("gs_sku_id"); %>;
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width=36 >&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(11); %>&nbsp;&gt;<br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="5" align="center" class="copy_1">
+							<tr>
+								<td class="body">
+									<% Fid_str(721); %>
+									<br><br><% Fid_str(722); %>
+									<ul>
+									<li><a href='wan_dhpc.stm' target=mainFrame><% Fid_str(1277); %></a></li>&nbsp;<br><% Fid_str(723); %>
+									<br>&nbsp;
+									<li><a href='wan_static.stm' target=mainFrame><% Fid_str(1278); %></a></li>&nbsp;<br><% Fid_str(724); %>
+									<br>&nbsp;
+									<script language="JavaScript">
+									if(skuid==33){
+										document.write("<li><a href='wan_multipppoe.stm' target=mainFrame><% Fid_str(1279); %></a></li>&nbsp;<br><% Fid_str(725); %><br>&nbsp;");
+									}else{
+										document.write("<li><a href='wan_pppoe.stm' target=mainFrame><% Fid_str(1279); %></a></li>&nbsp;<br><% Fid_str(725); %><br>&nbsp;");
+									}
+									if ((skuid!=33)&&(skuid!=34)){
+									document.write("<li><a href='wan_pptp.stm' target=mainFrame><% Fid_str(1280); %></a></li>&nbsp;<br><% Fid_str(726); %>	<br>&nbsp;");
+									document.write("<li><a href='wan_bigpondnew.stm' target=mainFrame><% Fid_str(727); %></a></li>&nbsp;<br><font color=#FF0000><% Fid_str(728); %></font><br>&nbsp;");
+									}
+									</script>
+									</ul>
+								</td>
+							</tr>							
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0031)scdmz.htm -->
+<HTML><HEAD>
+
+<% char_set(); %>
+<META http-equiv=Pragma content=no-cache>
+<LINK href="stylemain.css" type=text/css rel=stylesheet>
+<LINK href="colors.css" type=text/css rel=stylesheet>
+<LINK href="main_router.css" type=text/css rel=stylesheet>
+<% include file="refreshmenu.txt"; %>
+<SCRIPT language=javascript src="util.js"></SCRIPT>
+<SCRIPT language=javascript>
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+
+<!-- hide
+function splitDHCPStartIPString (stringToSplit,separator) 
+{
+	arrayOfStrings = stringToSplit.split(separator)
+	with ( document.forms[0] ) {
+		dmzAddr1.value = arrayOfStrings [0];
+		dmzAddr2.value = arrayOfStrings [1];
+		dmzAddr3.value = arrayOfStrings [2];
+	}
+}
+
+function EnableDmzIp(enabled)
+{
+   	with ( document.forms[0] ) {
+		if (enabled)
+		{
+			ip.disabled = false;
+			dmz_ipaddr.disabled=false;
+		}
+		else
+		{
+			ip.disabled = true;
+			dmz_ipaddr.disabled=true;
+		}
+	} 
+}
+
+function frmLoad() 
+{
+	var addr = '192.168.2.11';
+	var dhcpStart = '192.168.2.2';
+	var IPstring = '192.168.2.111';
+	with ( document.forms[0] ) {
+		//dmzAddr.value = addr;
+		if (dmz_enable.checked == false)
+		{
+			EnableDmzIp(false);
+		}
+		else
+		{
+			EnableDmzIp(true);	 
+		}
+		var dot = ".";
+		if (addr != "") {
+			splitDMZString(addr,dot);
+		}
+		else{
+			splitDHCPStartIPString(IPstring,dot);
+		}	
+	}
+}
+
+function splitDMZString (stringToSplit,separator) 
+{
+   
+	arrayOfStrings = stringToSplit.split(separator)
+	with ( document.forms[0] ) {
+		dmzAddr1.value = arrayOfStrings [0];
+		dmzAddr2.value = arrayOfStrings [1];
+		dmzAddr3.value = arrayOfStrings [2];
+		dmzAddr4.value = arrayOfStrings [3];
+	}
+}
+
+function btnApply() 
+{
+	var lanIP="<% nvram_get("lan_ipaddr"); %>";
+	var ipStr=new Array();
+
+	ipStr=lanIP.split(".");
+
+	with ( document.forms[0] ) {
+		if (dmz_enable.checked == true)
+		{
+			if ( ip.value == '' ) {
+				alert('<% Fid_str(103); %>.');
+				return false;
+			}
+
+			if (isNValidInt(ip.value))
+			{
+				alert('<% Fid_str(641); %> ');
+				return false;
+			}
+			
+			if (!(parseInt( ip.value ) >=1 && parseInt( ip.value ) <255))
+			{
+				alert('<% Fid_str(1253); %>');
+				return false;				
+			}
+		}
+		ipStr[3]=ip.value;
+		
+		if (dmz_enable.checked == true)
+		{
+			EnableDmzIp(true);
+			gs_dmzEnable.value=1;
+		}
+		else
+		{
+			EnableDmzIp(false);	 
+			gs_dmzEnable.value=0;
+		}
+	}
+	document.tF.dmz_ipaddr.value=ipStr[0]+'.'+ipStr[1]+'.'+ipStr[2]+'.'+ipStr[3];
+	
+	if(document.tF.dmz_ipaddr.value==lanIP)
+	{
+	  alert('<% Fid_str(1232); %>');
+	  return false;	
+	}
+	//document.tF.submit();
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function onFillIp(index)
+{
+	var wanIP="<% nvram_get("wan0_ipaddr"); %>";
+	var lanIP="<% nvram_get("lan_ipaddr"); %>";
+	var dmz="<% nvram_get("dmz_ipaddr"); %>";
+	
+	switch(index) {
+		case 0:
+			document.write(wanIP);
+			break;
+		case 1:
+			var ipStr=new Array();
+			if(dmz=="") ipStr=lanIP.split(".");
+			else ipStr=dmz.split(".");
+			document.write(ipStr[0]+'.'+ipStr[1]+'.'+ipStr[2]+'.');
+			break;
+		case 2:
+			var ipStr=new Array();
+			if(dmz=="") document.tF.ip.value=0;
+			else {
+				ipStr=dmz.split(".");
+				document.tF.ip.value=ipStr[3];
+			}
+			break;
+	}
+}
+// done hiding -->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR>
+</HEAD>
+<BODY onload=frmLoad() bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+<FORM NAME=tF METHOD=POST ACTION="apply.cgi"  onSubmit="return btnApply();">
+<input type="hidden" name="location_page" value="firewall_d.stm">
+<input type="hidden" name="dmzAddr1" >
+<input type="hidden" name="dmzAddr2" >
+<input type="hidden" name="dmzAddr3" >
+<input type="hidden" name="dmzAddr4" >
+<input type="hidden" name="dmz_ipaddr">
+<input type="hidden" name="gs_dmzEnable">
+<input type="hidden" name="arc_action" value="<% Fid_str(49); %>" >
+<TABLE width=600>
+    	<TR>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+  		<br><% Fid_str(89); %> 
+		<!--p>
+            	<b><font color="#000000"><% Fid_str(24); %></font></b></p-->
+              </td>
+    	</TR>
+    	<tr>
+    		<td>
+  			<TABLE width=600 class="copy_1">
+    				<TBODY>
+    					<TR>
+      						<TD height=17 class="body">
+							<br>
+							<P><FONT color=#004263><% Fid_str(90); %><font color="#ff0000"><% Fid_str(91); %></font><% Fid_str(92); %></FONT><A onclick=moreinfowin("glossary.stm#dmz"); href="javascript:void(0);"><B><FONT color=#0066FF><% Fid_str(47); %></FONT></B></A> </P>
+						</TD>
+					<TR>
+						<TD height=17 class="body">
+							<br>
+  							<B><% Fid_str(93); %>&nbsp;&gt;</B>
+							</TD></TR></TBODY></TABLE>
+  							<TABLE id=AutoNumber1 style="BORDER-COLLAPSE: collapse" borderColor=#ffffff cellSpacing=0 borderColorDark=#ffffff cellPadding=0 width=500 borderColorLight=#ffffff border=1>
+    								<TBODY>
+									<TR>
+									  <TD class="body" style="BACKGROUND-COLOR: #666262" borderColorLight=#ffffff align=middle width="5" borderColorDark=#ffffff height=17><B>
+										<FONT color=#ffffff>&nbsp;</FONT></B>
+										</TD>
+									  <TD class="body" style="BACKGROUND-COLOR: #666262" borderColorLight=#ffffff align=middle width="18%" borderColorDark=#ffffff height=17><B>
+										<FONT color=#ffffff><% Fid_str(94); %></FONT></B>
+										</TD>
+										<TD class="body" style="BACKGROUND-COLOR: #666262" borderColorLight=#ffffff align=middle width="30%" borderColorDark=#ffffff height=17><B>
+										<FONT color=#ffffff><% Fid_str(95); %></FONT></B>
+										</TD>
+										<TD class="body" style="BACKGROUND-COLOR: #666262" borderColorLight=#ffffff align=middle width="20%" borderColorDark=#ffffff height=17><B>
+										<FONT color=#ffffff><% Fid_str(96); %></FONT></B>
+										</TD>
+									</TR>
+		  								<tr>
+
+<td  style="BACKGROUND-COLOR: #cccccc" borderColorLight=#ffffff align=middle  borderColorDark=#ffffff class=copy_2>1</td>
+<td  style="BACKGROUND-COLOR: #cccccc" borderColorLight=#ffffff align=middle width="25%" borderColorDark=#ffffff class=copy_2>
+			<script>onFillIp(0)</script></td>
+<td  style="BACKGROUND-COLOR: #cccccc" borderColorLight=#ffffff align=middle width="40%" borderColorDark=#ffffff class=copy_2>
+			<script>onFillIp(1)</script>
+			<input NAME=ip TYPE=text maxlength=3 SIZE=3 VALUE=0></td>
+
+	        								<INPUT type=hidden size=19 name=dmzAddr></FONT>
+										<TD class="body" style="BACKGROUND-COLOR: #cccccc" borderColorLight=#ffffff align=middle width="30%" borderColorDark=#ffffff>
+										<FONT color=#000000>
+										</FONT>
+										<INPUT type=checkbox name=dmz_enable onClick=frmLoad()>
+										</TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+           						<SCRIPT LANGUAGE="JavaScript">
+								var iDOD=<% nvram_get("gs_dmzEnable"); %>;
+								if (iDOD ==0)
+									document.tF.dmz_enable.checked=false;
+								else
+									document.tF.dmz_enable.checked=true;
+								onFillIp(2);
+							</SCRIPT>
+  							<TABLE height=38 cellSpacing=1 cellPadding=1 width=500 border=0>
+    								<TBODY>
+   	 								<TR align="center">
+    										<br>
+										<TD><INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onClick="javascript:window.location.reload(true);return false" type=button value="<% Fid_str(48); %>"></FONT>
+										<FONT face=Verdana color=#004263 size=1>
+										<INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" type="submit" value="<% Fid_str(49); %>">
+										</FONT>
+										</TD>
+									</TR>
+								</TBODY>
+							</TABLE>
+							<FONT face=Verdana color=#000000 size=1><BR></FONT>
+							<CENTER>
+							<P></P>
+							</CENTER>							
+						</td>
+					</tr>
+<!--					
+				</TBODY>
+			</TABLE>
+		</td>
+	</tr>
+-->	
+</table>
+</FORM>
+</BLOCKQUOTE>
+<P></P>
+			</td>    
+		</tr>             
+     </table>
+</BODY>
+</HTML>

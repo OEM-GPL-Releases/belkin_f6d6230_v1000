@@ -1,0 +1,19 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript">
+<% login_timeout(); %>
+<% bt_config(); %>
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

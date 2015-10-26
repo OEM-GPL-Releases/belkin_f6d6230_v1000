@@ -1,0 +1,502 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% include file="routine.txt"; %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% exec cmd="Lan_IP_Address"; %> // get LAN_IP_ADDR[], LAN_NETMASK[], LAN_SUBNET[]
+<% exec cmd="Wan_IP_Subnet"; %> // get WAN_IP_ADDR[], WAN_NETMASK[], WAN_SUBNET[]
+
+var ipm='<% Fid_str(641); %>';
+var ipm1='<% Fid_str(675); %>';
+var Gm='<% Fid_str(395); %>';
+var Gm1='<% Fid_str(675); %>';
+var sm='<% Fid_str(766); %>';
+var wanm='<% Fid_str(1281); %>';
+var ipmUcast ='<% Fid_str(678); %>';
+var lastIpError ='<% Fid_str(1360); %>';
+
+var LAN_interface = new Interface_T();
+var WAN_interface = new Interface_T();
+<% exec cmd="LAN_Interface"; %>
+var ismultiPPPOEwizard =<% echo var="multiPPPOEwizard"-->;
+
+var ch;
+function specialshar(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='@' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token=='.' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function specialshar_name(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function allvalueisvalid(){
+
+	var errMsg;
+	if(isBlank(document.tF0.p_user_name.value))
+	{
+		alert('<% Fid_str(742); %>');  
+		return false; 
+	}
+	if(specialshar_name(document.tF0.p_user_name.value)){
+			alert('<% Fid_str(648); %>'+':'+ch);
+			return false; 
+	}
+	if(isBlank(document.tF0.p_passwd.value))
+	{ 
+		alert('<% Fid_str(757); %>'); 
+		return false; 
+	}
+	if(specialshar(document.tF0.p_passwd.value)){
+			alert('<% Fid_str(648); %>'+':'+ch);
+			return false; 
+	}
+	if(specialshar(document.tF0.p_sname.value)){
+		alert('<% Fid_str(648); %>'+':'+ch);
+		return false; 
+	}	
+	
+	if(document.tF0.p_passwdV.value!=document.tF0.p_passwd.value)
+	{ 
+		alert('<% Fid_str(624); %>'); 
+		return false; 
+	}
+	
+	/*if(document.tF0.dhcp_clt.checked==false)
+	{
+	
+		if(!(isBlank_Zero(document.tF0.wan_ip1.value))||!(isBlank_Zero(document.tF0.wan_ip2.value))||!(isBlank_Zero(document.tF0.wan_ip3.value))||!(isBlank_Zero(document.tF0.wan_ip4.value))){
+			if(isNValidLastIP(document.tF0.wan_ip1.value)) { alert(lastIpError); return false; }
+			if(isNValidIP(document.tF0.wan_ip2.value)) { alert(ipm); return false; }
+			if(isNValidIP(document.tF0.wan_ip3.value)) { alert(ipm); return false; }
+			if(isNValidLastIP(document.tF0.wan_ip4.value)) { alert(lastIpError); return false; }
+		}
+		else
+		{
+			alert(ipm);
+			return false;
+		}
+		if(!(isBlank_Zero(document.tF0.wan_mask1.value))||!(isBlank_Zero(document.tF0.wan_mask2.value))||!(isBlank_Zero(document.tF0.wan_mask3.value))||!(isBlank_Zero(document.tF0.wan_mask4.value))){
+			if(isNValidIP(document.tF0.wan_mask1.value)) { alert(sm); return false; }
+			if(isNValidIP(document.tF0.wan_mask2.value)) { alert(sm); return false; }
+			if(isNValidIP(document.tF0.wan_mask3.value)) { alert(sm); return false; }
+			if(isNValidLastMask(document.tF0.wan_mask4.value)) { alert(sm); return false; }
+		}
+		else
+		{
+			alert(sm);
+			return false;
+		}
+		if(!(isBlank_Zero(document.tF0.default_gw1.value))||!(isBlank_Zero(document.tF0.default_gw2.value))||!(isBlank_Zero(document.tF0.default_gw3.value))||!(isBlank_Zero(document.tF0.default_gw4.value))){
+			if(isNValidLastIP(document.tF0.default_gw1.value)) { alert(lastIpError); return false; }
+			if(isNValidIP(document.tF0.default_gw2.value)) { alert(Gm); return false; }
+			if(isNValidIP(document.tF0.default_gw3.value)) { alert(Gm); return false; }
+			if(isNValidLastIP(document.tF0.default_gw4.value)) { alert(lastIpError); return false; }
+		}
+		else
+		{
+			alert(Gm);
+			return false;
+		}
+		
+		if( ((document.tF0.wan_ip1.value & LAN_NETMASK[0]) == LAN_SUBNET[0]) &&
+		((document.tF0.wan_ip2.value & LAN_NETMASK[1]) == LAN_SUBNET[1]) &&
+		((document.tF0.wan_ip3.value & LAN_NETMASK[2]) == LAN_SUBNET[2]) &&
+		((document.tF0.wan_ip4.value & LAN_NETMASK[3]) == LAN_SUBNET[3]) )
+		{
+			alert(wanm);
+			return false;
+		}		
+		
+		if( (document.tF0.wan_ip1.value == 127 ) && (document.tF0.wan_ip2.value == 0 ) && (document.tF0.wan_ip3.value == 0 ) && (document.tF0.wan_ip4.value == 1 ) ) { 
+			errMsg = '<% Fid_str(1241); %>'; 
+			alert(errMsg); return false;
+		}
+		if( (document.tF0.default_gw1.value == 127 ) && (document.tF0.default_gw2.value == 0 ) && (document.tF0.default_gw3.value== 0 ) && (document.tF0.default_gw4.value == 1 ) ) { 
+			errMsg = '<% Fid_str(1243); %>'; 
+			alert(errMsg); return false;
+		}
+		if( (document.tF0.wan_ip1.value == document.tF0.default_gw1.value ) && (document.tF0.wan_ip2.value == document.tF0.default_gw2.value) && 
+			(document.tF0.wan_ip3.value == document.tF0.default_gw3.value) && (document.tF0.wan_ip4.value == document.tF0.default_gw4.value) ) { 
+			errMsg ='<% Fid_str(1243); %>'; 
+			alert(errMsg); return false;
+		}
+	}*/
+	
+	if ( document.tF0.p_auto_reconnect.checked==true ){	
+		if(isNValidNum(document.tF0.p_idle_time.value) || (document.tF0.p_idle_time.value<1) || (document.tF0.p_idle_time.value>99))
+		{	
+			alert('<% Fid_str(738); %> '); 
+			return false;
+		}
+	}
+	
+	if(isNValidNum(document.tF0.pppoe_mtu.value))
+	{
+		alert('<% Fid_str(659); %>');
+		return false;
+	}
+	
+	if(document.tF0.pppoe_mtu.value<550 || document.tF0.pppoe_mtu.value>1500)
+	{	
+		alert('<% Fid_str(659); %>'); 
+		return false;
+	}
+	return true;
+}
+
+function materevaltF() 
+{
+	if(!(allvalueisvalid())) 
+	{	return false;}
+	
+	document.tF0.session_index.value = 0;
+	document.tF0.session_type[0].checked = true;	
+	document.tF0.p_idle_time.disabled=false;
+	return true;
+}
+
+function subsessionevaltF(){
+	
+	if(!(allvalueisvalid())) 
+		return false;	
+	document.tF0.session_index.value = 2;
+	document.tF0.p_idle_time.disabled=false;
+	return true;
+}
+
+function check_clt()
+{	
+ 	/*if(document.tF0.dhcp_clt.checked==false)
+    	{
+	    	document.getElementById("tr_ip_address").style.display="";
+	    	document.getElementById("tr_subnet_address").style.display="";
+	    	document.getElementById("tr_gw_address").style.display="";
+    	
+    	}
+    	else
+    	{
+	    	document.getElementById("tr_ip_address").style.display="none";
+	    	document.getElementById("tr_subnet_address").style.display="none";
+	    	document.getElementById("tr_gw_address").style.display="none";
+    	
+    	}*/
+ }
+
+ 
+function ckeck_box()
+{
+	if(document.tF0.p_auto_reconnect.checked==false)
+		document.tF0.p_idle_time.disabled=true;
+	else
+		document.tF0.p_idle_time.disabled=false;
+}
+
+
+ function frmload(){
+ 	//check_clt();
+ 	ckeck_box();
+ 	if(ismultiPPPOEwizard ==1){
+ 		Doprevious();
+ 	}else{
+	 	if((document.tF0.session_type[1].checked == true) ||(document.tF0.session_type[2].checked == true)||(document.tF0.session_type[3].checked == true)){
+			document.getElementById("cgisubmit").style.display="";
+			document.getElementById("mastersession").style.display="none";
+			document.getElementById("redtext").style.display="none";
+			document.getElementById("splitline").style.display="none";
+			document.getElementById("subsession1").style.display="none";
+			document.getElementById("subsession2").style.display="none";
+			document.getElementById("subsession3").style.display="none";
+			document.getElementById("subsession4").style.display="none";
+			document.getElementById("subsessionsubmit").style.display="none";		
+		}else{
+			document.getElementById("cgisubmit").style.display="none";
+			document.getElementById("mastersession").style.display="";
+			document.getElementById("redtext").style.display="";
+			document.getElementById("splitline").style.display="";
+			document.getElementById("subsession1").style.display="";
+			document.getElementById("subsession2").style.display="";
+			document.getElementById("subsession3").style.display="";
+			document.getElementById("subsession4").style.display="";
+			document.getElementById("subsessionsubmit").style.display="";
+		}
+	}
+ }
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+
+function next(){
+
+	if(document.tF0.session_type[0].checked == true){
+		alert("<% Fid_str(1412); %>");	
+		return false;
+	}	
+	if(!(allvalueisvalid())) 
+		return false;	
+	document.tF0.session_index.value = 1;
+	document.tF0.p_idle_time.disabled=false;
+	document.tF0.submit();
+}
+
+
+function Doprevious(){
+		document.tF0.p_user_name.value ="<% echo var="mp_user_name"-->";
+		document.tF0.p_passwd.value ="<% echo var="mp_passwd"-->";
+		document.tF0.p_passwdV.value ="<% echo var="mp_passwd"-->";
+		document.tF0.p_sname.value ="<% echo var="mp_sname"-->";
+		document.tF0.pppoe_mtu.value ="<% echo var="mpppoe_mtu"-->";
+		document.tF0.p_idle_time.value="<% echo var="mp_idle_time"-->";
+		var iDOD=<% echo var="mp_auto_reconnect"; %>;
+		if(iDOD == 1){
+			document.tF0.p_auto_reconnect.defaultChecked=true;
+			document.tF0.p_auto_reconnect.checked=true;
+		}	
+		document.tF0.session_index.value = 0;		
+		document.getElementById("cgisubmit").style.display="none";
+		document.getElementById("mastersession").style.display="";
+		document.getElementById("redtext").style.display="";
+		document.getElementById("splitline").style.display="";
+		document.getElementById("subsession1").style.display="";
+		document.getElementById("subsession2").style.display="";
+		document.getElementById("subsession3").style.display="";
+		document.getElementById("subsession4").style.display="";
+		document.getElementById("subsessionsubmit").style.display="";
+}
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="frmload()">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="/cgi-bin/wan_multi_pppoe.exe">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="Wan_multipppoe.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<input type="hidden" name="session_index" value="0">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(1403); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;
+					</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr align=left>
+								<td colspan=2 align=left class="body"><% Fid_str(1404); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#multipppoe");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+								</td>
+							</tr>
+            		        			
+							<tr>	
+            			        			<td width="250" class="body"><b><% Fid_str(731); %> &gt;</b><br><br></td>
+								<td width="220">
+            			            			<input type="text" name="p_user_name" class="textfield" size="25" maxlength="63" value="">
+								</td>
+							</tr>
+							<tr>								
+								<td width="250" class="body"><b><% Fid_str(489); %> &gt;</b><br><br></td>
+								<td width="220">
+            			            				<input type="password" name="p_passwd" class="textfield" size="25" maxlength="63" value="">
+            			        			</td>
+							</tr>
+							<tr>								
+								<td width="250" class="body"><b><% Fid_str(732); %> &gt;</b><br><br></td>
+								<td width="220">
+            			            				<input type="password" name="p_passwdV" class="textfield" size="25" maxlength="63" value="">
+            			        			</td>
+							</tr>
+							
+							<!--<tr>
+								<td class="body"><b>Get IP By DHCP&gt;</b><br></td>
+								<td >
+									<input type="checkbox" name="dhcp_clt" value=1 onClick="check_clt()">
+									<br>
+								</td>
+							</tr>-->
+							<SCRIPT LANGUAGE="JavaScript">
+							//var iDOD = <% echo var="dhcp_enable_var"; %>;
+							//if (iDOD)		
+							//	document.tF0.dhcp_clt.checked=true;
+							//else
+							//	document.tF0.dhcp_clt.checked=false;
+							</script>
+							<!--<tr id="tr_ip_address" style="display: none;">
+	            		        			
+	            			        		<td ><b><% Fid_str(330); %> &gt;</b></td>
+	            			        		<td>
+										<input type="text" name="wan_ip1" size=3 maxlength=3>.
+										<input type="text" name="wan_ip2" size=3 maxlength=3>.
+										<input type="text" name="wan_ip3" size=3 maxlength=3>.
+										<input type="text" name="wan_ip4" size=3 maxlength=3>
+	            			        		</td>
+	                            		</tr>-->
+	                            		<!--<tr id="tr_subnet_address" style="display: none;">
+	                            			
+	            			        		<td ><b><% Fid_str(331); %> &gt;</b></td>
+	                                			<td >
+										<input type="text" name="wan_mask1" size=3 maxlength=3>.
+										<input type="text" name="wan_mask2" size=3 maxlength=3>.
+										<input type="text" name="wan_mask3" size=3 maxlength=3>.
+										<input type="text" name="wan_mask4" size=3 maxlength=3>
+	            			        		</td>
+	                            		</tr>-->
+	                            		<!--<tr id="tr_gw_address" style="display: none;">
+	                            			
+	            			        		<td ><b><% Fid_str(338); %>&gt;</b></td>
+	                                			<td >
+										<input type="text" name="default_gw1" size=3 maxlength=3>.
+										<input type="text" name="default_gw2" size=3 maxlength=3>.
+										<input type="text" name="default_gw3" size=3 maxlength=3>.
+										<input type="text" name="default_gw4" size=3 maxlength=3>
+	            			        		</td>
+	                            		</tr>-->
+	                            			                            		
+							<tr>								
+								<td width="250" class="body"><b><% Fid_str(733); %> &gt;</b><br><br></td>
+								<td width="220">
+            			            				<input type="text" name="p_sname" class="textfield" size="25" maxlength="39" value=""><br>
+            			        			<br></td>
+							</tr>
+							<tr>								
+            			        			<td class="body"><b><% Fid_str(734); %> &gt;</b><br><br></td>
+								<td><input type="text" name="pppoe_mtu" size="4" maxlength="4" value=""><br><br></td>
+							</tr>
+							<tr>								
+            			        			<td colspan=2 class="body"><% Fid_str(735); %>
+            			        			<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#mtu");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+								</td>
+							</tr>
+
+							<tr>									
+								<td colspan=2 nowrap class="body">
+									<input type="checkbox" name="p_auto_reconnect" value=1 onClick="ckeck_box()">
+									<% Fid_str(736); %><input type="text" name="p_idle_time" size="3" maxlength="5" value=""><% Fid_str(737); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#disconnect");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+            			        			</td>
+                            			</tr>                       			                         			
+							
+							<tr id="mastersession" style="display: none;">
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan=2 align="center">
+								<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return materevaltF();">
+								</td>
+							</tr>
+
+							<tr id="redtext" style="display: none;">
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan=2 align="center" class="body">
+								<br>
+								<font color=#ff0000><% Fid_str(1405); %></font>
+								</td>
+							</tr>
+
+							<tr id="splitline" style="display: none;">
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan="2" class="body"><br>
+									<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+							
+							<tr id="subsession1" style="display: none;">								
+            			        			<td class="body"><b><% Fid_str(1409); %> &gt;</b><br></td>
+								<td class="body"><input name="session_type" type="radio" value="0" CHECKED>&nbsp;&nbsp;<% Fid_str(1411); %><br></td>
+							</tr>
+							<tr id="subsession2" style="display: none;">								
+            			        			<td class="body"><br></td>
+								<td class="body"><input name="session_type" type="radio" value="1">&nbsp;&nbsp;<% Fid_str(1406); %><br></td>
+							</tr>
+							<tr id="subsession3" style="display: none;">								
+            			        			<td class="body"><br></td>
+								<td class="body"><input name="session_type" type="radio" value="2">&nbsp;&nbsp;<% Fid_str(1407); %><br></td>
+							</tr>
+							<tr id="subsession4" style="display: none;">								
+            			        			<td class="body"><br></td>
+								<td class="body"><input name="session_type" type="radio" value="3">&nbsp;&nbsp;<% Fid_str(1408); %><br></td>
+							</tr>
+							
+							<% exec cmd="WanPPPShow"; %>   
+							<% exec cmd="WanMultiPPPOEShow"; %>
+							
+							<tr id="subsessionsubmit" style="display: none;">
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan=2 align="center">
+								<br><br>
+									<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;<input type="button" value="<% Fid_str(700); %> >" style="{height=22px;width:150px;}" class="submitBtn" onClick="next()"></td>
+								</td>
+							</tr>
+
+							<tr id="cgisubmit" style="display:none">
+								<td  colspan=2 align="center"><input type="button" value="< <% Fid_str(1410); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="Doprevious();">
+									&nbsp;&nbsp;<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+								<script language="JavaScript">
+									if(document.tF0.session_type[3].checked == true)
+										document.write('<input type="submit" name="arc_action" value="<% Fid_str(1416); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return subsessionevaltF();">')
+									else
+										document.write('<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return subsessionevaltF();">');
+								</script>
+								</td>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>
+

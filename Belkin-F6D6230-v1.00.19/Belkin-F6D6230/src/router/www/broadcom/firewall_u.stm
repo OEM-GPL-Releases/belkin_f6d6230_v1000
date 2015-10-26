@@ -1,0 +1,129 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript1.1">
+function kDown() {
+if (navigator.appName =='Netscape'&&
+(e.which ==3|| e.which ==2))
+return false;
+else if (navigator.appName == 'Microsoft Internet Explorer' &&
+(event.keyCode == 13|| event.keyCode ==13)) {
+
+return false;
+}
+return true;
+}
+document.onkeydown=kDown;
+if (document.layers) window.captureEvents(Event.KEYDOWN);
+window.onkeydown=kDown;
+</script>
+
+<script language="javascript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% include file="routine.txt"; %>
+function evaltF()
+{
+	return true;
+}
+
+function messageCheck() {
+	if (confirm("<% Fid_str(1214); %>"))
+	{
+		return true;
+	}
+	else	return false;
+}
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<FORM NAME=tF METHOD=POST ACTION="/cgi-bin/Aurlbk.exe">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+		<br>&nbsp;<% Fid_str(1); %> &gt; <% Fid_str(6); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table border=0 cellspacing=2 cellpadding=0 width="620" align="left" bordercolor="#9999FF" class="copy_1">
+<!--
+							<tr>
+								<td nowrap>
+									<a href="/firewall_a.stm"><b>&gt;&gt; Access Control</b></a>&nbsp;&nbsp;&nbsp;
+									<a href="/firewall_u.stm"><b>&gt;&gt; URL Blocking</b></a>&nbsp;&nbsp;&nbsp;
+									<a href="/firewall_rule.stm"><b>&gt;&gt; Schedule Rule</b></a>&nbsp;&nbsp;&nbsp;
+								</td>
+							</tr>
+-->
+							<tr><td>&nbsp;</td></tr>
+							<tr valign="top">
+								<td nowrap class="copy_1" bgcolor="#FFFFFF">
+									<div align="left" class="copy_1">
+									<% Fid_str(3); %>
+									<a href="javascript:void(0);" onClick="window.open('glossary.stm#ip_filter','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<font color=#0066FF><b><% Fid_str(4); %></b></font></a></div><br>
+								</td>
+							</tr>
+							<tr valign="top">
+								<td nowrap class="copy_1" bgcolor="#FFFFFF">
+									<div align="left" class="copy_1">
+									<% Fid_str(185); %> <br><% Fid_str(935); %></p>
+									<p><% Fid_str(186); %><a href="firewall_a.stm" target="_self">"<% Fid_str(5); %>" </a><% Fid_str(936); %></p>
+									<p><% Fid_str(187); %><p>
+									</div><br>
+								</td>
+							</tr>
+							<tr valign="top">
+								<td nowrap class="copy_1" bgcolor="#FFFFFF">
+									<table width=600 border="0" cellspacing="1" cellpadding="0" align=left class="copy_1">
+										<tr bgcolor="#666262">
+											<th align="center"><font color=#ffffff><% Fid_str(188); %></font></th>
+											<th align="center"><font color=#ffffff><% Fid_str(190); %></font></th>
+										</tr>
+											<script language="javascript">
+											var i;
+											for(i=1;i<31;i++)
+											{
+											document.write('<tr bgcolor="#B4B2B2">');
+											document.write('<td align="center"> <% Fid_str(1249); %>&nbsp;&nbsp;',i,'</td>');
+											document.write('<td align="center"><input type="text" name="B',i,'" SIZE=60 MAXLENGTH=38></td>');
+											document.write('</tr>');
+											}
+											</script>
+										<tr>
+											<td align="left">
+												<b><input type="submit"  name="arc_action" value=" <% Fid_str(191); %> " name="clear" onclick="return messageCheck();"></b>
+											</td>
+										</tr>
+										<tr>
+											<td width="36">&nbsp;</td>
+											<td colspan="2" align=center>
+												<input type="button" value="<% Fid_str(78); %>" style="{height=22px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+												&nbsp;&nbsp;
+												<input type="submit" name="arc_action" value="<% Fid_str(986); %>" style="{height=22px;}" class="submitBtn" onClick="return evaltF();">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<% exec cmd="aurlbk"; %>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>

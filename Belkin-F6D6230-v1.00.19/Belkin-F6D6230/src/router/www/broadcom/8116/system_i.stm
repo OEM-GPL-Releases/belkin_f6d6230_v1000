@@ -1,0 +1,91 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<title></title>
+<script language="JavaScript">
+<% login_timeout(); %>
+// wan interface type:
+var WAN_TYPE_DHCP = 0;
+var WAN_TYPE_FIX = 1;
+var WAN_TYPE_PPPOE = 2;
+var WAN_TYPE_DIALUP = 4;
+var WAN_TYPE_BRIDGE = 3;
+<% gs_gateway_stauts(); %>
+
+function evaltF()
+{
+	return true;
+}
+
+function logsave(){
+	var name = "/cgi-bin/" + BACKUP_LOG_NAME;
+	document.location.href=name;
+}
+
+function logclear(){
+	document.tF0.securitylog.value = "";
+	return true;
+}
+
+function logrefresh(){
+	window.location.reload(true);
+	return true;
+}
+
+function dhcp_release() {
+	return true;
+}
+
+function dhcp_renew() {
+	return true;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body>
+<table width="98%" border="0" cellspacing="0" cellpadding="5">
+<tr>
+	<td valign="top" >
+        <p><b class=subtitle><% Fid_str(35); %></b></p>
+		<p class=normalText>
+        <% Fid_str(607); %></p>
+	</td></tr></table><br>
+<b class=txt1><% Fid_str(88); %> <% exec cmd="CurrentTime"; %></b>
+	<form action="/cgi-bin/statusprocess.exe" method="post" name="tF0">
+	<table width="90%" border=0>
+				<script language="javascript">
+				document.write('<br></td>');
+				document.write('<td valign=top class=txt1>');
+	            document.write('<b> <% Fid_str(1262); %></b>');
+				document.write(' <% Fid_str(1263); %>:&nbsp; '+dhcp_client_num+'<br>');
+				document.write(' <% Fid_str(1264); %>:&nbsp;&nbsp;&nbsp;'+runtime_code_version+'<br>');
+				document.write(' <% Fid_str(1265); %>:&nbsp; '+boot_code_version+'<br>');
+				document.write(' <% Fid_str(1266); %>:&nbsp;&nbsp;&nbsp;'+lan_mac_addr+'<br>');
+				document.write(' <% Fid_str(1267); %>:&nbsp;&nbsp;&nbsp;'+wan_mac_addr+'<br>');
+				document.write(' <% Fid_str(1268); %>:&nbsp; '+hardware_version+'<br>');
+				document.write(' <% Fid_str(479); %>:&nbsp;&nbsp;&nbsp;'+serial_number+'<br>');
+				document.write('<br></td>');
+				document.write('</tr>');
+				</script>
+		<tr>
+			<td colspan="3" width="90%" ><hr size="1" color="#008080"></td>
+		</tr>
+	</table>
+
+	<br>
+	<table width="98%" border="0" cellspacing="0" cellpadding="0">
+		<tr> 
+			<td> 
+			<div align="right">
+		<a href="#" onClick="MM_openBrWindow('help.stm#Status','help','scrollbars=yes,width=600,height=500')"><input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>"></a>
+		<a href="javascript:history.go(-1);" target="main1"><img src="images/back1.gif" width="58" height="58" border="0"></a>
+        </div>
+		</td>
+		</tr>
+	</table>
+	</form>
+</body>

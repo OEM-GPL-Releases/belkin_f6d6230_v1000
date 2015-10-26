@@ -1,0 +1,60 @@
+<html>
+<head>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<title></title>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="my_function"; %>
+function evaltF() {
+	return true;
+}
+
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body>
+<form name="BRNTForm" METHOD="POST"  action="/cgi-bin/qs6.exe" target="main1">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" width=90%>
+    <tr>
+	    <td>
+            <p class=subtitleR>
+            <script language="javascript">
+            if(operation_func == 1)
+            {	// wireless
+                document.write('4. Confirm');
+            }
+            else
+            {	// wireless
+                document.write('3. Confirm');
+            }
+            </script>
+            </p>
+            <p class=normalText>
+			<% Fid_str(536); %>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table border="0" cellspacing="1" cellpadding="5" width=75%>
+				<tr>
+					<td>
+						<% exec cmd="qSetConfirm"; %>
+					</td>
+				</tr>	
+			</table>	
+		</td>
+	</tr>
+	<tr>
+		<td class="mainmsgR">
+            <input type="button" class="formsbutton" name="back" value="<% Fid_str(521); %>" onClick="javascript:parent.location.href='setupw_2.stm';" target="main1">
+            <input type="button" class="formsbutton" name="next" value="FINISH" onClick="javascript:document.forms[0].submit()">
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>
+

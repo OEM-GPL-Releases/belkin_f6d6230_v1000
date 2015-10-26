@@ -1,0 +1,83 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="main_router.css" type="text/css">
+
+<script language="javascript">
+<% include file="my_function.txt"; %>
+<% exec cmd="my_function"; %>
+<% login_timeout(); %>
+<% exec cmd="initQConf"; %>
+function evalF()
+{
+	//alert('hahaha');
+	return true;
+}
+function btnbck(){
+	location.href = "/setupw_2.stm";
+}
+		
+</script>
+</head>
+<BODY text=#000000 bgColor=#ffffff leftMargin=0 topMargin=0 marginheight="0" marginwidth="0">
+<form ACTION="/cgi-bin/Wizard_Confirm.exe" method="post" name="BRNTForm">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+<tr>
+		<td width=36>&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(2); %>&gt;&nbsp;<% Fid_str(13); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					
+					<td>
+						<table width="485" border="0" cellspacing="5" cellpadding="0" align="center" class="copy_1">														
+							<tr align=left>
+								<td colspan="2"><% Fid_str(874); %></td>
+							</tr>
+							<tr align=left>
+								<td colspan="2"><% Fid_str(875); %><br><br></td>
+							</tr>
+							<tr>
+								<td width="5"><input name=ATM type="radio" value=1></td>
+								<td><b><% Fid_str(876); %></b></td>								
+							</tr>
+							<tr>
+								<td width="5"><input NAME=ATM TYPE=radio VALUE=2></td>
+								<td><b><% Fid_str(877); %><b></td>
+							</tr>
+							<tr>
+								<td width="5"><input NAME=ATM TYPE=radio VALUE=4></td>
+								<td><b><% Fid_str(878); %></b></td>
+							</tr>
+							<tr>
+								<td width="5"><input NAME=ATM TYPE=radio VALUE=3></td>
+								<td><b><% Fid_str(879); %></b></td>
+							</tr>
+							<tr>
+								<td width="5"><input NAME=ATM TYPE=radio VALUE=0></td>
+								<td><b><% Fid_str(880); %></b></td>
+							</tr>
+							<% exec cmd="qStep1"; %>
+							<tr><td colspan=2>&nbsp;</td></tr>														
+							<tr>
+								<td width="36">&nbsp;</td>
+								<td colspan="2" align=center>
+								<input type="button" value="&lt; <% Fid_str(882); %>" style="{height=22px;}" class="submitBtn" onClick="btnbck()">
+								<input type="submit"  name="arc_action" value="<% Fid_str(881); %> &gt;" style="{height=22px;}" class="submitBtn" name=next onClick="evalF()">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</form>
+</table>
+</body>
+</html>

@@ -1,0 +1,657 @@
+<% gs_NdcUpdate(); %>
+<html>
+<head>
+<title></title>
+
+<!--#exec cmd="char_set" -->
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style>
+.wiz_step {
+	width:550px;
+	height:400px;
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:12px;
+	margin-right:50px;
+	margin-left:50px;
+	margin-top:80px;
+	position:relative;
+}
+
+.wiz_step .bottom {
+	position:absolute;
+	bottom:10px;
+}
+
+.wiz_button {
+	width:550px;
+	margin-right:50px;
+	margin-left:50px;
+	margin-top:10px;
+}
+
+.wiz_blue {
+	color:#0099FF;
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:14px;
+	font-size-adjust:none;
+	font-stretch:normal;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:bold;
+	line-height:normal;
+	text-decoration:none;
+}
+
+.wiz_body {
+	color:#666666;
+	font-family:Arial,sans-serif;
+	font-size:14px;
+	font-size-adjust:none;
+	font-stretch:normal;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:normal;
+	clear:left;
+}
+
+.wiz_body a.link {
+	color:#0099FF;
+	font-family:Arial,sans-serif;
+	font-size:14px;
+	font-weight:bold;
+}
+
+.wiz_body input, select {
+	color:#000000;
+	font-family:Arial,sans-serif;
+	font-size:14px;
+}
+
+.wiz_body input {
+	border:1px solid #88AACC;
+	height:25px;
+}
+
+.wiz_body input.check_box {
+	//border:1px solid #88AACC;
+	height:13px;
+}
+
+.wiz_body input.chk_radio {
+	height:13px;
+}
+
+.wiz_body label {
+	width:180px;
+	float:left;
+}
+
+.wiz_ip_input input {
+	width:60px;
+	margin:2px;
+	font-family:Courier New,Courier;
+}
+
+.wiz_image {
+	margin-top:20px;
+	margin-bottom:20px;
+	text-align:center;
+}
+
+.wiz_field_title {
+	color:#666666;
+	font-family:Arial,sans-serif;
+	font-size:14px;
+}
+
+.wiz_example {
+	color:#999999;
+	font-family:Arial,sans-serif;
+	font-size:13px;
+	font-style:italic;
+}
+
+.wiz_info {
+	color:#0099FF;
+	font-family:Courier New,Courier;
+	font-size:14px;
+}
+
+</style>
+<script language="JavaScript" src="prototype.js"></script>
+<script language="JavaScript" src="data.js"></script>
+<script language="JavaScript" src="wizard.js"></script>
+<script language="javascript">
+var skuid=<% nvram_get("gs_sku_id"); %>;
+
+<% File_include("my_function.txt"); %>
+<!--#exec cmd="my_function" -->
+<!--#exec cmd="LoginTimeout" -->
+<% File_include("routine.txt"); %>
+//<!--#exec cmd="initQConf" --> //wenfang 20070207 remove for the cmd for ADSL
+<!--#exec cmd="Gateway_IsWanConnected" -->
+
+function evalF()
+{
+	return true;
+}
+
+
+function showConnectTest(reqObj) {
+
+if(reqObj.responseText.indexOf("OK") >=0)
+{
+	bWanConnected = 1;
+}
+
+else if(reqObj.responseText.indexOf("NO") >=0)
+{
+	bWanConnected = 0;
+}
+
+//	Element.update("connect_state",reqObj.responseText);
+
+}
+
+function doConnectTest() {
+	var url = "/cgi-bin/doConnectTest.exe";
+	var ajax = new Ajax.Request( url,
+		{
+			method: 'post',
+			parameters:'',
+			onComplete:showConnectTest
+		}
+		);		
+}
+var speed=2000;
+setInterval("doConnectTest()",speed);
+
+</script>
+</head>
+
+<BODY text=#000000 bgColor=#ffffff leftMargin=0 topMargin=0 marginheight="0" marginwidth="0" onload="Init()">
+	<!--#include file="menu_wiz.stm" -->
+	<form ACTION="/cgi-bin/setup_wiz.exe" method="post" name="tF">
+	<input type="hidden" name="conn_type_set" value="">
+			<div id="welcome" class="wiz_step">
+				<div class="wiz_blue" style="margin-bottom:10px"><% Fid_str(1632); %></div>
+				<div class="wiz_body"><% Fid_str(1633); %></div>
+				<div class="wiz_image"><img src="images/welcome.gif"></div>
+				<div class="wiz_body">Manual Setup: <a href="setup.htm" target="_top"><% Fid_str(1634); %></a><% Fid_str(1635); %></div>
+			</div>
+		
+			<div id="country" class="wiz_step" style="display:none">
+				<div class="wiz_image"><img src="images/wiz_2.gif"></div>
+				<div class="wiz_body" style="text-align:center"><% Fid_str(1636); %></div>
+				<div class="wiz_body" style="text-align:center;margin:5px">
+					<select name="country" onchange="ChangeCountry(this)">
+						<option value="0" selected><% Fid_str(1637); %></option>
+						<option value="1"><% Fid_str(1638); %></option>
+						<option value="2"><% Fid_str(1639); %></option>
+						<option value="3"><% Fid_str(1640); %></option>
+						<option value="4"><% Fid_str(1641); %></option>
+						<option value="5"><% Fid_str(1642); %></option>
+						<option value="6"><% Fid_str(1643); %></option>
+						<option value="7"><% Fid_str(1644); %></option>
+						<option value="8"><% Fid_str(1645); %></option>
+						<option value="9"><% Fid_str(1646); %></option>
+						<option value="10"><% Fid_str(1647); %></option>
+						<option value="11"><% Fid_str(1648); %></option>
+						<option value="12"><% Fid_str(1649); %></option>
+						<option value="13"><% Fid_str(1650); %></option>
+						<option value="14"><% Fid_str(1651); %></option>
+						<option value="15"><% Fid_str(1652); %></option>
+						<option value="16"><% Fid_str(1653); %></option>
+						<option value="17"><% Fid_str(1654); %></option>
+						<option value="18"><% Fid_str(1655); %></option>
+						<option value="19"><% Fid_str(1656); %></option>
+						<option value="20"><% Fid_str(1657); %></option>
+						<option value="21"><% Fid_str(1658); %></option>
+						<option value="22"><% Fid_str(1659); %></option>
+						<option value="23"><% Fid_str(1660); %></option>
+						<option value="24"><% Fid_str(1661); %></option>
+						<option value="25"><% Fid_str(1662); %></option>
+						<option value="26"><% Fid_str(1663); %></option>
+						<option value="27"><% Fid_str(1664); %></option>
+					</select>
+				</div>
+			</div>
+		
+			<div id="username_password" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px"><% Fid_str(1665); %></div>
+				<div class="wiz_body"><% Fid_str(1666); %></div>
+				<div class="wiz_body"><% Fid_str(1667); %></div>
+				<div class="wiz_body">
+					<div class="wiz_field_title" style="margin-top:20px"><% Fid_str(1668); %></div>
+					<div><input type="text" name="username" value="" onkeyup="check_userpw_empty(1)"></div>
+					<div class="wiz_example">username@planet.nl</div>
+					<div class="wiz_field_title" style="margin-top:20px"><% Fid_str(1669); %></div>
+					<div id="plain_pwd" style="display:block">
+						<input type="password" name="password1" value="" onkeyup="check_userpw_empty(1)">
+					</div>
+					<div id="obscure_pwd" style="display:none">
+						<input type="text" name="password2" value="" onkeyup="check_userpw_empty(1)">
+					</div>
+					<div class="wiz_field_title"><input type="checkbox" class="input check_box" name="view_pwd" onClick="show_pwd(1);"><% Fid_str(1670); %></div>
+				</div>
+			</div>
+			
+			<div id="isp" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px"><% Fid_str(1671); %></div>
+				<div class="wiz_body" style="margin-bottom:10px"><% Fid_str(1672); %></div>
+				<div class="wiz_body">
+					<table border="0" width="100%" cellspacing="0" cellpadding="0">
+						<tr>
+							<td width="50%">
+								<div class="wiz_body" style="margin:5px"><% Fid_str(1673); %></div>
+								<select name="isp" style="width:95%" onchange="ChangeISP(this)"></select>
+							</td>
+							<td width="50%">
+								<div id="conn_type_panel" style="display:none;width:100%">
+									<div class="wiz_body" style="margin:5px"><% Fid_str(1674); %></div>
+									<select name="conn_type_select" style="width:95%" onchange="ChangeConnType(this)"></select>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="wiz_body bottom"><% Fid_str(1675); %> <a href="setup.htm" target="_top"><% Fid_str(1676); %></a></div>
+			</div>
+			
+			<div id="connection_type" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px"><% Fid_str(1677); %></div>
+				<div class="wiz_body"><% Fid_str(1678); %></div>
+				<div class="wiz_field_title" style="margin-top:20px"><% Fid_str(1674); %></div>
+				<hr>
+				<div class="wiz_body"><input type="radio" name="conn_type" value="1" style="height:auto" onclick="SetConnType(JS_PROTO_DHCP)">Dynamic IP</div>
+				<div class="wiz_body"><input type="radio" name="conn_type" value="2" style="height:auto" onclick="SetConnType(JS_PROTO_PPPOE)">PPPoE</div>
+				<div class="wiz_body"><input type="radio" name="conn_type" value="3" style="height:auto" onclick="SetConnType(JS_PROTO_PPTP)">PPTP</div>
+				<div class="wiz_body"><input type="radio" name="conn_type" value="4" style="height:auto" onclick="SetConnType(JS_PROTO_STATIC)">Static IP</div>
+				<div class="wiz_body bottom">If you are unsure of your connection type, please contact your provider.</div>
+			</div>
+			
+			<div id="static_info" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Your Internet Service Provider requires the following information.</div>
+				<div class="wiz_body" style="margin-bottom:10px">This information should have been given to you when you signed up with your Internet Service Provider (ISP).  If you can find the information, contact your ISP.</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:60px">
+					<label>IP Address</label>
+					<input type="text" name="ip_1" maxlength="3" onkeyup="show_static()">.<input type="text" name="ip_2" maxlength="3" onkeyup="show_static()">.
+					<input type="text" name="ip_3" maxlength="3" onkeyup="show_static()">.<input type="text" name="ip_4" maxlength="3" onkeyup="show_static()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:10px">
+					<label>Subnet Mask</label>
+					<input type="text" name="mask_1" maxlength="3" onkeyup="show_static()">.<input type="text" name="mask_2" maxlength="3" onkeyup="show_static()">.
+					<input type="text" name="mask_3" maxlength="3" onkeyup="show_static()">.<input type="text" name="mask_4" maxlength="3" onkeyup="show_static()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:10px">
+					<label>Gateway</label>
+					<input type="text" name="gateway_1" maxlength="3" onkeyup="show_static()">.<input type="text" name="gateway_2" maxlength="3" onkeyup="show_static()">.
+					<input type="text" name="gateway_3" maxlength="3" onkeyup="show_static()">.<input type="text" name="gateway_4" maxlength="3" onkeyup="show_static()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:10px">
+					<label>DNS Address</label>
+					<input type="text" name="static_dns1_1" maxlength="3" onkeyup="show_static()">.<input type="text" name="static_dns1_2" maxlength="3" onkeyup="show_static()">.
+					<input type="text" name="static_dns1_3" maxlength="3" onkeyup="show_static()">.<input type="text" name="static_dns1_4" maxlength="3" onkeyup="show_static()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:10px">
+					<label>DNS Address (Optional)</label>
+					<input type="text" name="static_dns2_1" maxlength="3">.<input type="text" name="static_dns2_2" maxlength="3">.
+					<input type="text" name="static_dns2_3" maxlength="3">.<input type="text" name="static_dns2_4" maxlength="3">
+				</div>
+			</div>
+			
+			<div id="pppoe_info" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Username & Password</div>
+				<div class="wiz_body">Please contact your ISP if you are unsure of the settings below.</div>
+				<div class="wiz_body">
+					<div class="wiz_field_title" style="margin-top:20px">Username</div>
+					<div><input type="text" name="pppoe_username" value="" onkeyup="check_userpw_empty(2)"></div>
+					<div class="wiz_example">username@planet.nl</div>
+					<div class="wiz_field_title" style="margin-top:20px">Password</div>
+					<div id="plain_pppoe_pwd" style="display:block">
+						<input type="password" name="pppoe_password1" value="" onkeyup="check_userpw_empty(2)">
+					</div>
+					<div id="obscure_pppoe_pwd" style="display:none">
+						<input type="text" name="pppoe_password2" value="" onkeyup="check_userpw_empty(2)">
+					</div>					
+					<div>
+						<input type="checkbox" class="input check_box" name="pppoe_view_pwd" onClick="show_pwd(2);">View Password
+					</div>
+					<div class="wiz_body">
+						<table border="0" width="100%" cellspacing="0" cellpadding="0">
+							<tr>
+								<td width="60%">
+									<div class="wiz_field_title" style="margin-top:20px">Service Name (if given by ISP)</div>
+									<div class="wiz_body"><input type="text" name="pppoe_serv_name"></div>
+								</td>
+								<td width="40%">
+									<div class="wiz_body">Connect on Demand<input type="checkbox" class="input check_box" name="pppoe_demand" onClick="ConnectOnDemand(2);"></div>
+									<div class="wiz_body">Timeout (0-99 minutes) <input type="text" name="pppoe_timeout" style="width:50px" maxlength="2"></div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="wiz_field_title" style="margin-top:20px">MTU (550-1500)</div>
+					<div><input type="text" name="pppoe_mtu" maxlength="4"></div>
+				</div>
+			</div>
+			
+			<div id="pptp_info" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Your Internet Service Provider requires the following information.</div>
+				<div class="wiz_body" style="margin-bottom:10px">This information should have been given to you when you signed up with your Internet Service Provider (ISP).  If you can find the information, contact your ISP.</div>
+				<div class="wiz_body">
+					<div class="wiz_field_title" style="margin-top:10px">Username</div>
+					<div><input type="text" name="pptp_username" value="" onkeyup="show_pptp()"></div>
+					<div class="wiz_example">username@planet.nl</div>
+
+					<div class="wiz_body">
+						<table border="0" width="100%" cellspacing="0" cellpadding="0">
+							<tr>
+								<td width="60%">
+										<div class="wiz_field_title" style="margin-top:10px">Password</div>
+										<div id="plain_pptp_pwd" style="display:block">
+											<input type="password" name="pptp_password1" value="" onkeyup="show_pptp()">
+										</div>
+										<div id="obscure_pptp_pwd" style="display:none">
+											<input type="text" name="pptp_password2" value="" onkeyup="show_pptp()">
+										</div>					
+										<div class="wiz_body">						
+											<input type="checkbox" class="input check_box" name="pptp_view_pwd" onClick="show_pwd(3);">View Password
+										</div>
+								</td>
+								<td width="40%">
+										<div>
+											<div class="wiz_body" style="float:left;margin-right:20px">Connect on Demand<input type="checkbox" class="input check_box" name="pptp_demand" onClick="ConnectOnDemand(3);"></div>
+											<div class="wiz_body">Timeout (0-99 minutes) <input type="text" name="pptp_timeout" style="width:50px" maxlength="2"></div>
+										</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:10px">
+					<label>Login Server</label>
+					<input type="text" name="pptp_serv_ip_1" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_serv_ip_2" maxlength="3" onkeyup="show_pptp()">.
+					<input type="text" name="pptp_serv_ip_3" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_serv_ip_4" maxlength="3" onkeyup="show_pptp()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:2px">
+					<label>Client IP Address</label>
+					<input type="text" name="pptp_ip_1" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_ip_2" maxlength="3" onkeyup="show_pptp()">.
+					<input type="text" name="pptp_ip_3" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_ip_4" maxlength="3" onkeyup="show_pptp()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:2px">
+					<label>Client Subnet Mask</label>
+					<input type="text" name="pptp_mask_1" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_mask_2" maxlength="3" onkeyup="show_pptp()">.
+					<input type="text" name="pptp_mask_3" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_mask_4" maxlength="3" onkeyup="show_pptp()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:2px">
+					<label>Client Default Gateway</label>
+					<input type="text" name="pptp_gw_1" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_gw_2" maxlength="3" onkeyup="show_pptp()">.
+					<input type="text" name="pptp_gw_3" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_gw_4" maxlength="3" onkeyup="show_pptp()">
+				</div>				
+				<div class="wiz_body wiz_ip_input" style="margin-top:2px">
+					<label>DNS Address</label>
+					<input type="text" name="pptp_dns1_1" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_dns1_2" maxlength="3" onkeyup="show_pptp()">.
+					<input type="text" name="pptp_dns1_3" maxlength="3" onkeyup="show_pptp()">.<input type="text" name="pptp_dns1_4" maxlength="3" onkeyup="show_pptp()">
+				</div>
+				<div class="wiz_body wiz_ip_input" style="margin-top:2px">
+					<label>DNS Address (Optional)</label>
+					<input type="text" name="pptp_dns2_1" maxlength="3">.<input type="text" name="pptp_dns2_2" maxlength="3">.
+					<input type="text" name="pptp_dns2_3" maxlength="3">.<input type="text" name="pptp_dns2_4" maxlength="3">
+				</div>
+			</div>
+			
+			<div id="implement" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Configuring the Router</div>
+				<div class="wiz_body">Please wait while the router saves your setting.</div>
+				<div class="wiz_body">Time remaining (approx) <input type="text" name="ramain_sec" value="5"></div>
+			</div>
+			
+			<div id="check" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Checking Internet Connection</div>
+				<div class="wiz_body">Please wait while the router checks your internet connection.</div>
+			</div>
+			
+			<div id="check_second" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Checking Internet Connection</div>
+				<div class="wiz_body">Please wait while the router checks your internet connection.</div>
+			</div>
+			
+			<div id="reboot" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Reboot Modem</div>
+				<div class="wiz_image"><img src="images/wiz_3.gif"></div>
+				<div class="wiz_body">Please restart your modem by unplugging the modem's power supply, waiting 5 seconds, and then plugging it back in. Wait for the modem to power up and then click "Next".</div>
+			</div>
+			
+			<div id="check_static" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Internet account information not accepted</div>
+				<div class="wiz_body" style="margin-bottom:10px">Your ISP did not accept the settings shown below when we tried to connect. Please examine them closely to see if anything is incorrect.</div>
+				<div class="wiz_body" style="margin-top:20px">
+					<label style="font-weight:bold">Network Settings</label>
+				</div>
+				<div class="wiz_body" style="padding-top:10px">
+					<label>IP Address</label><span class="wiz_info" id="check_static_ip"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Subnet Mask</label><span class="wiz_info" id="check_static_mask"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Gateway Address</label><span class="wiz_info" id="check_static_gateway"></span>
+				</div>				
+				<div class="wiz_body">
+					<label>Primary DNS Server</label><span class="wiz_info" id="check_static_dns1"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Secondary DNS Server</label><span class="wiz_info" id="check_static_dns2"></span>
+				</div>
+				<div class="wiz_body" style="margin-top:30px">
+					<label style="width:300px">Are the settings listed above correct?</label>
+					<div style="float:left;margin-right:20px">
+						<label style="width:auto;color:#0099FF">Yes</label><input type="radio" class="input chk_radio" name="static_correct" value="1"  checked onClick="check_entry_correct(1);">
+					</div>
+					<div>
+						<label style="width:auto;color:#0099FF">No / Not Sure</label><input type="radio" class="input chk_radio" name="static_correct" value="0"  onClick="check_entry_correct(1);">
+					</div>
+				</div>
+			</div>
+			
+			<div id="check_pppoe" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Internet account information not accepted</div>
+				<div class="wiz_body" style="margin-bottom:10px">Your ISP did not accept the settings shown below when we tried to connect. Please examine them closely to see if anything is incorrect.</div>
+				<div class="wiz_body" style="margin-top:20px">
+					<label style="font-weight:bold">Account Settings</label>
+				</div>
+				<div class="wiz_body" style="padding-top:10px">
+					<label>User Name</label><span class="wiz_info" id="check_pppoe_name" ></span>
+				</div>
+				<div class="wiz_body" id="plain_chpppoe_pwd" style="display:block">
+					<label>Password</label><span class="wiz_info" id="check_pppoe_pwd">****</span>
+				</div>
+				<div class="wiz_body" id="obscure_chpppoe_pwd" style="display:none">
+					<label>Password</label><span class="wiz_info" id="check_pppoe_pwd1"></span>
+				</div>				
+				<div class="wiz_body">
+					<label style="width:100px">View Password</label><input type="checkbox"  class="input check_box" name="pppoe_check_view" value="" onClick="show_pwd(4);">
+				</div>
+				<div class="wiz_body">
+					<label>Service Name</label><span class="wiz_info" id="check_pppoe_serv"></span>
+				</div>
+				<div class="wiz_body">
+					<label>MTU</label><span class="wiz_info" id="check_pppoe_mtu"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Connect on Demand</label><span class="wiz_info" id="check_pppoe_demand"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Time-Out</label><span class="wiz_info" id="check_pppoe_timeout">mins</span>
+				</div>
+				<div class="wiz_body" style="margin-top:30px">
+					<label style="width:300px">Are the settings listed above correct?</label>
+					<div style="float:left;margin-right:20px">
+						<label style="width:auto;color:#0099FF">Yes</label><input type="radio" class="input chk_radio" name="pppoe_correct" value="1"  checked onClick="check_entry_correct(2);">
+					</div>
+					<div>
+						<label style="width:auto;color:#0099FF">No / Not Sure</label><input type="radio" class="input chk_radio" name="pppoe_correct" value="0"  onClick="check_entry_correct(2);">
+					</div>
+				</div>				
+			</div>
+			
+			<div id="check_pptp" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Internet account information not accepted</div>
+				<div class="wiz_body" style="margin-bottom:10px">Your ISP did not accept the settings shown below when we tried to connect. Please examine them closely to see if anything is incorrect.</div>
+				<div class="wiz_body" style="margin-top:20px">
+					<label style="font-weight:bold">Network Settings</label>
+				</div>
+				<div class="wiz_body" style="padding-top:10px">
+					<label>Login Server</label><span class="wiz_info" id="check_pptp_server"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Client IP</label><span class="wiz_info" id="check_pptp_ip"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Subnet Mask</label><span class="wiz_info" id="check_pptp_mask"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Default Gateway</label><span class="wiz_info" id="check_pptp_gw"></span>
+				</div>				
+				<div class="wiz_body">
+					<label>Primary DNS Server</label><span class="wiz_info" id="check_pptp_dns1"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Secondary DNS Server</label><span class="wiz_info" id="check_pptp_dns2"></span>
+				</div>
+				<div class="wiz_body">
+					<label >Connect on Demand</label><span class="wiz_info" id="check_pptp_demand"></span>
+				</div>
+				<div class="wiz_body">
+					<label>Time-Out</label><span class="wiz_info" id="check_pptp_timeout">mins</span>
+				</div>
+				
+				<div class="wiz_body" style="margin-top:20px">
+					<label style="font-weight:bold">Account Settings</label>
+				</div>
+				<div class="wiz_body" style="padding-top:10px">
+					<label>User Name</label><span class="wiz_info" id="check_pptp_name" ></span>
+				</div>
+				<div class="wiz_body" id="plain_chpptp_pwd" style="display:block">
+					<label>Password</label><span class="wiz_info" id="check_pptp_pwd">****</span>
+				</div>
+				<div class="wiz_body" id="obscure_chpptp_pwd" style="display:none">
+					<label>Password</label><span class="wiz_info" id="check_pptp_pwd1"></span>
+				</div>				
+				<div class="wiz_body">
+					<label style="width:100px">View Password</label><input type="checkbox" class="input check_box" name="pptp_check_view" value="" onClick="show_pwd(5);">
+				</div>				
+				
+				<div class="wiz_body" style="margin-top:30px">
+					<label style="width:300px">Are the settings listed above correct?</label>
+					<div style="float:left;margin-right:20px">
+						<label style="width:auto;color:#0099FF">Yes</label><input type="radio" class="input chk_radio" name="pptp_correct" value="1"  checked onClick="check_entry_correct(3);">
+					</div>
+					<div>
+						<label style="width:auto;color:#0099FF">No / Not Sure</label><input type="radio" class="input chk_radio" name="pptp_correct" value="0"  onClick="check_entry_correct(3);">
+					</div>
+				</div>
+			</div>
+			
+			<div id="support" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Internet account information not accepted</div>
+				<div class="wiz_body" style="margin-bottom:10px">If all of your internet account information was correct, there may be some other problem. We suggest calling Belkin Tech Support. Click the link in the lower left corner of the screen for a list of local contact information.</div>
+				<div class="wiz_body">Let the support staff know that you are setting up a Router, were asked to manually input your internet account information, but your ISP did not accept that information. Mention that you double-clicked your Internet account info to make sure everything was correct.</div>
+			</div>
+			
+			<div id="security" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Congratulations - Your Router is set up and you may now surf the web!</div>
+				<div class="wiz_body" style="margin-bottom:10px">Now that you have setup your router, we recommend turning on security.</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label>Network Name</label>
+					<span class="wiz_info" id="wlan_ssid"><input type="text" name="wlan_ssid" maxlength="32"></span>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label class="wiz_example">SSID</label>
+					<span class="wiz_example">Examples: Jan's Network, XYZ Corp Visitors WiFi</span>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label>Network Key</label>
+					<span class="wiz_info" id="wlan_key"><input type="text" name="wlan_key" maxlength="64"></span>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label>Guest Mode</label>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label>Guest SSID</label>
+					<span class="wiz_info" id="guest_ssid"><input type="text" name="guest_ssid" maxlength="15"></span>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">
+					<label>Guest Key</label>
+					<span class="wiz_info" id="guest_key"><input type="text" name="guest_key" maxlength="6"></span>
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">Please see the user manual for advice on entering your network keys and help transferring them between computers.</div>
+				<div class="wiz_body" style="margin-bottom:10px">We also recommend changing the wireless bandwidth to 20/40 mode for higher performance.</div>
+				<div class="wiz_body" style="margin-bottom:20px;margin-left:200px">
+					<input type="checkbox" class="input check_box" name="security_mode20_40" checked>Enable 20/40 mode
+				</div>
+				<div class="wiz_body" style="margin-bottom:10px">If you don't want to setup these features at this time, just click Skip.</div>
+			</div>
+			
+			<div id="finish" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Congratulations - You have a wireless network</div>
+				<div class="wiz_image"><img src="images/wiz_2.gif"></div>
+				<div class="wiz_body">Your XXX network is now setup and working.</div>
+			</div>
+			
+			<div id="cd_setup" class="wiz_step" style="display:none">
+				<div class="wiz_blue" style="margin-bottom:10px">Please insert the Troubleshooting CD into the computer.</div>
+				<div class="wiz_body" style="margin-bottom:10px">Don't worry, we just need to correct a setting on your computer that is particular to Australia and New Zealand. The setup wizard on the CD has a special program to do this automatically.</div>
+				<div class="wiz_body" style="margin-bottom:10px">Once you insert the disk, the CD-based Setup Wizard should appear on your screen within 15 seconds.</div>
+				<div class="wiz_body" style="margin-bottom:10px">You may close this browser-based Wizard by clicking on the Exit button below.</div>
+			</div>
+					
+		<div class="wiz_button">
+			<div id="btn_cancel" style="float:left;display:none">
+				<img src="images/cancel_normal.gif" name="cancel_link" style="cursor:pointer" onclick="javascript:document.location.href='status.stm'">
+			</div>
+<!--			
+			<div id="btn_try" style="float:right;display:none">
+				<img src="images/try_normal.gif" onmouseout="document.try_link.src=try_normal.src" onmouseover="document.try_link.src=try_over.src" name="try_link" style="cursor:pointer" onclick="NextStep()">
+			</div>
+-->			
+			<div id="btn_next" style="float:right;display:none">
+				<img src="images/next_normal.gif" onmouseout="document.next_link.src=next_normal.src" onmouseover="document.next_link.src=next_over.src" name="next_link" style="cursor:pointer" onclick="NextStep(); evalF();">
+			</div>
+			<div id="btn_next_alone" style="float:right;display:none">
+				<img src="images/begin_normal.gif" onmouseout="document.next_alone_link.src=next_alone_normal.src" onmouseover="document.next_alone_link.src=next_alone_over.src" name="next_alone_link" style="cursor:pointer" onclick="NextStep()">
+			</div>
+			<div id="btn_next_dis" style="float:right;display:none">
+				<img src="images/next_dis.gif">
+			</div>
+			<div id="btn_finish" style="float:right;display:none">
+				<img src="images/finish_normal.gif" onmouseout="document.finish_link.src=finish_normal.src" onmouseover="document.finish_link.src=finish_over.src" name="finish_link" style="cursor:pointer" onclick="CloseWindow()">
+			</div>
+			<div id="btn_skip" style="float:right;display:none">
+				<img src="images/skip_normal.gif" onmouseout="document.skip_link.src=skip_normal.src" onmouseover="document.skip_link.src=skip_over.src" name="skip_link" style="cursor:pointer" onclick="NextStep()">
+			</div>
+			<div id="btn_end" style="float:right;display:none">
+				<img src="images/end_normal.gif" onmouseout="document.end_link.src=end_normal.src" onmouseover="document.end_link.src=end_over.src" name="end_link" style="cursor:pointer" onclick="CloseWindow()">
+			</div>			
+			<div id="btn_apply" style="float:right;display:none">
+				<img src="images/apply_normal.gif" onmouseout="document.apply_link.src=apply_normal.src" onmouseover="document.apply_link.src=apply_over.src" name="apply_link" style="cursor:pointer" onclick="NextStep()">
+			</div>
+			<div id="btn_back" style="float:right;display:none">
+				<img src="images/back_normal.gif" onmouseout="document.back_link.src=back_normal.src" onmouseover="document.back_link.src=back_over.src" name="back_link" style="cursor:pointer" onclick="PrevStep()">
+			</div>			
+		</div>
+	</form>
+<!--
+	<form ACTION="/cgi-bin/setup_wiz1.exe" method="post" name="tF1">
+	</form>
+-->
+</table>
+
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

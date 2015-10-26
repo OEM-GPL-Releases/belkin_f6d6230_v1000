@@ -1,0 +1,120 @@
+<html>
+<head>
+<title></title>
+<!--<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">-->
+<% char_set(); %>
+<script src='/md5.js' language='JavaScript'></script>
+<style type="text/css">
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; color: #003366; text-decoration: none}
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.section {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 15px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #0000ff; text-decoration: none}
+.body{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #003366}
+a {  text-decoration: none; color: #003366}
+a:link{ color: #cccccc;text-decoration: none;}
+a:visited {color: #cccccc;text-decoration: none;}
+a:active{color: #cccccc;text-decoration: none;}
+a:hover {  text-decoration: underline; color: #0000ff}
+a.menuharf{FONT: 8pt Arial,Helvetica, sans-serif; text-decoration: none; color: #cccccc}
+a.menuharf:link{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+   }
+a.menuharf:visited{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+a.menuharf:active{
+     color: #cccccc;
+     font-size: 8pt;
+     text-decoration: none;
+    }
+a.menuharf:hover{  text-decoration: underline; color: #0000ff}
+.copy_1 {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 14px; color: #003366}
+.submitBtn {  font-family: Arial, Helvetica, sans-serif; font-size: 11px;border-color: #cccccc; background-color: #cccccc; color: #000000}
+.Menu_section {  FONT: bold 9pt Arial, Helvetica, sans-serif; text-decoration: none;}
+</style>
+
+<script language="JavaScript">
+	<% gs_gateway_stauts(); %>
+	function checkfwVersion()
+	{
+		//Encrypt password
+		if(typeof(bEncPassword) != 'undefined')
+		{
+			document.tF.pws.maxLength = 32;
+			document.tF.pws.value = hex_md5(document.tF.pws.value);
+		}
+		//document.tF.submit();
+		return true;
+	}
+	
+	function refreshload(){
+		//document.location.reload(true);
+		//top.topFrame.location.reload(true);
+		document.tF.pws.focus();
+	}
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="refreshload();">
+<form action="guest_login.cgi" method="post" name="tF" onsubmit="return checkfwVersion();">
+<input type="hidden" name="arc_action" value="guest_login">
+<input type="hidden" name="page" value="login_guest.stm">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+<INPUT type="hidden" name="totalMSec" value="">
+	<tr>
+	<td valign="top" width="99%" height="100%" class="head_bold">
+	<br><font color=#0000ff>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <% Fid_str(3); %></font><br>
+	<!--This is login_guest.stm-->
+		<table border=0 class="copy_1">
+			<tr>
+				<td width="5" colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td width="5">&nbsp;</td>
+				<td>
+					<table width="480" border="0" cellspacing="5" cellpadding="0" align=left class="copy_1">
+						<tr>
+							<td width="69" height="41">&nbsp;</td>
+							<td height="41" class="body" colspan="2">
+									<% Fid_str(1811); %>
+							</td>
+						</tr>
+						<tr>
+							<td width="69">&nbsp;</td>
+							<td width="146" class="head_bold"><font color="red"><b><% Fid_str(414); %><b></font></td>
+						</tr>
+						<tr>
+							<td width="69">&nbsp;</td>
+							<td width="146" class="body"><b><% Fid_str(409); %></b></td>
+							<td width="250"><INPUT type="password" maxLength="32" size="16" name="pws"></td>
+						</tr>
+						
+						<tr><td width="69" colspan="3">&nbsp;</td></tr>
+						<tr>
+							<td width="69">&nbsp;</td>
+							<td colspan="2" align=center>
+								<nobr>
+								<input type="button" onClick="javascript:document.tF.reset();" value="<% Fid_str(127); %>" style="{width=150px;height=22px;}" class="submitBtn" onMouseOver="window.status='Clear'; return true;" onMouseOut="window.status=''; return true;">
+								&nbsp;&nbsp;
+								<input type="submit" value="<% Fid_str(412); %>" style="{width=150px;height=22px;}" class="submitBtn">
+							</td>
+								</nobr>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

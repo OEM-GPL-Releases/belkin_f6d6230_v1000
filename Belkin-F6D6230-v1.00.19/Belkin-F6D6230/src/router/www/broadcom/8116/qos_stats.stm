@@ -1,0 +1,161 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
+<script language="javascript" type="text/javascript" src="jquery.js"></script>
+<script language="javascript" type="text/javascript" src="jquery_flot.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+
+setTimeout('document.location.href="qos_stats.stm"', 5000);
+
+function refresh(){
+    document.location.href="/qos_stats.stm";
+	return true;
+}
+var pid2="<% nvram_get("project_id2"); %>";
+var fwb_num=4;
+var max_stats_num = 144;
+var fwb_stats=new Array(fwb_num);
+var i, j;
+function STATS_ENTRY()
+{
+	this.outbytes = 0;
+	this.dropbytes = 0;
+}
+for(i=0; i<fwb_num; i++)
+{
+    fwb_stats[i]= new Array(max_stats_num);
+    for(j=0; j<max_stats_num; j++)
+	    fwb_stats[i][j] = new STATS_ENTRY();
+}
+
+var cur_time_lab=new Array(4);
+function TIME_LAB()
+{
+	this.hour = 0;
+	this.min = 0;
+}
+for(i=0; i<4; i++)
+{
+    cur_time_lab[i]=new TIME_LAB();
+}
+<% OutFwbStats_script(); %>
+
+function evaltF() {
+	return true;
+}
+
+function clear1() {
+	window.status="";
+}
+</script>
+</head>
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1()">
+<% File_include("menu.stm"); %>
+<form name="tF">
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+		<tr>
+			<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;
+			<script>
+			if(pid2=="00n2")
+			document.write("Play Features&gt; <% Fid_str(1490); %>");
+			else
+			document.write("<% Fid_str(1488); %>&gt; <% Fid_str(1490); %>");
+                        </script> 
+                        <br> 
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="5" height="25" >&nbsp;</td>
+					<td width="755" colspan="2" height="25">
+						<table border="0" cellpadding="0" cellspacing="0" class="copy_1">
+							<tr>
+								<td>
+										<% Fid_str(1563); %>.
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>		
+			</table>
+
+		<div style="margin-left:20px;width:800px">
+			<div class="copy_1" style="margin-top:5px;margin-bottom:5px">Egress Traffic - Bytes/Sec</div>
+    		<div class="copy_1" id="placeholder_egress" style="width:600px;height:220px;float:left"></div>
+    		<div class="copy_1" style="margin-top:190px;margin-left:20px;float:left;width:100px">Time of Day/Hours:Minutes</div>
+		</div>
+		<br>
+		<script id="source" language="javascript" type="text/javascript">
+$(function () {
+	var d1 = [];
+	var d2 = [];
+	var d3 = [];
+	var d4 = [];
+	var d5 = [];
+	var d6 = [];
+	var d7 = [];
+	var d8 = [];
+	var x_str = [];
+	for (var i = 143; i >= 0; i--)
+	{
+		d1.push([i, fwb_stats[0][i].outbytes]);
+		d2.push([i, fwb_stats[1][i].outbytes]);
+		d3.push([i, fwb_stats[2][i].outbytes]);
+		d4.push([i, fwb_stats[3][i].outbytes]);
+		d5.push([i, fwb_stats[0][i].dropbytes]);
+		d6.push([i, fwb_stats[1][i].dropbytes]);
+		d7.push([i, fwb_stats[2][i].dropbytes]);
+		d8.push([i, fwb_stats[3][i].dropbytes]);
+	}
+	for(var i=0;i<4;i++)
+		x_str[i] = cur_time_lab[i].hour + ":" + cur_time_lab[i].min;
+	
+	$.plot($("#placeholder_egress"), [
+		{ label: "<% Fid_str(1562); %>",  data: d1},
+		{ label: "<% Fid_str(1561); %>",  data: d2},
+		{ label: "<% Fid_str(1568); %>",  data: d3},
+		{ label: "<% Fid_str(1629); %>",  data: d4}
+	], {
+		lines: { show: true, fill: false, lineWidth: 1},
+		shadowSize: 0,
+		xaxis: {
+			ticks: [[0, x_str[0]], [47, x_str[1]], [95, x_str[2]], [143, x_str[3]]]
+		},
+		yaxis: {
+			//min: 0
+		},
+		grid: {
+			backgroundColor: "#fffaff"
+		}
+	});
+    
+
+});
+</script>
+			 
+			<table border=0 class="copy_1" style="clear:left">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="72">&nbsp;</td>
+					<td colspan="2" align=center>
+					</td>
+				</tr>							
+			</table>
+
+		</td>
+		</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+	</table>
+</body>
+</html>

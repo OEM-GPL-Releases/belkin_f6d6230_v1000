@@ -1,0 +1,242 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<!--#exec cmd="my_function" -->
+
+if(my_qos==1){
+    wan_bw_m='<!--#Fid_str(1539)-->';
+    minbwm="<!--#Fid_str(1540)-->\n <!--#Fid_str(1541)-->";
+    sumbwm='<!--#Fid_str(1542)-->';
+}
+else{
+    minbwm="<!--#Fid_str(1540)-->\n <!--#Fid_str(1543)-->";
+    sumbwm='<!--#Fid_str(1544)-->';
+}
+
+blockm="<!--#Fid_str(1545)-->";
+be_dscrpt='<!--#Fid_str(1546)-->';
+af_dscrpt="<!--#Fid_str(1547)-->";
+ef_dscrpt='<!--#Fid_str(1548)-->';
+
+var fwb_num;
+var max_fwb_num = 6;
+var fwb_pool=new Array(max_fwb_num);
+var i;
+function FWB_SUM()
+{
+	this.id = 0;
+	this.name = "";
+	this.pri = "";
+	this.minbw = "";
+	this.borrow = "";
+	this.dscp = "";
+}
+for(i = 0; i < max_fwb_num; i++)
+{
+	fwb_pool[i] = new FWB_SUM();
+}
+<!--#exec cmd="OutFwb_script"-->
+
+function verify_block(k)
+{
+    var fieldid, eidx, bw;
+
+    fieldid="borrow_"+k;
+    eidx=getElementsByFieldName(document.tF, fieldid);
+    if(document.tF.elements[eidx].checked==false){
+        fieldid="minbw_"+k;
+        eidx=getElementsByFieldName(document.tF, fieldid);
+        bw=document.tF.elements[eidx].value;
+        if(isBlank(bw) || eval(bw)==0)
+            {alert(blockm); return;}
+    }
+}
+
+function evaltF()
+{
+    var i, fieldid;
+    var eidx, input1, input2, input3;
+
+    if(my_qos==1){
+        input1=document.tF.wan_out_kbps.value;
+        if(isBlank(input1))
+            {alert(wan_bw_m); return false;}
+        else if(eval(input1)<1 || eval(input1)>100000)
+            {alert(wan_bw_m); return false;}
+        input3=0;
+        for(i=1; i<=fwb_num; i++){
+            fieldid="minbw_"+i;
+            eidx=getElementsByFieldName(document.tF, fieldid);
+            input2=document.tF.elements[eidx].value;
+            input3=eval(input3)+eval(input2);
+            if(!isBlank(input2)){
+                if(isNValidInt(input2) || input2<0 || eval(input2)>eval(input1)) {alert(minbwm); return false;}
+            }
+        }
+        if(eval(input3)>eval(input1)) {alert(sumbwm); return false;}
+    }
+    else{
+        input2=0;
+        for(i=1; i<=fwb_num; i++){
+            fieldid="minbw_"+i;
+            eidx=getElementsByFieldName(document.tF, fieldid);
+            input1=document.tF.elements[eidx].value;
+            if(!isBlank(input1)){
+                if(isNValidInt(input1) || eval(input1)<0 || eval(input1)>100) {alert(minbwm); return false;}
+            }
+            input2=eval(input2)+eval(input1);
+        }
+        if(eval(input2)>100) {alert(sumbwm); return false;}
+    }
+	return true;
+}
+
+function clear1() {
+	window.status="";
+}
+
+</script>
+</head>
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1();">
+<!--#include file="menu.stm" -->
+<form name="tF" METHOD="POST" action="/cgi-bin/qos_eb.exe">
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;<!--#Fid_str(1488)-->&gt;<br>
+
+<table border="0" class="copy_1">
+	<tr>
+		<td width="5" height="25">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="10" height="25" >&nbsp;</td>
+		<td width="100%" colspan="2" height="25">
+			<table border="0" cellpadding="0" cellspacing="0" class="copy_1">
+				<tr>
+					<td>
+					<!--#Fid_str(1549)--> <a href="javascript:void(0);" class="plaintext_bold" onClick="window.open('glossary.stm#qosmain','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');"><b><font color=#6464c3><!--#Fid_str(47)--></font></b></a>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="5" height="25">&nbsp;</td>
+	</tr>
+</table>
+
+<table border="0" class="copy_1">
+	<tr>
+			<td width="10" height="25" >&nbsp;</td>
+			<td width="100%" colspan="2" height="25">
+			
+			<p>
+			<b><!--#Fid_str(1550)--> &gt;&nbsp;&nbsp;</b>
+			<input type="radio" name=qos_enable value=1><!--#Fid_str(96)-->&nbsp;&nbsp;
+			<input type=radio name=qos_enable value=0><!--#Fid_str(119)-->
+			<SCRIPT LANGUAGE="JavaScript">
+				var iDOD = 1 - <!--#echo var="qos_enable_var" -->;
+				document.tF.qos_enable[iDOD].defaultChecked = true;
+				document.tF.qos_enable[iDOD].checked = true;
+			</SCRIPT>
+			
+			<p>
+			<SCRIPT LANGUAGE="JavaScript">
+			    if(my_qos==1){
+			        document.write('<b><!--#Fid_str(1551)--> : &nbsp;&nbsp;</b>');
+			        document.write('<input type="text" name="wan_out_kbps" size="4" maxlength="6" value=<!--#echo var="wan_out_kbps_var" -->>&nbsp;<!--#Fid_str(1552)-->');
+			    }
+			</SCRIPT>
+			
+			<p>
+			<p>
+			<b><!--#Fid_str(1553)--> &nbsp;&nbsp;</b>
+			<br><br>
+			<!--#Fid_str(1554)-->
+			<br><br>
+			<script language="javascript">
+				document.write('<table width="85%" border=0 cellpadding=2 cellspacing=2 align="center" class="copy_1">');
+				document.write('<tr bgcolor="#666262"><td width="10%"align="center" rowspan=2><font color=#ffffff><!--#Fid_str(1801)--></FONT></td>');
+				document.write('<td width="25%" align="center" rowspan=2><font color=#ffffff><!--#Fid_str(1804)--></FONT></td>');
+				document.write('<td width="8%" align="center" rowspan=2><font color=#ffffff><!--#Fid_str(1555)--></FONT></td>');
+				document.write('<td width="22%" align="center" colspan=2><font color=#ffffff><!--#Fid_str(1556)--></FONT></td>');
+				document.write('</tr>');
+				document.write('<tr bgcolor="#666262"><td width="14%"><p align="center"><font color=#ffffff><!--#Fid_str(1557)--></FONT></td>');
+				document.write('<td width="8%"><p align="center"><font color=#ffffff><!--#Fid_str(1558)--></FONT></td></tr>');
+			
+			    for(i=0;i<fwb_num;i++)
+			    {
+					document.write('<tr bgcolor="#b4b2b2">');
+					document.write('<td align=center>'+fwb_pool[i].name+'</td>');
+				    if(fwb_pool[i].id==0)
+				    {
+						document.write('<td align=left>'+be_dscrpt+'</td>');
+						document.write('<td align=center><!--#Fid_str(1559)--></td>');
+				    }
+				    else if(fwb_pool[i].id==1)
+				    {
+						document.write('<td align=left rowspan=4>'+af_dscrpt+'</td>');
+						document.write('<td align=center rowspan=4><!--#Fid_str(1560)--><br><br>&uarr;<br>&darr;<br><br><!--#Fid_str(1561)--></td>');
+				    }
+				    else if(fwb_pool[i].id==5){
+						document.write('<td align=left>'+ef_dscrpt+'</td>');
+						document.write('<td align=center><!--#Fid_str(1562)--></td>');
+			        }
+			
+			        if(my_qos==1)
+						document.write('<td align=center><input type="text" name="minbw_'+eval(i+1)+'" size="3" maxlength="6" value='+fwb_pool[i].minbw+'>&nbsp;<!--#Fid_str(1552)--></td>');
+			        else
+						document.write('<td align=center><input type="text" name="minbw_'+eval(i+1)+'" size="1" maxlength="3" value='+fwb_pool[i].minbw+'>%</td>');
+			
+			        if(fwb_pool[i].borrow==0)
+						document.write('<td align=center><input type="checkbox" name="borrow_'+eval(i+1)+'" value=1 onclick="verify_block('+eval(i+1)+')"></td>');
+			        else
+						document.write('<td align=center><input type="checkbox" name="borrow_'+eval(i+1)+'" value=1 checked onclick="verify_block('+eval(i+1)+')"></td>');
+					document.write('</tr>');
+			    }
+				document.write('</tr>');
+				document.write('</table>');
+			</script>
+			<p>
+			
+			<br>
+	         <table border="0" class="copy_1">
+						<tr>
+							<td width="70">&nbsp;</td>
+							<td colspan="2" >
+								<script language="javascript">
+	            				     if(navigator.appName != "Netscape")
+	                                {
+				              			document.write('<input type="button" value="<!--#Fid_str(48)-->" style="{width:240px;}" class="submitBtn" onClick="javascript:window.location.reload();">');
+								 }
+	                                else
+	                                {
+				              			document.write('<a href="/qos_main.stm"><input type="button" value="<!--#Fid_str(48)-->" style="{width:240px;}" class="submitBtn"></a>');
+								 }
+								 </script> 
+								&nbsp;&nbsp;
+								<input type="submit" name="arc_action" name="savesetting" value="<!--#Fid_str(49)-->" style="{width:240px;}" class="submitBtn" onClick="return evaltF();">
+							</td>
+						</tr>							
+			</table>
+			
+			<input NAME="trigger" TYPE="button" VALUE="." maxlength=0 SIZE=0  onclick="return trigging();" style="visibility: hidden">		
+					
+			</td>
+				<td width="5" height="25">&nbsp;</td>
+			</tr>
+	</table>
+
+</td>
+</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

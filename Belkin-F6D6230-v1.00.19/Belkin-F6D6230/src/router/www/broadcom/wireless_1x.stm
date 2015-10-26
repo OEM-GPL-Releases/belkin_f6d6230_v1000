@@ -1,0 +1,247 @@
+<html>
+<head>
+<title>802.1X</title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="my_function"; %>
+var usrCount = 0;
+
+if (my_tiny == 1) {
+<% exec cmd="TinyUserPool"; %>
+}
+function evaltF() {
+	if (isBlank(document.form0.Dot1X_idle_session_timeout.value) || isNaN(document.form0.Dot1X_idle_session_timeout.value) ||
+	    document.form0.Dot1X_idle_session_timeout.value<0) {
+		alert(idle_sessionm);
+		return false;
+	}
+	if (isBlank(document.form0.Dot1X_reAuthPeriod.value) || isNaN(document.form0.Dot1X_reAuthPeriod.value) ||
+	    document.form0.Dot1X_reAuthPeriod.value<0) {
+		alert(re_authrnm);
+		return false;
+	}
+	if (isBlank(document.form0.Dot1X_quietPeriod.value) || isNaN(document.form0.Dot1X_quietPeriod.value) ||
+	    (document.form0.Dot1X_quietPeriod.value < 0) || (document.form0.Dot1X_quietPeriod.value > 60)) {
+		alert(q_period_err);
+		return false;
+	}
+
+	if (document.form0.Dot1X_enable[0].checked==true && document.form0.Dot1X_srv_type.value==1){    //RADIUS server
+	    	if (isNValidIP(document.form0.Dot1X_srv_ip0.value)) { alert(ipm); return false; }
+	    	if (isNValidIP(document.form0.Dot1X_srv_ip1.value)) { alert(ipm); return false; }
+	    	if (isNValidIP(document.form0.Dot1X_srv_ip2.value)) { alert(ipm); return false; }
+	    if (isNValidLastIP(document.form0.Dot1X_srv_ip3.value)) { alert(ipm); return false; }
+
+	    if (isNValidPort(document.form0.Dot1X_srv_port.value)) {
+		    alert(radius_portm);
+		    return false;
+	    }
+	}
+	return true;
+}
+
+function editUser(userID, userN) {
+	document.form0.tiny_idx.value = userID;
+	document.form0.tiny_name.value = userN;
+	document.form0.tiny_pass.value = "";
+	document.form0.tiny_pass2.value = "";
+	document.form0.tiny_pass.focus();
+	document.form0.ConfBut.value="Modify";
+}
+
+function clearUser() {
+	document.form0.tiny_idx.value = usrCount;
+	document.form0.tiny_name.value = "";
+	document.form0.tiny_pass.value = "";
+	document.form0.tiny_pass2.value = "";
+	document.form0.ConfBut.value="New";
+}
+
+function checkUser() {
+	if (document.form0.tiny_idx.value >= 30) {
+		alert(user_pool_err);
+		return false;
+	}
+	if (isBlank(document.form0.tiny_name.value)) {
+		alert(username_err);
+		return false;
+	}
+	for (i = 0 ; i < usrCount ; i++) {
+		if (i == document.form0.tiny_idx.value) continue;
+		if (document.form0.tiny_name.value == usrName[i]) {
+			alert(username_dup);
+			return false;
+		}
+	}
+	if (document.form0.tiny_pass.value != document.form0.tiny_pass2.value) {
+		alert(pwd_match_1);
+		return false;
+	}
+	document.form0.tiny_change.value=1;
+	document.form0.submit();
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<form name="form0" method="post" action="/cgi-bin/wireless1X.exe">
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+    <tr>
+	    <td>
+            <p class=subtitle>802.1X</p>
+            <p class=normalText>
+			<% Fid_str(856); %>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table border="0" cellspacing="1" cellpadding="5" align="center">
+				<tr>
+					<td class=tdTitler><% Fid_str(857); %></td>
+					<td class=tdText>
+						<input type="radio" name="Dot1X_enable" value="1"><% Fid_str(27); %>&nbsp;&nbsp;&nbsp;
+						<input type="radio" name="Dot1X_enable" value="0">Disable
+				    </td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(858); %></td>
+					<td class=tdText>
+						<input type=text name=Dot1X_idle_session_timeout size=9 maxlength=6><% Fid_str(862); %>
+					</td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(859); %></td>
+					<td class=tdText>
+						<input type=text name=Dot1X_reAuthPeriod size=9 maxlength=6><% Fid_str(863); %>
+					</td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(860); %></td>
+					<td class=tdText>
+						<input type=text name=Dot1X_quietPeriod size=9 maxlength=2><% Fid_str(864); %>
+					</td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(861); %></td>
+					<td class=tdText>
+						<select name=Dot1X_srv_type class=selectList>
+							<script language="JavaScript">
+								if (my_tiny == 1)
+									document.write('<option value=0>TINY\n');
+							</script>
+							<option value=1>RADIUS
+						</select></td>
+				</tr>
+	          	<tr><td>&nbsp;</td></tr>
+	          	<tr>
+					<td colspan=2><b class=normalText><% Fid_str(845); %></b></td>
+				</tr>	
+				<tr>
+					<td class=tdTitler><% Fid_str(204); %></td>
+					<td class=tdText>
+						<input type="text" class="textbox" name="Dot1X_srv_ip0" size="3" maxlength=3>.
+						<input type="text" class="textbox" name="Dot1X_srv_ip1" size="3" maxlength=3>.
+						<input type="text" class="textbox" name="Dot1X_srv_ip2" size="3" maxlength=3>.
+						<input type="text" class="textbox" name="Dot1X_srv_ip3" size="3" maxlength=3>
+					</td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(865); %></td>
+					<td class=tdText>
+						<input type=text name=Dot1X_srv_port size=6 maxlength=5>
+					</td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler><% Fid_str(866); %></td>
+					<td class=tdText>
+						<input type=password name=Dot1X_secret_key size=24 maxlength=23></td>
+				</tr>
+
+				<tr>
+					<td class=tdTitler>NAS-ID</td>
+					<td class=tdText>
+						<input type=text name=Dot1X_nas_id size=32 maxlength=31></td>
+				</tr>
+	          	<tr><td>&nbsp;</td></tr>
+				<script language="JavaScript">
+					if (my_tiny == 1) {
+						document.write('<tr>\n');
+						document.write('<td colspan=2><b class=normalText> <% Fid_str(1281); %></b></td>\n');
+						document.write('</tr>\n');
+						document.write('<tr>\n');
+						document.write('<td class=tdTitlec> <% Fid_str(1282); %></td>\n');
+						document.write('<td class=tdTitlec colspan=3> <% Fid_str(955); %></td>\n');
+						document.write('<td class=tdTitlec><% Fid_str(501); %></td>\n');
+						document.write('</tr>\n');
+
+						if (usrCount != 0) {
+							for (var i = 0 ; i < usrCount ; i++) {
+								document.write('<tr>\n');
+								document.write('<td class="tdTextc">'+(i+1)+'</td>\n');
+								document.write('<td class=tdTextc colspan=3>'+usrName[i]+'</td>\n');
+								document.write('<td class="tdTextc"><a href="javascript:editUser('+i+',usrName['+i+'])"><% Fid_str(1269); %></a>');
+								document.write('&nbsp;&nbsp;<a href="/cgi-bin/tiny_del.exe/'+i+'"><% Fid_str(1248); %></a></td>');
+								document.write('</tr>\n');
+							}
+						}
+						else {
+							document.write('<tr><td class=tdTextc colspan=5>\n');
+							document.write(' <% Fid_str(1283); %> !!!</td></tr>\n');
+						}
+
+						document.write('<tr><td colspan=5></td></tr>\n');
+						document.write('<tr><td colspan=5></td></tr>\n');
+						document.write('<input type=hidden name="tiny_change" value=0>\n');
+						document.write('<input type=hidden name=tiny_idx value=0>');
+						document.write('<tr>\n');
+						if (usrCount == 10)
+							document.write('<td valign="middle" class=tdTitlec><% Fid_str(1248); %>\n</td>');
+						else
+							document.write('<td valign="middle" class=tdTitlec><% Fid_str(1284); %>/<% Fid_str(1248); %>\n</td>');
+						document.write('<td valign="middle" class=tdTitle> <% Fid_str(163); %><br>\n');
+						document.write('<input type=text name=tiny_name size=22 maxlength=23></td>\n');
+						document.write('<td valign="middle" class=tdTitle><% Fid_str(164); %><br>\n');
+						document.write('<input type=password name=tiny_pass size=15 maxlength=16></td>\n');
+						document.write('<td valign="middle" class=tdTitle><% Fid_str(1285); %><br>\n');
+						document.write('<input type=password name=tiny_pass2 size=15 maxlength=16></td>\n');
+						document.write('<td valign="middle" class=tdTitle>\n');
+						if (usrCount == 10)
+							document.write('<input type=Button  name=ConfBut value=" <% Fid_str(1286); %>" OnClick="checkUser()">&nbsp;\n');
+						else
+							document.write('<input type=Button  name=ConfBut value="<% Fid_str(1284); %>" OnClick="checkUser()">&nbsp;\n');
+						document.write('<input type=Button  name=ClrBut value="<% Fid_str(522); %>" OnClick="clearUser()"></td>\n');
+						document.write('</tr>\n');
+						document.form0.tiny_idx.value = usrCount;
+					}
+				</script>
+				<% exec cmd="wireless1X_show"; %>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="mainmsgR">
+            <a href="#" onClick="MM_openBrWindow('/help.stm#wireless_e','help','scrollbars=yes,width=600,height=500')"><input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>"></a>
+			<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+			<script language="javascript">
+			    if(navigator.appName != "Netscape")
+			        document.write('<input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">');
+			    else
+			        document.write('<a href="/wireless_1X.stm"><input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>"></a>');
+			</script>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% include file="routine.txt"; %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% exec cmd="Lan_IP_Address"; %> // get LAN_IP_ADDR[], LAN_NETMASK[], LAN_SUBNET[]
+<% exec cmd="Wan_IP_Subnet"; %> // get WAN_IP_ADDR[], WAN_NETMASK[], WAN_SUBNET[]
+
+var LAN_interface = new Interface_T();
+var WAN_interface = new Interface_T();
+<% exec cmd="LAN_Interface"; %>
+var ipm='<% Fid_str(641); %>.';
+var sm='<% Fid_str(766); %>.';
+var lastIpError ='<% Fid_str(1360); %>';
+
+function specialshar_name(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+ function frmload(){ 	
+ 	itemSelectipanddomain();
+ }
+
+
+function Doprevious(){ 	
+	location.href = "/wan_multipppoe.stm";
+}
+
+function checkallipvalue(index){
+	var mm,pp,dd,ss;
+	var args,args1,i;
+	
+	mm=document.getElementsByName('src_ip' +index);
+	pp=document.getElementsByName('dst_ip' +index);
+	ss=document.getElementsByName('src_mask' +index);
+	dd=document.getElementsByName('dst_mask' +index);
+
+	if((mm[0].value=='')||(pp[0].value=='')){
+		alert(ipm);
+		return false;			
+	}else{
+		args =(mm[0].value).split('.'); 
+		if(args.length<4)
+		{ alert(ipm); return false; }
+		
+		for(i=0;i<args.length;i++){
+			if(isNValidLastIP(args[0])) { alert(lastIpError); return false; }
+			if(isNValidIP(args[1])) { alert(ipm); return false; }
+			if(isNValidIP(args[2])) { alert(ipm); return false; }
+			if(isNValidIP(args[3])) { alert(lastIpError); return false; }
+		}
+		args =(pp[0].value).split('.');
+		if(args.length<4)
+		{ alert(ipm); return false; }
+		
+		for(i=0;i<args.length;i++){
+			if(isNValidLastIP(args[0])) { alert(lastIpError); return false; }
+			if(isNValidIP(args[1])) { alert(ipm); return false; }
+			if(isNValidIP(args[2])) { alert(ipm); return false; }
+			if(isNValidIP(args[3])) { alert(lastIpError); return false; }
+		}
+		
+	}
+	if((ss[0].value=='')||(dd[0].value=='')){
+			alert(sm);
+			return false;
+
+	}else{
+		args =(ss[0].value).split('.'); 
+		if(args.length<4)
+		{ alert(sm); return false; }
+		if(isNValidSubnetMask(args[0], args[1], args[2], args[3])){
+			alert(sm); 
+			return false;
+		}	
+		args =(dd[0].value).split('.'); 
+		if(args.length<4)
+		{ alert(sm); return false; }
+		if(isNValidSubnetMask(args[0], args[1], args[2], args[3])){
+			alert(sm); 
+			return false;
+		}		
+
+	}
+	return true;	
+}
+
+function is_same(a,b)
+{
+	var b1,b2;
+	var nn,nn1;
+	var pppoeaccount,pppoeaccount1;	
+      	var mm,pp,mm1,pp1;
+      	var dd,ss,dd1,ss1;
+
+	if(document.tF0.dest_type[0].checked==true){   
+      		b1 = document.getElementsByName('ip_isEnabled' + a);
+      	}else{
+      		b1 = document.getElementsByName('domain_isEnabled' + a);
+      	}
+	if(b1[0].checked==false)
+	{	return false;}
+	
+	if(document.tF0.dest_type[0].checked==true){   
+      		b2 = document.getElementsByName('ip_isEnabled' + b);
+      	}else{
+      		b2 = document.getElementsByName('domain_isEnabled' + b);
+      	}
+      	
+	if(b2[0].checked==false)
+	{	return false;}
+	if(document.tF0.dest_type[0].checked==true){	
+	
+		mm=document.getElementsByName('src_ip' +a);	
+		pp=document.getElementsByName('src_ip' +b);
+		
+		dd=document.getElementsByName('dst_ip' +a);
+		ss=document.getElementsByName('dst_ip' +b);
+	
+		mm1=document.getElementsByName('src_mask' +a);
+		pp1=document.getElementsByName('src_mask' +b);
+		
+		dd1=document.getElementsByName('dst_mask' +a);
+		ss1=document.getElementsByName('dst_mask' +b);
+
+		if((mm[0].value!=pp[0].value)||(dd[0].value!=ss[0].value)||(mm1[0].value!=pp1[0].value)||(dd1[0].value!=ss1[0].value))
+		{return false;}
+	}
+	else{
+		nn = document.getElementsByName('domain_name' + a);
+		nn1= document.getElementsByName('domain_name' + b);
+		if(nn[0].value != nn1[0].value) 
+		{return false;}
+	}
+
+	if(document.tF0.dest_type[0].checked==true){
+		pppoeaccount = document.getElementsByName('ip_pppoe_routing_interface' + a);
+		pppoeaccount1= document.getElementsByName('ip_pppoe_routing_interface' + b);
+	}else{
+		pppoeaccount = document.getElementsByName('domain_pppoe_routing_interface' + a);
+		pppoeaccount1= document.getElementsByName('domain_pppoe_routing_interface' + b);
+	}
+	if(pppoeaccount[0].value != pppoeaccount1[0].value) 
+		{return false;}
+      return true;
+}
+
+
+function evaltF(){
+	var i,j;
+	var en;
+	var selecked=false;
+	var field_name,field_value;
+	
+	for (i=0;i<10;i++) {
+		
+		if(document.tF0.dest_type[0].checked==true){   
+			en = document.getElementsByName('ip_isEnabled' + i);     
+      			if(en[0].checked==false) continue;
+      			selecked = true;
+      			if(checkallipvalue(i)==false) 
+      				return false;
+      			
+      		}else{
+      			en = document.getElementsByName('domain_isEnabled' + i);      	
+      			field_value = document.getElementsByName('domain_name' + i);
+      			if ((en[0].checked==false)&&(field_value[0].value=="")) continue;
+      			selecked = true;
+      			if(field_value[0].value==""){
+      				alert('NO.'+' '+i+':'+'<% Fid_str(1430); %>');
+				return false; 
+      			}
+      			if(specialshar_name(field_value[0].value)){
+				alert('<% Fid_str(648); %>'+':'+ch);
+				return false; 
+			}
+      		}
+	      	for(j=i+1;j<10;j++){
+			if (is_same(i,j))
+			{
+				alert('<% Fid_str(1312); %>');
+				return false;
+			}
+	      	}
+	      
+	}
+	if(selecked ==false){
+		msg = '<% Fid_str(1311); %>';
+		alert(msg);
+		return false;
+	}
+	return true;
+		
+	
+}
+
+
+function itemSelectipanddomain(){
+	var i=0;
+	var ss,mm,pp,nn,dd,ee,ii,di,de;
+	
+	if (document.tF0.dest_type[0].checked==true ){
+		document.getElementById('domain_id').style.display = "none";	
+		document.getElementById('ip_id').style.display = "";				
+		for(i=0;i<10;i++){
+			ss= "srcipid"+i;
+			mm= "srcmaskid"+i;
+			pp= "dstipid"+i;
+			nn= "dstmaskid"+i;
+			dd= "domainnameid"+i;	
+			ii = "ip_pppoe_routing_interface_id"+i;
+			di = "domain_pppoe_routing_interface_id"+i;
+			ee ="ip_Enabled_id"+i;
+			de= "domain_Enabled_id"+i;
+			
+			document.getElementById(dd).style.display= "none";	
+			document.getElementById(ss).style.display="";
+			document.getElementById(mm).style.display="";
+			document.getElementById(pp).style.display="";
+			document.getElementById(nn).style.display="";
+			
+			document.getElementById(ii).style.display="";
+			document.getElementById(di).style.display="none";
+			document.getElementById(ee).style.display="";
+			document.getElementById(de).style.display="none";
+					
+		}
+	}else{
+		document.getElementById('ip_id').style.display = "none";
+		document.getElementById('domain_id').style.display = "";
+		for(i=0;i<10;i++){
+			ss= "srcipid"+i;
+			mm="srcmaskid"+i;
+			pp="dstipid"+i;
+			nn="dstmaskid"+i;
+			dd="domainnameid"+i;		
+			ii = "ip_pppoe_routing_interface_id"+i;
+			di = "domain_pppoe_routing_interface_id"+i;
+			ee ="ip_Enabled_id"+i;
+			de= "domain_Enabled_id"+i;
+			
+			document.getElementById(ss).style.display = "none";
+			document.getElementById(mm).style.display = "none";
+			document.getElementById(pp).style.display = "none";
+			document.getElementById(nn).style.display = "none";
+			document.getElementById(dd).style.display = "";
+
+			document.getElementById(ii).style.display="none";
+			document.getElementById(di).style.display="";
+			document.getElementById(ee).style.display="none";
+			document.getElementById(de).style.display="";
+		}
+	}	
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="frmload()">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="/cgi-bin/pppoe_routing_table.exe">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="multiPPPOE_Routing_table.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(688); %> &gt; <% Fid_str(1416); %>
+			<table border=0 class="copy_1">
+				<tr>					
+					<td>
+						<table width=800 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr align=left>
+								<td colspan=2 align=left class="body"><% Fid_str(1417); %> <br><br>
+									<% Fid_str(1418); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#routingtable_id");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+								</td>
+							</tr>
+            		        			
+							<tr>	
+            			        			<td width="150" class="body"><b><% Fid_str(1419); %> &gt;</b><br><br></td>
+								<td width="400">
+            			            			<input type="radio" name="dest_type"  value="0"  onClick="itemSelectipanddomain()"><b><% Fid_str(65); %></b>
+            			            			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            			            			<input type="radio" name="dest_type"  value="1" onClick="itemSelectipanddomain()"><b><% Fid_str(1420); %></b>
+								<br><br></td>
+							</tr>
+							
+							<tr>	
+								<td colspan=2>
+								<table  width="600" border="0" cellspacing="1" cellpadding="2" class="copy_1" align="left">
+									<SCRIPT language=javascript>
+										document.write('<tr id = ip_id style=display: none; bgcolor="#666262" >');								
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b>ID</b></FONT></td>');
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(1424); %></b></FONT></td>');
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(331); %></b></FONT></td>');
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(1425); %></b></FONT></td>');
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(331); %></b></FONT></td>');
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(1421); %></b></FONT></td>');								
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><B><% Fid_str(71); %></B></FONT></td>');								
+										document.write('</tr>');	
+
+										document.write('<tr id = domain_id style=display: none; bgcolor="#666262">');								
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><b>ID</b></FONT></td>');
+										document.write('<td width=6% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(1420); %></b></FONT></td>');
+										document.write('<td width=2% nowrap align="center" class="body"><font color=#ffffff><b><CENTER><% Fid_str(1421); %></CENTER></b></FONT></td>');								
+										document.write('<td width=1% nowrap align="center" class="body"><font color=#ffffff><B><% Fid_str(71); %></B></FONT></td>');								
+										document.write('</tr>');			
+										
+										var totalCount = 10;
+										for (i =0;i< totalCount;i++)
+										{
+											document.write('<TR bgColor=#cccccc>');
+											document.write(' <TD >');
+											document.write('<CENTER>');
+											document.write(i);
+											document.write('</CENTER></TD>');	
+											
+											document.write("<TD id=domainnameid"+i+" style=display: none;>");
+											document.write('<CENTER><INPUT type=text name=domain_name'+i+' maxLength=31 size=40 value="">');											
+											document.write("</CENTER></TD>");
+											
+											document.write("<TD id=srcipid"+i+" style=display: none;><CENTER>");
+											document.write('<input type=text name=src_ip'+i+' size=15 maxlength=15 value="">');											
+											document.write('</CENTER></TD>');
+											
+											document.write("<TD id=srcmaskid"+i+" style=display: none;><CENTER>");
+											document.write('<input type=text name=src_mask'+i+' size=15 maxlength=15 value="">');
+											document.write('</CENTER></TD>');
+											
+											document.write("<TD id =dstipid"+i+" style=display: none;><CENTER>");
+											document.write('<input type=text name=dst_ip'+i+' size=15 maxlength=15 value="">');	
+											document.write('</CENTER></TD>');
+											
+											document.write("<TD id=dstmaskid"+i+" style=display: none;><CENTER>");
+											document.write('<input type=text name=dst_mask'+i+' size=15 maxlength=15 value="">');	
+											document.write('</CENTER></TD>');
+											
+											document.write('<TD id=ip_pppoe_routing_interface_id'+i+' style=display: none;><CENTER><select size=1 name=ip_pppoe_routing_interface'+i+' class=selectList>');
+											document.write('<option value=0 selected><% Fid_str(1422); %></option>');
+											document.write('<option value=1 ><% Fid_str(1423); %></option></select>');											
+											document.write(' </CENTER></TD>');	
+											
+											document.write('<TD id=ip_Enabled_id'+i+' style=display: none;>');
+											document.write('<CENTER><INPUT type=checkbox name=ip_isEnabled'+i+'></CENTER></TD>');
+
+											document.write('<TD id=domain_pppoe_routing_interface_id'+i+' style=display: none;><CENTER><select size=1 name=domain_pppoe_routing_interface'+i+' class=selectList>');
+											document.write('<option value=0 selected><% Fid_str(1422); %></option>');
+											document.write('<option value=1 ><% Fid_str(1423); %></option></select>');											
+											document.write(' </CENTER></TD>');
+											
+											document.write('<TD id=domain_Enabled_id'+i+' style=display: none;>');
+											document.write('<CENTER><INPUT type=checkbox name=domain_isEnabled'+i+'></CENTER></TD>');
+											document.write('</TR>');
+										}
+									</SCRIPT>
+								</table>					
+            			        		</td>
+						</tr>
+
+						<tr>
+							<td  colspan=2 align="center"><br></td>
+						</tr>
+						
+						<% exec cmd="wan_pppoe_route"; %> 
+						
+						<tr>
+							<br><br>
+							<td  colspan=2 align="center"><input type="button" value="< <% Fid_str(1410); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="Doprevious();">
+									&nbsp;&nbsp;<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+							</a></td>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+	</td>    
+	</tr>             
+</table>
+</body>
+</html>
+

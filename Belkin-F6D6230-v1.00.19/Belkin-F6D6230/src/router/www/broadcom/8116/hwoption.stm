@@ -1,0 +1,112 @@
+<html>
+<head>
+
+<% char_set(); %>
+<title>Advanced Configuration - Hardware Options</title>
+<script language="JavaScript">
+HW_OPT='<% echo var="HW_OPT"; %>';
+HW_OPT1='<% echo var="HW_OPT1"; %>';
+HW_OPT2='<% echo var="HW_OPT2"; %>';
+HW_OPT3='<% echo var="HW_OPT3"; %>';
+HW_OPT4='<% echo var="HW_OPT4"; %>';
+</script>
+</head>
+
+<body  bgcolor="#99cccc" text="#330099">
+<table width="98%" border="0" cellspacing="0" cellpadding="5">
+<form method="POST" action="/cgi-bin/hw_opt.cgi">
+<tr>
+<td>
+	<p><font face="Arial" size="4" color="#330099">
+	<b><% Fid_str(340); %></b>
+	</font></p>
+</td>
+</tr>
+<tr>
+<td>
+	<font face="Arial" color="#330099" size="2">
+        <p><% Fid_str(341); %>
+     <b><i><% Fid_str(19); %></i></b><% Fid_str(491); %></p>
+	</font>
+
+	<table border=1 cellspacing="0" cellpadding="10" height="90%" align=center>
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(342); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<input TYPE="text" maxLength="1" name="HW_OPT0" size="1" value="<% echo var="HW_OPT"; %>">
+	</td></tr>
+	
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C1<% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<input TYPE="text" maxLength="1" name="HW_OPT1" size="1" value="<% echo var="HW_OPT1"; %>">
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C2 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT2" size="1" value="<% echo var="HW_OPT2"; %>">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C3 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT3" size="1" value="<% echo var="HW_OPT3"; %>">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C4<% Fid_str(346"; %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT4" size="1" value="<% echo var="HW_OPT4"; %>">
+	</font>
+	</td></tr>
+
+<script language="JavaScript">
+	document.write('<tr><td nowrap bgcolor="#330099"><font color="#FFFFCC" face="Arial" size="2"><b> <% Fid_str(481); %></b></font></td><td nowrap bgcolor="#FFFFE6">');
+	document.write('<font color="#330099" face="Arial" size="2"><input TYPE="text" maxLength="10" name="key" size="10"></font></td></tr>');
+</script>
+	</table>
+</td>
+</tr>
+<tr>
+<td>
+	<br>
+	<div align="center">
+<script language="JavaScript">
+	document.write('<INPUT onclick="return true;" type=submit value=" <% Fid_str(19); %>" name="OK.x" href="javascript:document.forms[0].submit()">  ');
+	document.write('<INPUT onClick="javascript:window.location.reload(true);return false;" type="button" value="<% Fid_str(344); %>" name=Cancel>  ');
+	document.write('<INPUT onClick="javascript:history.go(-1);" type="button" value=" <% Fid_str(521); %>" name=Cancel>');
+</script>
+	</div>
+</td>
+</tr>
+</form>
+</table>
+</body>
+</html>
+

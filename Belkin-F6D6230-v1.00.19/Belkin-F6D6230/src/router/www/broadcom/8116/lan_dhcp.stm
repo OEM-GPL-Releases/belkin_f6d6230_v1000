@@ -1,0 +1,255 @@
+<% gs_NdcUpdate(); %>
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% include file="refreshmenu.txt" ; %>
+<script language="JavaScript">
+
+</script>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+<% gs_Lan_IP_Addr("gs_Lan_IP_Address"); %>
+<% DHCP_FixIP_SSI(); %>
+
+function logrefresh(){
+	window.location.reload(true);
+	return true;
+}
+function isValidMacAddress(address) {
+   var c = '';
+   var i = 0, j = 0;
+
+   if ( address.toLowerCase() == 'ff:ff:ff:ff:ff:ff' ) return false;
+   if(address.toLowerCase() == '00:00:00:00:00:00' || address.toLowerCase() == '0:0:0:0:0:0' ) return false;
+   
+   addrParts = address.split(':');
+   if ( addrParts.length != 6 ) return false;
+   
+   for (i = 0; i < 6; i++) {
+      for ( j = 0; j < addrParts[i].length; j++ ) {
+         c = addrParts[i].toLowerCase().charAt(j);
+         if ( (c >= '0' && c <= '9') ||
+              (c >= 'a' && c <= 'f') )
+            continue;
+         else
+            return false;
+      }
+   }
+
+   return true;
+}
+
+function addClick()
+{
+	var F=document.tF1;
+	var sLan_ip = lan_ip[0]+"."+lan_ip[1]+"."+lan_ip[2]+"."+lan_ip[3];
+	var sLan_mask = LAN_NETMASK[0]+"."+LAN_NETMASK[1]+"."+LAN_NETMASK[2]+"."+LAN_NETMASK[3];
+	var ulLanIP = IpToLong(sLan_ip);
+	var ulLanMask = IpToLong(sLan_mask);
+	var manual_ulLanIP = IpToLong(F.fixIP.value);
+	var sIP = F.fixIP.value.split(/\./);
+	var valIP4 = new Number(sIP[3]);
+	var i=0;
+	if(num_fix_dhcp>=MAX_FIXIP) { return false;}
+	if(F.fixIP.value=="") { alert("<% Fid_str_Js(403)); %>"); return false; }
+	if(F.fixMAC.value=="") { alert("<% Fid_str_Js(904)); %>"); return false; }
+		
+	var dhcpSt="<% nvram_get("dhcp_start"); %>";
+	var dhcpEnd="<% nvram_get("dhcp_end"); %>";
+	var LastStartLanIP = parseInt(dhcpSt.split(".")[3]);
+	var LastEndLanIP = parseInt(dhcpEnd.split(".")[3]);
+	if((ulLanIP&ulLanMask)==(manual_ulLanIP&ulLanMask))
+	{
+		if(valIP4<LastStartLanIP) { alert('<% Fid_str_Js(2110); %>'+(LastStartLanIP-1)); return false; }
+		if(valIP4>LastEndLanIP)	{ alert('<% Fid_str_Js(2111); %>'+(LastEndLanIP+1)); return false; }
+	}
+	else
+	{
+		alert("<% Fid_str_Js(2109); %>");
+		return false;
+	}
+	
+	if ( isValidMacAddress( F.fixMAC.value ) == false ) 
+	{
+		alert("<% Fid_str_Js(902); %>");
+		return false;
+    }
+	
+//check duplicated data
+	for(i=0;i<=num_fix_dhcp;i++)
+	{
+		if(F.fixIP.value==dhcpip[i])
+		{
+			alert("<% Fid_str_Js(2107); %>");
+			return false;
+		}
+		if(F.fixMAC.value==MAC[i])
+		{
+			alert("<% Fid_str_Js(2108); %>");
+			return false;
+		}
+	}
+	
+	document.tF1.dhcp_reserveIP.value=F.fixIP.value;	
+	document.tF1.dhcp_reserveMAC.value=F.fixMAC.value;		
+	document.tF1.dhcp_action.value="add";
+
+	F.submit();
+	return true;
+}
+
+function RemoveEntry(index)
+{
+	var F=document.tF1;
+	document.tF1.dhcp_reserveIP.value=dhcpip[index];	
+	document.tF1.dhcp_reserveMAC.value=MAC[index];		
+	document.tF1.dhcp_action.value="remove";
+	document.tF1.dhcp_reserveRemoveId.value=index;
+	F.submit();
+	return true;
+}
+
+function calcHeight(source)
+{
+	//var min_height=600;
+
+	if(source=='parent'){
+		document.getElementById('DhcpClientTable').height=0;
+	  	//find the height of the internal page
+	  	var the_height=document.getElementById('DhcpClientTable').contentWindow.document.body.scrollHeight;
+		//if(the_height<min_height) the_height=min_height;
+	  	//change the height of the iframe
+	  	document.getElementById('DhcpClientTable').height=the_height;
+	}else{
+		parent.document.getElementById('DhcpClientTable').height=0;
+		//find the height of the internal page
+		var the_height=parent.document.getElementById('DhcpClientTable').contentWindow.document.body.scrollHeight;
+		//if(the_height<min_height) the_height=min_height;
+		//change the height of the iframe
+		parent.document.getElementById('DhcpClientTable').height=the_height;
+	}
+}
+
+function addReserved(ipAddr, macAddr)
+{
+	var	index=<% nvram_get("dhcp_reserveIndex"); %>;
+	
+	if(index >= 10) {
+		alert("DHCP pool is full");
+		return false;
+	} else {		
+		document.tF1.dhcp_reserveIP.value=ipAddr;
+		document.tF1.dhcp_reserveMAC.value=macAddr;		
+		document.tF1.dhcp_action.value="add";
+		document.tF1.submit(); 
+		return ture;	
+	}
+	
+}
+
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(353); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td>
+									<form name="tF1" action="apply.cgi" method="post">
+									<input type="hidden" name="dhcp_reserveIP">
+									<input type="hidden" name="dhcp_reserveMAC">
+									<input type="hidden" name="dhcp_reserveRemoveId">
+									<input type="hidden" name="arc_action" value="dhcp_reverse_apply">
+									<input type="hidden" name="location_page" value="lan_dhcp.stm">
+									<input type="hidden" name="dhcp_action">
+									<table width="100%" border="0" cellspacing="0" cellpadding="1" height="90%" class="copy_1">
+										<tr>
+											<td valign="top" class="body">
+												<div align="left">
+													<span>
+													<br>
+													<% Fid_str(354); %>
+													</span>
+												</div>
+												<table border="0" cellspacing="1" cellpadding="5" width="100%" class="copy_1">
+													<tr height="30" >
+														<td colspan="3 "valign="bottom">&nbsp;<b><!--#Fid_str(2103)--></b></td>
+													</tr>
+													<tr height="25">
+														<td width="9%" bgcolor="#666262" align="center"><b><font color="fffffff" ><% Fid_str(1592); %></font></b></td>
+														<td width="20%" bgcolor="#666262" align="center"><b><font color="fffffff" ><% Fid_str(355); %></font></b></td>
+														<td width="23%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(356); %></font></b></td>
+														<td width="21%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(357); %></font></b></td>
+														<td width="11%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(67); %></font></b></td>
+														<td width="16%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(872); %></font></b></td>
+				  									</tr>
+				  									<% DHCPOffer(); %>
+													<tr>
+														<td width="20%" bgcolor="#FFFFFF" align="left">&nbsp;</td>
+														<td width="20%" bgcolor="#FFFFFF" align="left">&nbsp;</td>
+														<td width="20%" bgcolor="#FFFFFF" align="right">
+														<div align="right">
+														<input type="button" value="<% Fid_str(128); %>" style="{width=150px;height=22px;}" class="submitBtn" name="refresh_log" onClick="return logrefresh();">
+														</div>
+														</td>														
+													</tr>
+												</table>
+												<table border="0" cellspacing="1" cellpadding="5" width="81%" class="copy_1">
+													<tr height="30">
+														<td colspan="3" valign="bottom"><b><% Fid_str(1435); %></b></td>
+													</tr>
+													<tr height="25">
+														<td width="27%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(355); %></font></b></td>
+														<td width="27%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(357); %></font></b></td>
+														<td width="27%" bgcolor="#666262" align="center"><b><font color="fffffff"><% Fid_str(872); %></font></b></td>
+				  									</tr>
+													<SCRIPT LANGUAGE="JavaScript">												
+														var i;
+														for(i=0;i<num_fix_dhcp;i++)
+														{
+															document.write('<tr bgcolor="#cccccc">');
+															document.write('<td align="center">',dhcpip[i],'</td>');
+															document.write('<td align="center">',MAC[i],'</td>');
+															document.write('<td align="center"><span><input class="submitBtn" type="button" name="remove" value="<% Fid_str(114); %>" onClick="return RemoveEntry(',i,')"></span></td>');
+															document.write("</tr>");
+														}
+													</SCRIPT>
+													<tr bgcolor="#cccccc">
+														<td align="center"><input type="text" name="fixIP" value="" maxLength=17 size=14 style="width:100px"></td>
+														<td align="center"><input type="text" name="fixMAC" value="" maxLength=17 size=14 style="width:100px"></td>
+														<td align="center"><span><input type="button" value="<% Fid_str(113); %>" class="submitBtn" onClick="return addClick()"></span></td>
+						
+													</tr>
+												</table>
+											</td>
+										</tr>
+										</form>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table> 
+</body>
+</html>

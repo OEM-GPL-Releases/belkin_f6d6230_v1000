@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+
+<specVersion>
+	<major>1</major>
+	<minor>0</minor>
+</specVersion>
+			<device>
+			  <deviceType>urn:schemas-wifialliance-org:device:WFADevice:1</deviceType>
+			  <friendlyName>Belkin Wireless Router(WFA)</friendlyName>
+				<manufacturer>Belkin</manufacturer>
+				<manufacturerURL>http://www.Belkin.com/</manufacturerURL>
+				<modelDescription>Internet Gateway Device with UPnP support</modelDescription>
+				<modelName><!--# echo var="Upnp_UniversalProductCode" --></modelName>
+				<modelNumber><!--# echo var="Upnp_FirmwareVersion" --></modelNumber>
+				<modelURL>http://www.Belkin.com/</modelURL>
+				<serialNumber><!--# echo var="Upnp_SerialNumber" --></serialNumber>
+				<UDN>uuid:00000000-0000-0001-1000-<!--# exec cmd="Upnp_UUID" --></UDN>
+        <UPC></UPC>
+			  <serviceList>
+			    <service>
+			      <serviceType>urn:schemas-wifialliance-org:service:WFAWLANConfig:1</serviceType>
+			      <serviceId>urn:wifialliance-org:serviceId:WFAWLANConfig1</serviceId>
+			      <SCPDURL>/igd_WSC_UPnP.xml</SCPDURL>
+						<controlURL>/upnp/control?WFAWLANConfig</controlURL>
+						<eventSubURL>/upnp/event?WFAWLANConfig</eventSubURL>
+			    </service>
+			  </serviceList>
+	      <presentationURL>/</presentationURL>
+			</device>
+</root>

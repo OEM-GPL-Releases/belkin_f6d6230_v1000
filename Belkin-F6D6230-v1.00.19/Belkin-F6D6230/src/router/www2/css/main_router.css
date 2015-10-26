@@ -1,0 +1,521 @@
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; color: #003366; text-decoration: none}
+.top{ FONT: bold 9pt Arial,Helvetica, sans-serif;}
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #000000; text-decoration: none}
+.section {  font: caption; font-size: 11px; font-stretch: normal; text-indent: inherit; text-align: center; text-decoration: line-through; text-transform: capitalize; color: white}
+.head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #0000ff; text-decoration: none}
+.body{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #003366}
+.help{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #000000}
+.bbody{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #000000}
+.textbody{FONT: 8pt Arial,Helvetica, sans-serif;COLOR: #000000}
+.test{font-family: Arial,Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #000000}
+.wbody{FONT: 9pt Arial,Helvetica, sans-serif;COLOR: #ffffff}
+a {FONT: bold 9pt Arial,Helvetica, sans-serif; text-decoration: none; color: #003366}
+.copy_1 {  font-family: Arial,Helvetica, sans-serif; font-size: 11px; line-height: 14px; color: #003366}
+.copy_2{  font-family: Arial,Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #000000}
+.submitBtn {  font-family:  Arial,Helvetica, sans-serif; font-size: 11px;border-color: #cccccc; background-color: #cccccc; color: #000000}
+a:active {  color: #ffff00;  text-decoration: none;}
+a:visited { color: #000000; text-decoration: none;}
+a:hover {  text-decoration: underline; color: #0000ff}
+
+.Menu_leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; color: #cccccc; text-decoration: none;}
+.Menu_top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.Menu_section {  FONT: bold 8pt Arial, Helvetica, sans-serif; text-decoration: none;}
+.Menu_head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #000000; text-decoration: none}
+.Menu_copy_1 {  font-family: Arial, Helvetica, sans-serif; font-size: 10px; line-height: 14px; color: #003366}
+.Menu_submitBtn {  font-family: Arial, Helvetica, sans-serif; font-size: 10px;border-color: #666262; background-color: #666262; color: #ffffff}
+
+a.menuharf{FONT: 8pt Arial,Helvetica, sans-serif; text-decoration: none; color: #cccccc}
+a.menuharf:link{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+   }
+a.menuharf:visited{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+a.menuharf:active{
+     color: #cccccc;
+     font-size: 8pt;
+     text-decoration: none;
+    }
+a.menuharf:hover{  text-decoration: underline; color: #0000ff}
+
+"font: caption; font-stretch: normal; text-indent: inherit; text-align: center; text-decoration: line-through; text-transform: capitalize; color: white"txt2 {background-color:  #94CAE4;}
+.tdTitle { background-color: #666262; color: #003399; color: #ffffff}
+.tdText { background-color:  #cccccc; }
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #000000; text-decoration: none}
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; font-color: #000000; text-decoration: none}
+
+.head_bold2
+{
+	font-family:Arial,Helvetica,sans-serif;
+	color: #003366;
+	font-weight: bold;
+	font-size:10pt;
+}
+
+input, select
+{
+	color: #003366;
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:8pt;
+}
+
+.info_table
+{
+	font-size:10pt;
+	border-collapse: collapse;
+	border: 2px solid #ccc;
+	/*margin: 10px;*/
+}
+
+.info_table caption
+{
+	color:#003366;
+	font-family:Arial,Helvetica,sans-serif;
+	font-weight:bold;
+	font-size:9pt;
+	text-align:left;
+	margin-bottom:5px;
+}
+
+.info_table th
+{
+	color:#999;
+	background-image: url(../images/header_bg1.jpg);
+	border: 2px solid #CCC;
+	/*background-color:#666262;*/
+	padding: 0px 3px 0px 3px;
+}
+
+.info_table tr
+{
+	background-color:#ffffff;
+	font-weight: normal;
+	height: 40px;
+}
+
+.info_table .file_tr
+{
+	height: 30px;
+}
+
+.info_table .tr2
+{
+	background-color:#eeeeee;
+}
+
+.info_table .tr_sel
+{
+	/*border: 2px solid #8CF;*/
+	background-color:#ddeeff;
+	font-weight: bold;
+}
+
+.info_table td
+{
+	/*color:#000000;*/
+	/*border: 1px solid #FFF;*/
+	padding: 3px;
+}
+
+.member_list tr
+{
+	height:24px;
+}
+
+.caption
+{
+	margin:5px;
+	clear:left;
+}
+
+.caption label
+{
+	width:180px;
+	margin-left:5px;
+	margin-top:5px;
+	float:left;
+	font-weight:bold;
+}
+
+.popup_base
+{
+	position:absolute;
+	/*filter: alpha(opacity=70);*/
+	background-image: url('/images/popup_bg.gif');
+	background-repeat: repeat;
+	/*background-color: #FFF;*/
+	width:100%;
+	height: 100%;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	z-index: 500;
+	/*opacity: 0.7;*/
+	left: 0px;
+	top: 0px;
+}
+
+.popup_panel
+{
+	position:absolute;
+	border:5px double #0099FF;
+	padding:10px;
+	background-color:#FFF;
+	width:500px;
+	z-index: 600;
+}
+
+.ip_panel input
+{
+	width:30px;
+	margin:2px;
+}
+
+.mac_panel input
+{
+	width:20px;
+	margin:2px;
+}
+
+
+
+
+/* added for BT */
+#desktop {
+	visibility: visible;
+	/*border: 2px solid #888;*/
+	margin: 10px;
+}
+
+#pageWrapper {
+	background: #7c9dbf;
+	border: 0;	
+}
+
+#page {
+	margin: 0 auto 0;
+	width: 800px;
+	background: #fff;	
+}
+
+#header {
+	background: #f0f0f0;
+	padding: 20px;	
+}
+
+#navigation {
+	background: #f5f5f5;
+	padding: 5px 20px;	
+}
+
+#content {
+	padding: 20px;
+}
+
+#footer {
+	background: #f0f0f0;
+	padding: 10px 20px;
+}
+
+#dockWrapper {
+	border-top: 1px solid #999;
+	border-bottom: 0;
+}
+
+#dockWrapper.top {
+	border-top: 0;
+	border-bottom: 1px solid #999;
+}
+
+.progress_bar .inner {
+	background-color: #7CF;
+}
+
+.progress_bar .outer {
+	border: 1px solid #000;
+	background-color: #FFF;
+}
+
+.dialog {
+	font-size: 9pt;
+	display: none;
+}
+
+.dialog fieldset {
+	padding: 5px;
+	margin: 10px;
+	border: 0px;
+}
+
+.dialog input.txt_short {
+	margin: 2px;
+	width: 50px;
+	text-align: center;
+}
+
+.dialog input.txt_long {
+	margin: 2px;
+	width: 250px;
+}
+
+.dialog p {
+	clear: left;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	padding: 0;
+	padding-top: 5px;
+}
+
+.dialog p label {
+	float: left;
+	text-align: right;
+	margin-right: 15px;
+	width: 35%;
+	font-weight: bold;
+}
+
+.dialog p .sub_label {
+	float: left;
+	text-align: right;
+	margin-right: 10px;
+	width: 70px;
+	font-weight: normal;
+}
+
+.dialog .icon {
+	float: left;
+	margin-right: 10px;
+}
+
+.dialog .folder {
+	background-image: url(../images/folder_16.gif);
+	background-repeat: no-repeat;
+	background-position: 3px 7px;
+	padding-left: 24px;
+	font-weight: bold;
+}
+
+.dialog .file {
+	background-image: url(../images/file_16.gif);
+	background-repeat: no-repeat;
+	background-position: 20px 7px;
+	padding-left: 40px;
+}
+
+.content_lbl {
+	float: none;
+}
+
+.drag_hint {
+	background-image: url(../images/drag_hint.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.health_hint {
+	background-image: url(../images/health_hint.gif);
+	width: 24px;
+	height: 24px;
+	float: left;
+}
+
+.health_1 {
+	background-image: url(../images/health_1.gif);
+	background-repeat: no-repeat;
+	width: 48px;
+	height: 12px;
+	float: right;
+	margin-top: 5px;
+}
+
+.health_2 {
+	background-image: url(../images/health_2.gif);
+	background-repeat: no-repeat;
+	width: 48px;
+	height: 12px;
+	float: right;
+	margin-top: 5px;
+}
+
+.health_3 {
+	background-image: url(../images/health_3.gif);
+	background-repeat: no-repeat;
+	width: 48px;
+	height: 12px;
+	float: right;
+	margin-top: 5px;
+}
+
+.health_4 {
+	background-image: url(../images/health_4.gif);
+	background-repeat: no-repeat;
+	width: 48px;
+	height: 12px;
+	float: right;
+	margin-top: 5px;
+}
+
+.upload_stop {
+	background-image: url(../images/upload_stop.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_0p {
+	background-image: url(../images/upload_0p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_10p {
+	background-image: url(../images/upload_10p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_20p {
+	background-image: url(../images/upload_20p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_30p {
+	background-image: url(../images/upload_30p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_40p {
+	background-image: url(../images/upload_40p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_50p {
+	background-image: url(../images/upload_50p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_60p {
+	background-image: url(../images/upload_60p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_70p {
+	background-image: url(../images/upload_70p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_80p {
+	background-image: url(../images/upload_80p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_90p {
+	background-image: url(../images/upload_90p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.upload_100p {
+	background-image: url(../images/upload_100p.gif);
+	width: 32px;
+	height: 32px;
+}
+
+.status_hint {
+	width: 16px;
+	height: 16px;
+	margin-right: 10px;
+}
+
+.delete_hint {
+	background-image: url(../images/trashcan.gif);
+	width: 24px;
+	height: 24px;
+	float: right;
+	cursor: pointer;
+}
+
+.task_index {
+	width: 20px;
+	margin-right: 5px;
+	text-align: 20px;
+}
+
+.task_dragging {
+	background-color: #FCC;
+	border: 2px dotted #999;
+}
+
+.btn_start {
+	background-image: url(../images/btn_start_s.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.btn_start_over {
+	background-image: url(../images/btn_start_s_over.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.btn_pause {
+	background-image: url(../images/btn_pause_s.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.btn_pause_over {
+	background-image: url(../images/btn_pause_s_over.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.btn_stop {
+	background-image: url(../images/btn_stop_s.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.btn_stop_over {
+	background-image: url(../images/btn_stop_s_over.gif);
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+.checkbox {
+	cursor: default;
+}
+
+.task_link {
+	font-weight: bold;
+}
+
+.task_link_hover {
+	font-weight: bold;
+	color: #0088FF;
+	cursor: pointer;
+}

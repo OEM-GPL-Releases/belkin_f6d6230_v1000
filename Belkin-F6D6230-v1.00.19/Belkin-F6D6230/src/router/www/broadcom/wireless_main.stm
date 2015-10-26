@@ -1,0 +1,239 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+function evaltF(addType) {
+
+	if ((addType == 1) || (edIdx > 0)) {
+		if ((document.tF.w0.checked == false) && (document.tF.w1.checked == false) && (document.tF.w2.checked == false) &&
+			(document.tF.w3.checked == false) && (document.tF.w4.checked == false) && (document.tF.w5.checked == false) &&
+			(document.tF.w6.checked == false)) {
+			alert('<% Fid_str(1210); %>');
+			return false;
+		}
+
+		if ((document.tF.stHr.value > 23) || (document.tF.stHr.value < 0) || (document.tF.stMin.value > 59) || (document.tF.stMin.value < 0)) {
+			alert('<% Fid_str(1211); %>');
+			return false;
+		}
+
+		if ((document.tF.edHr.value > 23) || (document.tF.edHr.value < 0) || (document.tF.edMin.value > 59) || (document.tF.edMin.value < 0)) {
+			alert('<% Fid_str(1212); %>');
+			return false;
+		}
+		if (addType == 1) document.tF.confType.value = 2;
+	}
+	else {
+		if (document.tF.Wireless_enable[2].checked) {
+			if (rlNum == 0) {
+				if (confirm("<% Fid_str(1230); %> !") == false)
+					return false;
+			}
+		}
+	}
+
+	document.tF.submit();
+	return true;
+}
+
+function Edit(i) {
+	var url;
+	var tmpId = 500 + i;
+
+	url = "/wireless_main.stm/" + tmpId;
+	document.location.href = url;
+    return true;
+}
+
+function Dele(i) {
+	document.tF.confType.value = 1;
+	document.tF.edIdx.value = i;
+	document.tF.submit();
+    return true;
+}
+
+var weekStr = new Array(7);
+weekStr[0] = 'Sun';
+weekStr[1] = 'Mon';
+weekStr[2] = 'Tue';
+weekStr[3] = 'Wed';
+weekStr[4] = 'Thr';
+weekStr[5] = 'Fri';
+weekStr[6] = 'Sat';
+<% exec cmd="wlanSchRulePool"; %>
+
+function setPageValue() {
+	var i, f, fidx, realIdx;
+	window.status = "";
+
+	if (edIdx == 0) {
+		document.tF.defAct.value = (1 - rlAct);
+		realIdx = rlNum;
+	}
+	else if (edIdx > 0) {
+		realIdx = edIdx - 500;
+		for (i = 0 ; i < 7 ; i++) {
+			if (rlWeek[realIdx][i] == 1) {
+				f = "w" + i;
+				fidx = getElementsByFieldName(document.tF, f);
+				document.tF.elements[fidx].checked = true;
+				document.tF.elements[fidx].defaultChecked = true;
+			}
+		}
+		document.tF.stHr.value = rlStHr[realIdx];
+		document.tF.stMin.value = rlStMin[realIdx];
+		document.tF.edHr.value = rlEdHr[realIdx];
+		document.tF.edMin.value = rlEdMin[realIdx];
+		document.tF.confType.value = 3;
+	}
+	document.tF.edIdx.value = realIdx;
+}
+
+function submit_cancel() {
+	document.location.href="/wireless_main.stm";
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="setPageValue()">
+<form name="tF" action="/cgi-bin/wireless_eb.exe" method="post">
+<input type="hidden" name="edIdx">
+<input type="hidden" name="confType" value="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" align="center">
+<tr>
+	<td>
+		<p><b class=subtitle><% Fid_str(884); %></b></p>
+		<p class=normalText>
+			<% Fid_str(885); %></p>
+	</td>
+</tr>
+<tr>
+	<td><ul>
+		<p class=txt1>
+			<li class=txt1>
+			<% Fid_str(886); %> &nbsp;&nbsp;
+			<SCRIPT LANGUAGE="JavaScript">
+				var iDOD = 1 - <% echo var="Wireless_enable_var"; %>;
+				var iDOD2 = <% echo var="Wireless_sch_enable_var"; %>;
+
+				if (edIdx >= 500) {	// for edit schedule rule
+					if (iDOD2 == 1) {
+						document.write(' <% Fid_str(1291); %>');
+						document.write('<input type="hidden" name="Wireless_enable" value="2">');
+					}
+					else {
+						if (iDOD == 0) {
+							document.write(' <% Fid_str(27); %>');
+							document.write('<input type="hidden" name="Wireless_enable" value="1">');
+						}
+						else {
+							document.write(' <% Fid_str(28); %>');
+							document.write('<input type="hidden" name="Wireless_enable" value="0">');
+						}
+					}
+				}
+				else {
+					document.write('<input type="radio" name="Wireless_enable" value=1> <% Fid_str(27); %>&nbsp;&nbsp;');
+					document.write('<input type="radio" name="Wireless_enable" value=0> <% Fid_str(28); %>&nbsp;&nbsp;');
+					document.write('<input type="radio" name="Wireless_enable" value=2> <% Fid_str(1291); %>');
+					if (iDOD2 == 0) {
+						document.tF.Wireless_enable[iDOD].defaultChecked = true;
+						document.tF.Wireless_enable[iDOD].checked = true;
+					}
+					else {
+						document.tF.Wireless_enable[2].defaultChecked = true;
+						document.tF.Wireless_enable[2].checked = true;
+					}
+				}
+			</SCRIPT>
+			</li>
+		</p>
+		<p class=normalText>
+			<li class=txt1>
+				<% Fid_str(887); %>
+			</li>
+		</p>
+		<table width="90%" border="0" cellspacing="2" cellpadding="5">
+		<tr>
+			<!--<td class=tdTitlec><% Fid_str(27); %></td>-->
+			<td class=tdTitlec><% Fid_str(888); %></td>
+			<td class=tdTitlec><% Fid_str(889); %></td>
+			<td class=tdTitlec><% Fid_str(890); %></td>
+			<td class=tdTitlec><% Fid_str(501); %></td>
+		</tr>
+		<script language="javascript">
+			var i, j, tmpStr;
+			for (i = 0 ; i < (rlNum + 1) ; i++) {
+				if (((edIdx == 0) && (i == rlNum) && (rlNum < 5)) || (edIdx == (i + 500))) {
+					document.write('<tr><td class=tdTextcvc>');
+					document.write('<table width="100%" border=0><tr>');
+					for (j = 0 ; j < 7 ; j++) {
+						document.write('<td class=tdTextr width=15>');
+						document.write('<input type="checkbox" name="w',j,'" value="1"></td>');
+						if (j == 0) tmpStr = '<font color="ff0000">' + weekStr[j] + '</font>';
+						else tmpStr = weekStr[j];
+						document.write('<td class=tdText>',tmpStr,'</td>');
+					}
+					document.write('</tr></table></td>');
+
+					document.write('<td class=tdTextcvc>');
+					document.write('<input type="text" name="stHr" size="3" maxlength="2">&nbsp;:&nbsp;<input type="text" name="stMin" size="3" maxlength="2"></td>');
+					document.write('<td class=tdTextcvc>');
+					document.write('<input type="text" name="edHr" size="3" maxlength="2">&nbsp;:&nbsp;<input type="text" name="edMin" size="3" maxlength="2"></td>');
+					document.write('<td class=tdTextcvc>');
+					if (edIdx == 0)
+						document.write('<input type="button" class="formsbutton" name="Add',rlNum,'" value=" <% Fid_str(1270); %>" onClick="evaltF(1);">');
+					else
+						document.write('&nbsp;');
+					document.write('</td></tr>');
+				}
+				else if (i < rlNum) {
+					document.write('<tr><td class=tdTextcvc>');
+					tmpStr = '';
+					for (j = 0 ; j < 7 ; j++) {
+						if (rlWeek[i][j] == 1) {
+							if (tmpStr != '')  tmpStr += ', ';
+							tmpStr += weekStr[j];
+						}
+					}
+					tmpStr += '</td>\n';
+					document.write(tmpStr);
+					document.write('<td class=tdTextcvc>'+rlStHr[i]+':'+rlStMin[i]+'</td>');
+					document.write('<td class=tdTextcvc>'+rlEdHr[i]+':'+rlEdMin[i]+'</td>');
+					document.write('<td class=tdTextcvc>');
+					document.write('<input type="button" class="formsbutton" name="edit',i,'" value=" <% Fid_str(1269); %>" onClick="Edit(',i,');">&nbsp;');
+					document.write('<input type="button" class="formsbutton" name="dele',i,'" value=" <% Fid_str(1248); %>" onClick="Dele(',i,');"></td>');
+					document.write('</tr>');
+				}
+			}
+			if (edIdx == 0) {
+				document.write('<tr><td class=tdText colspan=4>');
+				document.write('When previous rules are <font color="ff0000">NOT</font> <% Fid_str(1292); %>.&nbsp;&nbsp;<select size="1" name="defAct">');
+				document.write('<option value=1> <% Fid_str(27); %></option>');
+				document.write('<option value=0> <% Fid_str(28); %></option></select>&nbsp;  <% Fid_str(1293); %>.</td>');
+				document.write('</tr>');
+			}
+		</script>
+		</table>
+		</ul>
+	</td>
+</tr>
+</table>
+<br><br>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr><td>
+		<div align="right">
+		<a href="#" onClick="MM_openBrWindow('help.stm#wireless','help','scrollbars=yes,width=600,height=500')"><input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>"></a>
+		<input type="button" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF(0);">
+		<input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>" onClick="return submit_cancel();">
+		</div>
+	</td></tr>
+</table>
+</form>
+</body>
+</html>

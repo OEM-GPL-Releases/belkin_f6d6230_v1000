@@ -1,0 +1,36 @@
+	<tr>
+		<td colspan="3" bordercolor="#FFFFFF" height="64">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td rowspan="3" width="20" valign="bottom"><a href="http://www.belkin.com"><img src="/images/head_logo.gif" border="0" width="121" height="64"></a></td>
+					<td colspan="4" height="21" align="right" nowrap>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="4" height="14"><img src="/images/title.gif" height="15" width="265"></td>
+				</tr>
+				<tr>
+					<td background="/images/bar_floor.gif" width="150" height="28"><img src="/images/shim.gif" width="1" height="28"></td>
+					<td background="/images/bar.gif" height="28"><img src="/images/bar_slope.gif" width="163" height="28"></td>
+					<td background="/images/bar.gif" height="28" align="right" nowrap class="top_nav">
+						<nobr>
+						<a href="/index.stm" class="top_nav"><!--#Fid_str(530)--></a> |
+						<a href="/help.stm" class="top_nav"><!--#Fid_str(279)--></a> |
+						<a href="/cgi-bin/logout.exe" class="top_nav"><!--#Fid_str(532)--></a> &nbsp; &nbsp;
+						<script language="javascript">
+						if (ap_mode == 0)
+						{
+							document.write('<span class="top_nav"><!--#Fid_str_Js(960)--><b>');
+							
+								if(bWanConnected==1)
+									document.write('<font face="verdana,arial" size="2" color="#33FF33"><!--#Fid_str_Js(961)--></font></b></span>');
+								else
+									document.write('<font face="verdana,arial" size="2" color="#FF0000"><!--#Fid_str_Js(962)--></font></b></span>');
+						}
+						</script>
+						</nobr>
+					</td>
+					<td height="28" align="right" background="/images/bar.gif"><img src="/images/bar_cap.gif" width="11" height="28"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>

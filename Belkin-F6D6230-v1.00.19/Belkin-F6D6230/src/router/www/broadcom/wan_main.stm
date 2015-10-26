@@ -1,0 +1,167 @@
+<% gs_NdcUpdate(); %>
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="javascript">
+var skuid=<% nvram_get("gs_sku_id"); %>;
+
+<% File_include("my_function.txt"); %>
+<% exec cmd="my_function" ; %>
+<% login_timeout(); %>
+<% exec cmd="multipppoeQConf" ; %>
+<% File_include("routine.txt"); %>
+//<% exec cmd="initQConf" ; %> //wenfang 20070207 remove for the cmd for ADSL
+
+function evalF()
+{
+	if(document.tF0.wan_type[0].checked==true)
+		document.location.href="wan_dhpc.stm";
+	else if(document.tF0.wan_type[1].checked==true)
+		document.location.href="wan_static.stm";
+	else if(document.tF0.wan_type[2].checked==true)
+		document.location.href="wan_pppoe.stm";
+	else if(document.tF0.wan_type[3].checked==true)
+		document.location.href="wan_pptp.stm";
+	else if(document.tF0.wan_type[4].checked==true)
+		document.location.href="wan_bigpondnew.stm";
+}
+</script>
+</head>
+
+<BODY text=#000000 bgColor=#ffffff leftMargin=0 topMargin=0 marginheight="0" marginwidth="0">
+<% File_include("menu.stm"); %>
+<form ACTION="apply.cgi" method="post" name="tF0">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+<tr>
+		<td width=36>&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(688); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<table width="485" border="0" cellspacing="5" cellpadding="0" align="center" class="copy_1">
+							<tr>								
+								<td colspan="3" class="body"><% Fid_str(689); %></td>
+							</tr>
+							<tr>
+								<td width="30"><input name="wan_type" type="radio" value="0"></td>
+								<td colspan="2" class="body"><b><% Fid_str(690); %></b></td>
+							</tr>
+							<tr>
+								<td height="40" width="35">&nbsp;</td>
+								<td height="40" colspan="2" class="body"><% Fid_str(691); %></td>
+							</tr>
+							<tr>
+								<td width="30"><input name="wan_type" type="radio" value="1"></td>
+								<td colspan="2" class="body"><b><% Fid_str(692); %></b></td>
+							</tr>
+							<tr>
+								<td width="30">&nbsp;</td>
+								<td colspan="2" class="body"><% Fid_str(693); %></td>
+							</tr>
+							<tr>
+								<td width="30"><input name="wan_type" type="radio" value="2"></td>
+								<td colspan="2" class="body"><b><% Fid_str(694); %></b></td>
+							</tr>
+							<tr>
+								<td width="30">&nbsp;</td>
+								<td colspan="2" class="body"><% Fid_str(695); %></td>
+							</tr>
+
+							<script language="JavaScript">
+							if ((skuid!=33)&&(skuid!=34)){
+								document.write("<tr><td width='30'><input name='wan_type' type='radio' value='5'></td><td colspan='2' class='body'><b><% Fid_str(696); %></b></td>	</tr>");
+								document.write("<tr><td width='30'>&nbsp;</td><td colspan='2' class='body'><% Fid_str(697); %></td></tr>");
+								document.write("<tr><td width='30'><input name='wan_type' type='radio' value='6'></td><td colspan='2' class='body'><b><% Fid_str(1679); %></b></td></tr>");
+								document.write("<tr><td width='30'>&nbsp;</td><td colspan='2' class='body'><% Fid_str(1680); %></td></tr>");
+							}
+							</script>
+
+							<!--<tr>
+								<td width="30"><input name="wan_type" type="radio" value="9"></td>
+								<td colspan="2" class="body"><b>L2TP</b></td>
+							</tr> -->
+
+							<!--<tr>
+								<td width="30">&nbsp;</td>
+								<td colspan="2" class="body"><% Fid_str(139); %></td>
+							</tr> -->
+							
+							<SCRIPT LANGUAGE="JavaScript">
+								var wanType="<% nvram_get("wan0_proto"); %>";
+								var pptp_enable="<% nvram_get("wan0_pptp_enable"); %>";
+								var bigpond_enable="<% nvram_get("wan_bigpond_enable"); %>";
+								var iDOD;
+								
+								if(wanType=="dhcp") 
+								{
+									if (pptp_enable==1)iDOD=5;
+									else if(bigpond_enable==1)iDOD=6;
+									else iDOD=0;
+								}	
+								if(wanType=="static")
+								{
+									if (pptp_enable==1)iDOD=5;
+									else iDOD=1;
+								}	
+								if(wanType=="pppoe") iDOD=2;
+								if(wanType=="pptp") iDOD=5;
+								//if(wanType=="bigpond") iDOD=6;
+							  	switch (iDOD) {
+							    	case 0:  // Dynamic IP Address
+									document.tF0.wan_type[0].defaultChecked=true;
+									document.tF0.wan_type[0].checked=true;
+							      	break;
+							    	case 1:  // Static IP Address
+									document.tF0.wan_type[1].defaultChecked=true;
+									document.tF0.wan_type[1].checked=true;
+							      break;
+							    	case 2:  // PPPoE
+									document.tF0.wan_type[2].defaultChecked=true;
+									document.tF0.wan_type[2].checked=true;
+							      break;
+							      case 5:  // PPTP
+									document.tF0.wan_type[3].defaultChecked=true;
+									document.tF0.wan_type[3].checked=true;
+							      break;
+
+							      case 6:  //BigPond
+									document.tF0.wan_type[4].defaultChecked=true;
+									document.tF0.wan_type[4].checked=true;
+							      break;
+							      case 9:  //L2TP
+									document.tF0.wan_type[5].defaultChecked=true;
+									document.tF0.wan_type[5].checked=true;
+							      break;
+							      default:
+							     }
+							</SCRIPT>
+							<tr>
+								<td  colspan=3>&nbsp;</td>								
+							</tr>
+							<tr>
+								<td width="30">&nbsp;</td>
+								<td align=center colspan=2>
+								<input type="button"  name="arc_action" value="<% Fid_str(700); %> >" style="{width=150px;height=22px;}" class="submitBtn" name=next onClick="evalF()">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</form>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

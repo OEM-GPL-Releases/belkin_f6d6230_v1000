@@ -1,0 +1,560 @@
+<% exec cmd("NdcUpdate"); %>
+<html>
+<head>
+<% char_set(); %>
+<META http-equiv=Pragma content=no-cache>
+<LINK rel="stylesheet" href="stylemain.css" type="text/css">
+<LINK rel="stylesheet" href="colors.css" type="text/css">
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% LoginTimeout(); %>
+<% File_include("routine.txt"); %>
+<% gs_myFunction(); %>
+
+var remove_cfm='Would you like to really continue and remove the data storage surely?';
+var remove_prcfm='Would you like to really continue and remove the USB printer surely?';
+
+function disclaimers()
+{
+ alert(" The items on this page are unsupported.");
+}
+
+function stZrk(){
+	top.frames[2].location.href = "usb_fsrv.stm";
+}
+
+function evaltF() {
+	var strTmp1, strTmp2;
+
+	if ((preUsbEnb == 1) && (document.tF0.usbEnable.checked == false)) {
+		if (confirm('Before you disable this function. Please make sure no any user is connecting to the USB device. Unexpect disconnect could result client user file crash or system hang-up. Do you really want to continue ?') == false) {
+			document.tF0.usbEnable.checked = true;
+			return false;
+		}
+	}
+
+	// check change all disable field to enable to prevent submit NULL form
+	if(document.tF0.usbEnable.checked==true)	document.tF0.gs_usb_enabled.value =1;
+	else document.tF0.gs_usb_enabled.value = 0;
+	document.tF0.target="";
+
+	document.tF0.submit();
+	return true;
+}
+
+var preUsbEnb = <% nvram_get("gs_usb_enabled"); %>;
+var preSmbEnb = <% nvram_get("gs_samba_enabled"); %>;
+var ftpFunc = <% nvram_get("gs_ftp_enabled"); %>;
+var wftpFunc = <% nvram_get("gs_wftp_enabled"); %>;
+var upnpavFunc = 0; 
+var unPlugDisk = false;
+var unPlugPrinter = false;
+
+<% disk_info(); %>
+
+<% disk_vol(); %>
+
+<% ftp_vol_info(); %>
+
+<% wftp_info(); %>
+
+<% Get3GInfo(); %>
+
+function submitUnPlug(devID,isPrinter,unPlugType) {
+	var i, j, con, disk_id;
+/*
+	if (isPrinter == 0) {
+		if (unPlugDisk) {
+			window.location.reload();
+			return;
+		}
+		disk_id = document.tF0.disk_id.value;
+	}
+	else {
+		if (unPlugPrinter) {
+			window.location.reload();
+			return;
+		}
+		disk_id = devID;
+		document.tF0.disk_id.value = devID;
+	}
+
+	// confirm un-plug
+	if ((isPrinter == 0) && (part_Num[disk_id] > 0)) {
+		if (confirm(remove_cfm) == false) {
+			return false;
+		}
+
+		if ((preSmbEnb == 1) || (ftpFunc == 1) || (wftpFunc == 1) || (upnpavFunc == 1)) {
+			if (confirm('Before you disable this function. Please make sure no any user is connecting to the USB. Unexpect disconnect could result client user file crash or system hang-up. Do you really want to continue ?') == false) {
+				return false;
+			}
+		}
+	}
+	else {
+		if (confirm(remove_prcfm) == false) {
+			return false;
+		}
+	}
+
+	if (isPrinter == 1) unPlugPrinter = true;
+	else unPlugDisk = true;
+*/
+	// submit process
+	if (confirm(remove_cfm) == false) {
+		return false;
+	}
+	
+	if (confirm('Before you disable this function. Please make sure no any user is connecting to the USB. Unexpect disconnect could result client user file crash or system hang-up. Do you really want to continue ?') == false) {
+		return false;
+	}
+
+	document.tF0.isPrinter.value = isPrinter;
+	document.tF0.unplug.value = unPlugType;
+	document.tF0.gs_web_umount.value=1;
+	document.tF0.arc_action.value="umount device";
+	document.tF0.rm_usb_index.value=document.tF0.disk_id.selectedIndex;
+	document.tF0.target="hidden_frame";
+	setTimeout("reloadFrame()", 5000);
+	alert("The USB device is safe to be disconnected now.");
+}
+
+function reloadFrame()
+{
+	window.top.document.location.reload();
+	
+}
+
+function submitRefreshDisk() {
+	document.tF0.isPrinter.value = 0;
+	document.tF0.unplug.value = 3;
+	document.tF0.submit();
+
+	return true;
+}
+
+// flag: 1-mount, 2-unmount
+// diskId: 0 based
+// volId: 1 based
+function mountFunc(diskId, volId, flag) {
+	if (volShareNum[diskId][volId] > 0) {
+		alert('This partition has been shared for some service. Please disable these services before you deactivate this partition.');
+		return false;
+	}
+
+	document.tF0.disk_id.value = diskId;
+	document.tF0.volID.value = volId - 1;
+	document.tF0.volType.value = volTypeID[diskId][volId];
+	document.tF0.mountflag.value = flag;
+	document.tF0.submit();
+}
+
+var stri;
+// volId: 1 based
+function part_stat(diskId, volId){
+	var j, strTmp, tt, cnt = 0, cntFtp = 0, cntWFtp = 0;
+	var st, ed, range, wftpDVar, wftpVVar;
+
+	// check file server
+	strTmp = '';
+	tt = '';
+	range = (shareMaxNum - 2) / maxSupportNum;
+	if (maxSupportNum > 1) {
+		st = 2 + (diskId * range);
+		ed = 2 + ((diskId + 1) * range);
+	}
+	else {
+		st = 2;
+		ed = shareMaxNum;
+	}
+
+	for (j = st ; j < ed ; j++) {
+		if ((shEnable[j] == 1) && ((shDisk[j] == diskId) && (shVol[j] == volId) && (shName[j] != ''))) {
+			if (cnt > 0) strTmp += ',';
+			strTmp += shName[j];
+			cnt++;
+		}
+	}
+	if (cnt > 0) {
+		tt += 'File Server('+strTmp+')';
+	}
+
+	// check ftp
+	strTmp = '';
+	range = profile_num / maxSupportNum;
+	if (maxSupportNum > 1) {
+		st = diskId * range;
+		ed = (diskId + 1) * range;
+	}
+	else {
+		st = 0;
+		ed = profile_num;
+	}
+	for (j = st ; j < ed ; j++) {
+		if ((enb_value[j] == 1) && (disk_value[j] == diskId) && (partition_value[j] == volId) && (user_value[j] != '')) {
+			if (cntFtp > 0) strTmp += ',';
+			strTmp += user_value[j];
+			cntFtp++;
+		}
+	}
+	if (cntFtp > 0) {
+		if (tt != '') tt += ', ';
+		tt += 'FTP('+strTmp+')';
+	}
+
+	// check wftp
+if (def_wftpFunc == 1) {
+	if (maxSupportNum > 1) {
+		wftpDVar = wftpFolderDisk[diskId];
+		wftpVVar = wftpFolderVol[diskId];
+	}
+	else {
+		wftpDVar = wftp_disk_value;
+		wftpVVar = wftp_partition_value;
+	}
+	if ((wftpDVar == diskId) && (wftpVVar == volId)) {
+		if (tt != '') tt += ', ';
+		tt += 'Web-FTP';
+		cntWFtp = 1;
+	}
+}
+
+	if (tt == '') stri += '&nbsp;';
+	else stri += tt;
+	
+	volShareNum[diskId][volId] = cnt + cntFtp + cntWFtp;
+}
+
+function getDISKButton(k) {
+	var butt;
+
+	butt = '';
+	/*	
+	if (usb_ms_reload[k]) {
+		butt += '<a href=" " onclick="javascript:void(submitRefreshDisk());" ><input type="button" name="rescan111" value="Rescan"></a>';
+		//butt += '<a href=" " onclick="javascript:void(submitUnPlug(0,0,1));"><input type="button" name="uplug111" value="Safely Remove"></a>';
+	}
+	else {
+		if (dev_eject[k])
+			butt += '<a href=" " onclick="javascript:void(submitUnPlug(0,0,2));"><input type="button" name="eject111" value="Eject"></a>';
+		if(mountNum>0)
+			butt += '<a href=" " onclick="javascript:void(submitUnPlug(0,0,1));"><input type="button" name="uplug111" value="getDiskButton: Safely Remove"></a></td>';
+	}
+
+	document.getElementById('diskButton').innerHTML=butt;
+	*/
+
+	if(mountNum>0)
+		butt += '<input type="submit" name="uplug111" value="Safely Remove" onclick="submitUnPlug(0,0,1)"></td>';
+		
+	document.getElementById('diskButton').innerHTML=butt;		
+}
+
+function getDISK() {
+	var j, k;
+
+	k = parseInt(document.tF0.disk_id.value);
+	j=1; 
+	if(gUsb_disk[k].fs_mount=='') return; 
+	stri = '<table border="0" cellspacing="1" cellpadding="5" width=80% class="copy_1">';
+	stri += '<tr bgcolor=#666262><td class=body><font color=#ffffff><b>Partition</b></font></td>\n';
+	stri += '<td class=body><font color=#ffffff><b>Sharing Status</b></font></td>';
+	stri += '<td class=body><font color=#ffffff><b>Configure</b></font></td></tr>';
+	if(gUsb_disk[k].fs_format == 'fuseblk')
+		stri += '<tr bgcolor=#B4B2B2><td class=plaintext> 1. NTFS </td>';
+	else
+		stri += '<tr bgcolor=#B4B2B2><td class=plaintext> 1. '+gUsb_disk[k].fs_format+'</td>';
+		
+		stri += '<td class=plaintext>'+gUsb_disk[k].fs_mount+'</td>';;
+		stri += '<td class=plaintext><input type="button" name="activate111" value="Activate" onclick="javascript:void(mountFunc('+k+','+j+',1));" disabled></td></tr>';
+	stri += '<tr><td></td></tr></table>';
+	document.getElementById('Partition').innerHTML=stri;
+	getDISKButton(k);
+/*
+	if ((diskNum + reloadCnt) == 0) return;
+	k = parseInt(document.tF0.disk_id.value);
+
+	if (usb_ms_reload[k] == false) {
+		stri = '<table border="0" cellspacing="1" cellpadding="5" width=80% class="copy_1">';
+		if (part_Num[k] != -1) {
+			stri += '<tr bgcolor=#666262><td class=body><font color=#ffffff><b>Partition</b></font></td>\n';
+			stri += '<td class=body><font color=#ffffff><b>Sharing Status</b></font></td>';
+			stri += '<td class=body><font color=#ffffff><b>Configure</b></font></td></tr>';
+			for (j = 1 ; j < part_Num[k]+1 ; j++) {
+				stri += '<tr bgcolor=#B4B2B2><td class=plaintext>'+(j)+'.  '+volType[k][j]+'</td>';
+				if (volFsIdx[k][j] < 0) {
+					stri += '<td class=plaintext colspan=2>(not supported)</td></tr>';
+				}
+				else if ((volMount[k][j] == 0) && (mountNum >= mountMaxNum)) {
+					stri += '<td class=plaintext>&nbsp;</td>';
+					stri += '<td class=plaintext>&nbsp;</td></tr>';
+				}
+				else {
+					if (volMount[k][j] > 0) {
+						stri += '<td class=plaintext>';
+						part_stat(k, j);
+						stri += '</td>';
+						stri += '<td class=plaintext><input type="button" name="deactivate111" value="Deactivate" onclick="javascript:void(mountFunc('+k+','+j+',2));" disabled></td></tr>';
+					}
+					else {
+						stri += '<td class=plaintext>'+volMount[0][1]+'</td>';
+						stri += '<td class=plaintext><input type="button" name="activate111" value="Activate" onclick="javascript:void(mountFunc('+k+','+j+',1));" disabled></td></tr>';
+					}
+				}
+			}
+		}
+		stri += '<tr><td></td></tr></table>';
+	}
+	else stri = '';
+
+	document.getElementById('Partition').innerHTML=stri;
+	getDISKButton(k);
+*/
+	
+	
+}
+
+function logrefresh(){
+	window.location.reload(true);
+	return true;
+}
+<% gateway_status(); %>
+<% Gateway_IsWanConnected(); %>
+
+var total_usb_nodes=<% nvram_get("usb_disk_total"); %>;
+var gUsb_disk = new Array(8); 
+
+for(var i=0; i<8; i++) {
+	gUsb_disk[i] = new Object();
+}
+
+gUsb_disk[0].fs_dev =  '<% nvram_get("usb_disk0_fs_dev"); %>';
+gUsb_disk[0].fs_mount = '<% nvram_get("usb_disk0_fs_mount"); %>';
+gUsb_disk[0].fs_format = '<% nvram_get("usb_disk0_fs_format"); %>';
+gUsb_disk[0].fs_desp = '<% nvram_get("usb_disk0_fs_desp"); %>';
+
+gUsb_disk[1].fs_dev =  '<% nvram_get("usb_disk1_fs_dev"); %>';
+gUsb_disk[1].fs_mount = '<% nvram_get("usb_disk1_fs_mount"); %>';
+gUsb_disk[1].fs_format = '<% nvram_get("usb_disk1_fs_format"); %>';
+gUsb_disk[1].fs_desp = '<% nvram_get("usb_disk1_fs_desp"); %>';
+	
+gUsb_disk[2].fs_dev =  '<% nvram_get("usb_disk2_fs_dev"); %>';
+gUsb_disk[2].fs_mount = '<% nvram_get("usb_disk2_fs_mount"); %>';
+gUsb_disk[2].fs_format = '<% nvram_get("usb_disk2_fs_format"); %>';
+gUsb_disk[2].fs_desp = '<% nvram_get("usb_disk2_fs_desp"); %>';
+	
+gUsb_disk[3].fs_dev =  '<% nvram_get("usb_disk3_fs_dev"); %>';
+gUsb_disk[3].fs_mount = '<% nvram_get("usb_disk3_fs_mount"); %>';
+gUsb_disk[3].fs_format = '<% nvram_get("usb_disk3_fs_format"); %>';
+gUsb_disk[3].fs_desp = '<% nvram_get("usb_disk3_fs_desp"); %>';
+	
+gUsb_disk[4].fs_dev =  '<% nvram_get("usb_disk4_fs_dev"); %>';
+gUsb_disk[4].fs_mount = '<% nvram_get("usb_disk4_fs_mount"); %>';
+gUsb_disk[4].fs_format = '<% nvram_get("usb_disk4_fs_format"); %>';
+gUsb_disk[4].fs_desp = '<% nvram_get("usb_disk4_fs_desp"); %>';
+	
+gUsb_disk[5].fs_dev =  '<% nvram_get("usb_disk5_fs_dev"); %>';
+gUsb_disk[5].fs_mount = '<% nvnvram_get("usb_disk5_fs_mount"); %>';
+gUsb_disk[5].fs_format = '<% nvram_get("usb_disk5_fs_format"); %>';
+gUsb_disk[5].fs_desp = '<% vram_get("usb_disk5_fs_desp"); %>';
+
+gUsb_disk[6].fs_dev =  '<% nvram_get("usb_disk6_fs_dev"); %>';
+gUsb_disk[6].fs_mount = '<% nvram_get("usb_disk6_fs_mount"); %>';
+gUsb_disk[6].fs_format = '<% nvram_get("usb_disk6_fs_format"); %>';
+gUsb_disk[6].fs_desp = '<% nvram_get("usb_disk6_fs_desp"); %>';
+	
+gUsb_disk[7].fs_dev =  '<% nvram_get("usb_disk7_fs_dev"); %>';
+gUsb_disk[7].fs_mount = '<% nvram_get("usb_disk7_fs_mount"); %>';
+gUsb_disk[7].fs_format = '<% nvram_get("usb_disk7_fs_format"); %>';
+gUsb_disk[7].fs_desp = '<% nvram_get("usb_disk7_fs_desp"); %>';
+	
+</script>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="disclaimers();">
+<% File_include("menu.stm"); %>
+
+	<form name="tF0" method="post" action="apply.cgi" target="hidden_frame">
+	<input type="hidden" name="location_page" value="storage_disk.html">	
+	<input type="hidden" name="arc_action" value="umount usb">
+	<input type="hidden" name="gs_usb_enabled" value=<% nvram_get("gs_usb_enabled"); %> >
+	<input type="hidden" name="isPrinter">
+	<input type="hidden" name="unplug" value=0>
+	<input type="hidden" name="mountflag" value=0>
+	<input type="hidden" name="volID">
+	<input type="hidden" name="volType">
+	<input type="hidden" name="fromStatus" value=0>
+	<input type="hidden" name="gs_web_umount" value=0>
+	<input type="hidden" name="rm_usb_index" value=0>
+	
+	<table width="650" border="0" cellspacing="1" cellpadding="1">
+		
+	<tr>
+	<td width="36">&nbsp;</td>
+	<td class="body">
+		<br>&nbsp;<font class="head_bold">USB</font><br><br><P>
+		<FONT color=#004263>
+			The router supports the USB Host controller function. You could enable this function and plug-in your USB device to share it with other people via network. The supported USB devices include:<br><br>
+			<script LANGUAGE="JavaScript">
+				if(my_usb_storage > 0) document.write('<li>USB mass storage: hard disk, flash disk or memory card reader, up to '+diskMaxNum+' device(s).</li>');
+				if(my_usb_printer > 0) document.write('<li>USB printer: up to '+prMaxNum+' device.</li>');
+				if (X02_pf == 0) document.write('<li>USB-Hub: up to 1 device.</li>');
+				if (my_umts == 1) document.write('<li>USB-UMTS-Stick: up to 1 device.</li>');
+
+				document.write('<br><br>After you plug-in the USB device into the router. You may click "Update Status" to see the device information in the "Current USB Device Status" table.<br>');
+			if(my_usb_storage > 0) {
+				document.write('Four different file system formats are supported: FAT12, FAT16, FAT32 and NTFS and up to '+mountMaxNum +' partitions could be activated at the same time. For your convenience, the router will activate the first '+mountMaxNum +' partitions automatically when you plug-in an USB storage device.');
+				//document.write('If you have more than '+mountMaxNum +' partitions in your storage device, you could "Deactivate" some unused partitions and "Activate" other partitions you would like to use.<br>');
+				document.write('<br>');
+				if ((diskNum + prNum) > 0) {
+					document.write('<font color="red">Warning!</font> If you would like to unplug the USB storage, please click "Safely Remove" button in the "Current USB Device Status" table to make sure all un-saved data have been written into disk completely. Directly unplugging device may cause your USB storage crash.');
+				}
+			}
+			</script>
+		</FONT>
+		</P>
+	</td>
+	</tr>
+
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td class="body">
+			<input type="checkbox" name="usbEnable" value=1>&nbsp;&nbsp;Enable USB function
+			<script LANGUAGE="JavaScript">
+				if (preUsbEnb == 1)
+					document.tF0.usbEnable.checked = true;
+				else
+					document.tF0.usbEnable.checked = false;
+			</script>
+		</td>
+	</tr>
+	
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td class="body">
+		Current USB Device Status:
+		<script language="javascript">
+			var k;
+			/*
+			if(my_usb_storage > 0) {
+				document.write('<table border=0 cellspacing="1" cellpadding="5" width=80% class="copy_1"><tr><td>\n');
+				document.write('<table border=0 cellspacing="0" cellpadding="0" width=100% class="copy_1"><tr>');
+				if ((diskNum + reloadCnt) > 0) {
+					document.write('<td width=80%>');
+					if ((diskNum + reloadCnt) > 1) {
+						document.write('<select size="1" name="disk_id" onChange="getDISK();">');
+						for (k = 0 ; k < (diskNum + reloadCnt) ; k++) {
+							if (usb_ms_reload[k]) {
+								if (isBlank(usb_ms_drive_Info[k]) == false)
+									document.write('<option value='+k+'>'+usb_ms_drive_Info[k]+'</option>');
+								else
+									document.write('<option value='+k+'>Mass Storage</option>');
+							}
+							else {
+								if (isBlank(drive_Info[k]) == false)
+									document.write('<option value='+k+'>'+drive_Info[k]+' connected with '+part_Num[k]+' Partitions</option>');
+								else
+									document.write('<option value='+k+'>Mass storage '+(k+1)+' connected with '+part_Num[k]+' Partitions</option>');
+							}
+						}
+						document.write('</select>');
+					}
+					else {
+						document.write('<input type="hidden" name="disk_id" value=0>');
+						for (k = 0 ; k < diskMaxNum ; k++) {
+							if (usb_ms_reload[k]) {
+								document.tF0.disk_id.value = k;
+								if (isBlank(usb_ms_drive_Info[0]) == false)
+									document.write('<b>'+usb_ms_drive_Info[0]+'</b>');
+								else
+									document.write('<b>Mass Storage</b>');
+							}
+							else {
+								if (part_Num[k] == 0) continue;
+								document.tF0.disk_id.value = k;
+								if (isBlank(drive_Info[k]) == false)
+									document.write('<b>'+drive_Info[k]+' connected with '+part_Num[k]+' Partitions</b>');
+								else
+									document.write('<b>Mass storage connected with '+part_Num[k]+' Partitions</b>');
+							}
+						}
+					}
+					*/
+			if(total_usb_nodes > 0 ) {
+				document.write('<table border=0 cellspacing="1" cellpadding="5" width=80% class="copy_1"><tr><td>\n');		
+				document.write('<select size="1" name="disk_id" onChange="getDISK();">');
+				for(k=0; k<total_usb_nodes; k++) {
+					document.write('<option value='+k+'>'+gUsb_disk[k].fs_dev+'connected with 1 Partitions</option>');
+				}
+				document.write('</select></td>');
+				document.write('<td align=right nowrap id="diskButton"></td>');
+				document.write('</tr></table>');
+				document.write('<span id="Partition"></span>');
+				getDISK();
+			} else {
+				document.write('<table border=0 cellspacing="1" cellpadding="5" width=80% class="copy_1"><tr><td>\n');	document.write('<input type="hidden" name="disk_id" value=0><tr>');
+				document.write('<td width=80%><b>Mass storage Disconnected</b></td>\n');
+				document.write('<td align=right width=20%><a href=" " onclick="javascript:window.location.reload();" ><input type="button" name="updatebbb" value="Update Status"></a></td>');
+				document.write('</tr></table>');
+			}
+			
+			if(my_usb_printer > 0) {
+				for (k = 0 ; k < prUINum ; k++) {
+					document.write('<table border=0 cellspacing="1" cellpadding="5" width=80% class="copy_1"><tr><td>\n');
+					document.write('<table border=0 cellspacing="0" cellpadding="0" width=100% class="copy_1"><tr>');
+					if (isBlank(pr_Info[k]) == false) {
+						document.write('<td width=80%><b>'+pr_Info[k]+' connected</b></td>');
+						document.write('<td align=right width=20%><a href=" " onclick="javascript:void(submitUnPlug(',k,',1,3));"><input type="button" name="uplugaa" value="Safely Remove"></a></td>');
+					}
+					else {
+						document.write('<td width=80%><b>Printer Disconnected</b></td>');
+						document.write('<td align=right width=20%><a href=" " onclick="javascript:window.location.reload();"><input type="button" name="updateaa" value="Update Status"></a></td>');
+					}
+					document.write('</tr></table></td></tr><tr><td></td></tr></table>');
+				}
+			}
+			if (my_umts != 0) {
+					document.write('<table border=0 cellspacing="1" cellpadding="5" width=80% class="copy_1"><tr><td>\n');
+					document.write('<table border=0 cellspacing="0" cellpadding="0" width=100% class="copy_1"><tr>');
+					if ((umtsCnt > 0) && (isBlank(umts_Info) == false)) {
+						document.write('<td width=80%><b>'+umts_Info+' connected</b></td>');
+						document.write('<td align=right width=20%><a href=" " onclick="javascript:void(submitUmts(4));"><input type="button" name="uplugb" value="Safely Remove"></a></td>');
+	
+						document.write('</tr></table></td></tr></table>');
+					}
+					else {
+						document.write('<tr>');
+						document.write('<td width=80%><b>No UMTS-Stick found</b></td>');
+						document.write('<td align=right width=20%><a href=" " onclick="javascript:window.location.reload();"><input type="button" name="updateb" value="my_umts:Update Status"></a></td>');
+						document.write('</tr>');
+					}
+
+				}
+				</script>
+		 </td>
+	</tr>
+	<tr>
+	<td width="36">&nbsp;</td>
+	<td>	
+ 	 <TABLE>
+   	 <TBODY>
+
+		<TR align="center">
+
+      	<TD height=30>
+      	<INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onClick="javascript:window.location.reload(true);return false" type=button value="<% Fid_str(48); %>">&nbsp;&nbsp;<INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onclick=evaltF() type=button value="<% Fid_str(49); %>">
+      	</TD>
+		</TR>
+	</TBODY>
+  	</TABLE>
+
+	</td>
+	</tr>
+</form>
+</table>
+<iframe name="hidden_frame" id="hidden_frame" src="#" width="0" height="0" frameborder="0"></iframe>
+</body>
+</html>
+

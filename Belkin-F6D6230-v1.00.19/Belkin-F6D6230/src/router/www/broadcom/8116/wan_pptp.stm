@@ -1,0 +1,523 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style type="text/css">
+ a:link {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:visited {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:active {
+      color:#6464c3;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+ </style>
+
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% gs_Lan_IP_Addr("Lan_IP_Address"); %> // get LAN_IP_ADDR[], LAN_NETMASK[], LAN_SUBNET[]
+<% gs_Wan_IP_Subnet("Wan_IP_Subnet"); %> // get WAN_IP_ADDR[], WAN_NETMASK[], WAN_SUBNET[]
+
+var ipm='<% Fid_str(641); %>';
+var ipm1='<% Fid_str(675); %>';
+var Gm='<% Fid_str(338); %>' +': '+ '<% Fid_str(395); %>';
+var Gm1='<% Fid_str(338); %>' +': '+ '<% Fid_str(1780); %>';
+var sm='<% Fid_str(766); %>';
+var wanm='<% Fid_str(1281); %>';
+var ipmUcast ='<% Fid_str(678); %>';
+var lastIpError ='<% Fid_str(2617); %>';
+var service_ip_title='<% Fid_str(748); %>'+': ';
+var ip_title='<% Fid_str(330); %>'+': ';
+var errorIP_224 = '<% Fid_str(1780); %>';
+var LAN_interface = new Interface_T();
+var WAN_interface = new Interface_T();
+
+<% exec cmd="LAN_Interface"; %>
+var ch;
+function specialshar(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='@' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token=='.' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function specialshar_name(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function evaltF() 
+{
+	var errMsg;
+
+	
+	if(isBlank(document.tF0.wan_pptp_username.value)){
+		alert('<% Fid_str(742); %>'); 
+		return false;
+	}
+
+	if(isBlank(document.tF0.wan_pptp_passwd.value))
+	{ 	
+		alert('<% Fid_str(757); %>');  
+		return false; 
+	}
+
+//	if(specialshar(document.tF0.wan_pptp_hostname.value)){
+//		alert('<% Fid_str(648); %>'+":"+ch);
+//		return false; 
+//	}		
+
+	if(isBlank(document.tF0.re_passwd.value)){ alert('<% Fid_str(904); %>'); return false; }
+	if(document.tF0.re_passwd.value!=document.tF0.wan_pptp_passwd.value)
+	{ 
+		alert('<% Fid_str(624); %>'); 
+		return false; 
+	}
+	
+   if((document.tF0.serverip1.value=="0")&&(document.tF0.serverip2.value=="0")&&(document.tF0.serverip3.value=="0")&&(document.tF0.serverip4.value=="0")){
+		alert('Please enter PPTP Server IP Address or Domain Name!');
+		return false;		
+	}
+	
+	if((document.tF0.serverip1.value==LAN_interface.ip[0] )&& (document.tF0.serverip2.value==LAN_interface.ip[1])
+	&&(document.tF0.serverip3.value==LAN_interface.ip[2])&&(document.tF0.serverip4.value==LAN_interface.ip[3])){
+		alert('PPTP Server IP Address can not be the same as Gateway IP Address!');
+		return false;	
+	}
+	
+	if ( document.tF0.on_demand.checked==true ){
+	       if(isNValidNum(document.tF0.wan_pptp_idletime.value) || (document.tF0.wan_pptp_idletime.value<1) || (document.tF0.wan_pptp_idletime.value>99))
+				{
+						alert('<% Fid_str(738); %> '); 
+						return false;
+				}
+				document.tF0.wan_pptp_demand.value=1;
+		}
+		else
+	  	{document.tF0.wan_pptp_demand.value=0;}
+
+	if(!(isBlank_Zero(document.tF0.serverip1.value))||!(isBlank_Zero(document.tF0.serverip2.value))||!(isBlank_Zero(document.tF0.serverip3.value))||!(isBlank_Zero(document.tF0.serverip4.value))){
+
+		if(document.tF0.serverip1.value>223 || isNValidLastIP(document.tF0.serverip1.value)) { alert(ip_title+errorIP_224); return false; }
+		//if(isNValidLastIP(document.tF0.serverip1.value)) { alert(service_ip_title+lastIpError); return false; }
+		if(isNValidIP(document.tF0.serverip2.value)) { alert(service_ip_title+ipm); return false; }
+		if(isNValidIP(document.tF0.serverip3.value)) { alert(service_ip_title+ipm); return false; }
+		if(isNValidLastIP(document.tF0.serverip4.value)) { alert(service_ip_title+lastIpError); return false; }
+
+	}
+	else
+	{
+		alert(ipm);
+		return false;
+	}
+        document.tF0.wan_pptp_serviceip.value= document.tF0.serverip1.value+"."+ document.tF0.serverip2.value+"."+ document.tF0.serverip3.value+"."+ document.tF0.serverip4.value;
+
+
+	if(document.tF0.dhcp_clt.selectedIndex==1)
+	{
+	//check static ip
+	if(!(isBlank_Zero(document.tF0.wan_ip1.value))||
+		!(isBlank_Zero(document.tF0.wan_ip2.value))||
+		!(isBlank_Zero(document.tF0.wan_ip3.value))||
+		!(isBlank_Zero(document.tF0.wan_ip4.value))){
+		
+		if(document.tF0.wan_ip1.value>223 || isNValidLastIP(document.tF0.wan_ip1.value)) { alert(ip_title+errorIP_224); return false; }
+		//if(isNValidLastIP(document.tF0.wan_ip1.value)) { alert(ip_title+lastIpError); return false; }
+		if(isNValidIP(document.tF0.wan_ip2.value)) { alert(ip_title+ipm); return false; }
+		if(isNValidIP(document.tF0.wan_ip3.value)) { alert(ip_title+ipm); return false; }
+		if(isNValidLastIP(document.tF0.wan_ip4.value)) { alert(ip_title+lastIpError); return false; }
+}
+	else
+	{
+		alert(ipm);
+		return false;
+	}
+	
+	//check static mask
+	if(!(isBlank_Zero(document.tF0.wan_mask1.value))||
+		!(isBlank_Zero(document.tF0.wan_mask2.value))||
+		!(isBlank_Zero(document.tF0.wan_mask3.value))||
+		!(isBlank_Zero(document.tF0.wan_mask4.value))){
+		
+			if(isNValidSubnetMask( document.tF0.wan_mask1.value, 
+							document.tF0.wan_mask2.value, 
+							document.tF0.wan_mask3.value, 
+							document.tF0.wan_mask4.value )){
+				alert(sm); 
+				return false;
+			}		
+	}
+	else
+	{
+		alert(sm);
+		return false;
+	}
+	
+	// check static gateway
+	if(!(isBlank_Zero(document.tF0.default_gw1.value))||
+		!(isBlank_Zero(document.tF0.default_gw2.value))||
+		!(isBlank_Zero(document.tF0.default_gw3.value))||
+		!(isBlank_Zero(document.tF0.default_gw4.value))){
+		
+		if(document.tF0.default_gw1.value>223 || isNValidLastIP(document.tF0.default_gw1.value)) { alert(ip_title+errorIP_224); return false; }
+		//if(isNValidLastIP(document.tF0.default_gw1.value)) { alert(Gm1); return false; }
+		if(isNValidIP(document.tF0.default_gw2.value)) { alert(Gm); return false; }
+		if(isNValidIP(document.tF0.default_gw3.value)) { alert(Gm); return false; }
+		if(isNValidLastIP(document.tF0.default_gw4.value)) { alert(Gm1); return false; }
+	
+	}
+	else
+	{
+		alert(Gm);
+		return false;
+	}
+	
+  	document.tF0.wan_pptp_dhcp.value="static";
+  	document.tF0.wan_proto.value="static";
+  	document.tF0.wan_pptp_ip.value= document.tF0.wan_ip1.value+"."+ document.tF0.wan_ip2.value+"."+ document.tF0.wan_ip3.value+"."+ document.tF0.wan_ip4.value;
+  	document.tF0.wan_pptp_subnet.value= document.tF0.wan_mask1.value+"."+ document.tF0.wan_mask2.value+"."+ document.tF0.wan_mask3.value+"."+ document.tF0.wan_mask4.value;
+  	document.tF0.wan_pptp_gateway.value= document.tF0.default_gw1.value+"."+ document.tF0.default_gw2.value+"."+ document.tF0.default_gw3.value+"."+ document.tF0.default_gw4.value;
+   
+   	document.tF0.wan_ipaddr.value= document.tF0.wan_ip1.value+"."+ document.tF0.wan_ip2.value+"."+ document.tF0.wan_ip3.value+"."+ document.tF0.wan_ip4.value;
+  	document.tF0.wan_netmask.value= document.tF0.wan_mask1.value+"."+ document.tF0.wan_mask2.value+"."+ document.tF0.wan_mask3.value+"."+ document.tF0.wan_mask4.value;
+  	document.tF0.wan_gateway.value= document.tF0.default_gw1.value+"."+ document.tF0.default_gw2.value+"."+ document.tF0.default_gw3.value+"."+ document.tF0.default_gw4.value;
+        document.tF0.wan_pptp_connect_id.value=document.tF0.connectionID.value;
+	
+  	
+	}
+  	else
+  	{
+   		document.tF0.wan_pptp_dhcp.value="dhcp";
+   		document.tF0.wan_proto.value="dhcp";
+   	 	document.tF0.wan_pptp_ip.disabled=true;
+  	  document.tF0.wan_pptp_subnet.disabled=true;
+  	  document.tF0.wan_pptp_gateway.disabled=true;
+  	  
+  	  //document.tF0.wan_ipaddr.disabled=true;
+  	  //document.tF0.wan_netmask.disabled=true;
+  	  //document.tF0.wan_gateway.disabled=true;
+  	    document.tF0.wan_ipaddr.value="0.0.0.0";
+  	  document.tF0.wan_netmask.value="0.0.0.0";
+  	  document.tF0.wan_gateway.value="0.0.0.0";
+  	  document.tF0.wan_pptp_connect_id.value=document.tF0.connectionID.value;
+
+  	}
+	//document.tF0.submit();
+	
+	return true;
+}
+
+
+ function ckeck_box()
+{
+	if(document.tF0.on_demand.checked==false)
+		document.tF0.wan_pptp_idletime.disabled=true;
+	else
+		document.tF0.wan_pptp_idletime.disabled=false;	
+}
+
+function check_clt()
+{
+	
+ 	if(document.tF0.dhcp_clt.selectedIndex==1)
+    	{
+	    	document.getElementById("tr_ip_address").style.display="";
+	    	document.getElementById("tr_subnet_address").style.display="";
+	    	document.getElementById("tr_gw_address").style.display="";
+    	
+    	}
+    	else
+    	{
+	    	document.getElementById("tr_ip_address").style.display="none";
+	    	document.getElementById("tr_subnet_address").style.display="none";
+	    	document.getElementById("tr_gw_address").style.display="none";
+    	
+    	}
+ }
+
+function frmload(){
+
+  var server_ip="<% nvram_get("wan0_pptp_serviceip"); %>";
+  var my_ip="<% nvram_get("wan0_pptp_ip"); %>";
+  var my_subnet="<% nvram_get("wan0_pptp_subnet"); %>";
+  var my_gw="<% nvram_get("wan0_pptp_gateway"); %>";
+
+  if(server_ip!="")
+  {
+  var tmp=server_ip.split(".");
+  document.tF0.serverip1.value=tmp[0];
+  document.tF0.serverip2.value=tmp[1];
+  document.tF0.serverip3.value=tmp[2];
+  document.tF0.serverip4.value=tmp[3];
+  }
+  
+  if(my_ip!="")
+  {
+    var tmp1=my_ip.split(".");
+  document.tF0.wan_ip1.value=tmp1[0];
+  document.tF0.wan_ip2.value=tmp1[1];
+  document.tF0.wan_ip3.value=tmp1[2];
+  document.tF0.wan_ip4.value=tmp1[3];
+  
+    var tmp2=my_subnet.split(".");
+  document.tF0.wan_mask1.value=tmp2[0];
+  document.tF0.wan_mask2.value=tmp2[1];
+  document.tF0.wan_mask3.value=tmp2[2];
+  document.tF0.wan_mask4.value=tmp2[3];
+  
+    var tmp3=my_gw.split(".");
+  document.tF0.default_gw1.value=tmp3[0];
+  document.tF0.default_gw2.value=tmp3[1];
+  document.tF0.default_gw3.value=tmp3[2];
+  document.tF0.default_gw4.value=tmp3[3];
+  
+  }
+
+	ckeck_box();
+	check_clt();
+
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+function tempPage()
+{
+	document.location.href="/setup_dns.stm";
+	return false;
+}
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="frmload()">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="apply.cgi">
+<input type="hidden" name="page" value="wan_main.stm">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='location.href="wan_pptp.stm";'>
+<input type="hidden" name="location_page" value="wan_pptp.stm">
+<input type="hidden" name="wan_proto" value="dhcp">
+<input type="hidden" name="action" value="Apply">
+<input type="hidden" name="wan_pptp_enable" value="1">
+<input type="hidden" name="wan_unit" value="0">
+<input type="hidden" name="wan_pptp_dhcp" value="<% nvram_get("wan0_pptp_dhcp"); %>">
+<input type="hidden" name="wan_pptp_serviceip" value="<% nvram_get("wan0_pptp_serviceip"); %>" > 
+<input type="hidden" name="wan_pptp_ip" value="<% nvram_get("wan0_pptp_ip"); %>" >
+<input type="hidden" name="wan_pptp_subnet" value="<% nvram_get("wan0_pptp_subnet"); %>" >
+<input type="hidden" name="wan_pptp_gateway" value="<% nvram_get("wan0_pptp_gateway"); %>" >
+<input type="hidden" name="wan_pptp_connect_id" value="<% nvram_get("wan0_pptp_connect_id"); %>" >
+<input type="hidden" name="wan_ipaddr">
+<input type="hidden" name="wan_netmask">
+<input type="hidden" name="wan_gateway">
+<input type="hidden" name="wan_pptp_demand">
+<input type="hidden" name="wan_ifnames" value="<% nvram_get("wan0_ifnames"); %>">
+<input type="hidden" name="wan_bigpond_enable" value="0">
+<input type="hidden" name="wan_primary" value="1">
+<input type="hidden" name="wan_hwaddr" value="<% nvram_get("wan0_hwaddr"); %>">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(743); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;
+					</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+						
+							<!--<tr align=left>
+								<td colspan=2 align=left class="body"><% Fid_str(170); %>
+									<a href="javascript:void(0);" onClick="window.open('glossary.stm#pptp','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');"><b><font color=6464c3><% Fid_str(188); %></font></b></a><br><br>
+								</td>
+							</tr>-->
+							
+							<tr align=left>
+								<td colspan=2 align=left class="body"><a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#pptp");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+								</td>
+							</tr>
+							
+							<tr>	
+            			        		<td width="250" class="body" height="30"><b><% Fid_str(744); %> &gt;</b></td>
+								<td width="220">
+            			            			<input type=text name="wan_pptp_username" size=25 maxlength=63 VALUE="<% nvram_get("wan0_pptp_username"); %>"> 
+								</td>
+							</tr>
+							
+							<tr>								
+            			        		<td width="250" class="body" height="30"><b><% Fid_str(745); %> &gt;</b></td>
+								<td width="220">
+            			            			<input type=password name="wan_pptp_passwd" size=25 maxlength=63 VALUE="<% nvram_get("wan0_pptp_passwd"); %>">
+							</tr>
+							
+							<tr>								
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(746); %> &gt;</b></td>
+								<td width="220">
+            			            			<input type=password name="re_passwd" size=25 maxlength=63 VALUE="<% nvram_get("wan0_pptp_passwd"); %>">
+            			            			</td>
+							</tr>
+							<tr>								
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(747); %> &gt;</b></td>
+								<td width="220">
+            			            			<input type=text  name="wan_pptp_hostname"  size=25 maxlength=39 VALUE="<% nvram_get("wan0_pptp_hostname"); %>">
+            			            			</td>
+							</tr>
+							<tr>
+								<td width="250" class="body" height="30"><b><% Fid_str(1770); %>&nbsp;&gt;</b></td>
+								<td width="220">
+									<select name="dhcp_clt" onchange="check_clt()">
+										<option value="dhcp"><% Fid_str(1771); %></option>
+										<option value="static"><% Fid_str(1772); %></option>
+									</select>
+									<br>
+								</td>
+							</tr>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+							var iDOD = "<% nvram_get("wan0_pptp_dhcp"); %>";
+							if (iDOD=="dhcp")		
+								document.tF0.dhcp_clt.selectedIndex=0;
+							else
+								document.tF0.dhcp_clt.selectedIndex=1;
+							</script>
+							
+							<tr>	
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(748); %> &gt;</b></td>
+								<td width="260">
+            			            			<input type="text" name="serverip1" size="3" maxlength=3>.
+            			            			<input type="text" name="serverip2" size="3" maxlength=3>.
+            			            			<input type="text" name="serverip3" size="3" maxlength=3>.
+            			            			<input type="text" name="serverip4" size="3" maxlength=3>
+								</td>
+							</tr>
+
+							<tr id="tr_ip_address" style="display: none;">	
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(330); %> &gt;</b></td>
+								<td width="260">
+								<input type="text" name="wan_ip1" size=3 maxlength=3>.
+								<input type="text" name="wan_ip2" size=3 maxlength=3>.
+								<input type="text" name="wan_ip3" size=3 maxlength=3>.
+								<input type="text" name="wan_ip4" size=3 maxlength=3>
+								</td>
+							</tr>
+							
+							<tr id="tr_subnet_address" style="display: none;">	
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(750); %> &gt;</b></td>
+								<td width="260">
+            			            			<input type="text" name="wan_mask1" size=3 maxlength=3>.
+								<input type="text" name="wan_mask2" size=3 maxlength=3>.
+								<input type="text" name="wan_mask3" size=3 maxlength=3>.
+								<input type="text" name="wan_mask4" size=3 maxlength=3>
+								</td>
+							</tr>
+
+							<tr id="tr_gw_address" style="display: none;">
+	                            			
+	            			        		<td width="250" class="body" height="30"><b><% Fid_str(338); %> &gt;</b></td>
+								<td width="260">
+	                  <input type="text" name="default_gw1" size=3 maxlength=3>.
+										<input type="text" name="default_gw2" size=3 maxlength=3>.
+										<input type="text" name="default_gw3" size=3 maxlength=3>.
+										<input type="text" name="default_gw4" size=3 maxlength=3>
+	            			        		</td>
+	                            		</tr>
+	                            		
+							<tr>								
+            			        			<td width="250" class="body" height="30"><b><% Fid_str(751); %> &gt;</b></td>
+								<td width="220">
+            			            			<input type=text name=connectionID size=25 maxlength=63 VALUE="<% nvram_get("wan_pptp_connect_id"); %>">
+            			            			</td>
+							</tr>							
+							
+							<tr>									
+								<td colspan=2 nowrap class="body">
+									<input type="checkbox" name="on_demand"  onClick="ckeck_box()">
+									<% Fid_str(736); %><input type="text" name="wan_pptp_idletime" size="3" maxlength="5" value="<% nvram_get("wan0_pptp_idletime"); %>"><% Fid_str(737); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#disconnect");><b><font color=0066ff><% Fid_str(47); %></font></b></a><br>
+            			        			</td>
+                            			</tr>
+                            			
+                            			<SCRIPT LANGUAGE="JavaScript">
+								var iDOD=<% nvram_get("wan0_pptp_demand"); %>;
+								if(iDOD == 1){
+									document.tF0.on_demand.defaultChecked=true;
+									document.tF0.on_demand.checked=true;
+								}	
+								//ckeck_box();
+							</SCRIPT>
+							
+							<tr>								
+								<td colspan=2 noWrap><br><a href="javascript:void(0);" onClick="return tempPage();"><b><% Fid_str(754); %></b></a>
+								</td>
+							</tr>
+							
+							<% exec cmd="WanPPTPShow"; %>							
+	             <% exec cmd="PPTP_WAN_Tunnel_Info"; %>				
+												
+							<tr>
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan=2 align="center">
+								<br><br>
+									<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+									<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();"></td>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

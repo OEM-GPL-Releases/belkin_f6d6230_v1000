@@ -1,0 +1,90 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+
+<script language="JavaScript">
+var pid2="<% nvram_get("project_id2"); %>";
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+<% exec cmd("PeerMacAddress"); %>
+
+<% exec cmd("gateway_status"); %>
+<% exec cmd("Gateway_IsWanConnected"); %>
+
+
+function evaltF(index)
+{
+	if(document.tF.ck_dlna_enabled.checked) document.tF.dlna_enabled.value=1;
+	else document.tF.dlna_enabled.value=0;
+	
+	document.tF.submit();
+	return true;
+}
+
+function frmLoad() 
+{
+	var dlna_enabled=<% nvram_get("dlna_enabled"); %>;
+	
+	if(dlna_enabled) document.tF.ck_dlna_enabled.checked=true;
+	else document.tF.ck_dlna_enabled.checked=false;
+	
+}
+
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload=frmLoad()>
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="system_dlna.stm";'>
+<input type="hidden" name="location_page" value="system_dlna.stm">
+<input type="hidden" name="arc_action" value="Apply Changes">
+<input type="hidden" name="dlna_enabled">
+
+<table width="100%" border="0" cellspacing="1" cellpadding="1">
+    <tr>
+    	<td width="36">&nbsp;</td>
+        <td valign="top" width="95%" height="99" class="head_bold" >
+            <p><b><br>
+            <script>
+            if(pid2=="00n2")
+            document.write("Play Features> Music Mover");
+            else
+            document.write("Utilities > <% Fid_str(1900); %>");
+            </script>
+            </b>
+      </td>
+	</tr>
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td>
+			<table border="0" cellspacing="1" cellpadding="5" width="600" class="copy_1">
+			<tr height="25">
+			  <th align="center" class="body"> <div align="left"><B>
+			    <input type="checkbox" name="ck_dlna_enabled" value="<% nvram_get("dlna_enabled"); %>">
+			    Server media to compatible networked media players </B> </div>			    <div align="left"></label>	          
+		        </div></th>
+			  </tr>
+				<tr>				
+					<td align=center><div align="center"><br>
+				      <input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+  &nbsp;&nbsp; <a href="#" onClick="return evaltF();">
+    <input type="submit"  name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn">
+    </a>
+				    </div></td>
+				</tr>			  
+			</table>		
+
+        </td>
+    </tr>
+</table>
+</form>     
+</body>
+</html>

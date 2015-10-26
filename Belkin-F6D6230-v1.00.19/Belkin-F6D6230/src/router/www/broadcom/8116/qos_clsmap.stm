@@ -1,0 +1,168 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<!--#exec cmd="my_function" -->
+<% login_timeout(); %>
+
+var cls_rule_num;
+var max_cls_rule_num = 16;
+var cls_rule_pool=new Array(max_cls_rule_num);
+var i;
+function CLS_RULE_SUM()
+{
+	this.id = 0;
+	this.name = "";
+	this.traffic_desc = "";
+	this.fwd_pri = "";
+	this.out_vc = "";
+}
+for(i = 0; i < max_cls_rule_num; i++)
+{
+	cls_rule_pool[i] = new CLS_RULE_SUM();
+}
+<!--#exec cmd="OutClsfy_script"-->
+
+function open_help(url)
+{
+	newwindow=window.open(url,"","toolbar=0,location=0,directories=0,status=0,menubar=0,width=450,height=400,scrollbars=1");
+}
+
+cls_rule_num_m='<!--#Fid_str(1502)-->.';
+
+function check_cls_rule_num()
+{
+	if(cls_rule_num>=16)
+	{
+		alert(cls_rule_num_m);
+		return false;
+	}
+	return true;
+}
+
+function modify_rule(type, rule_idx){
+    jpurl="";
+
+    if(type==0 || type==4){
+        if(type==4){
+            flag=check_cls_rule_num();
+            if(!flag) return false;
+        }
+        //jpurl="/qos_editcls.stm/"+rule_idx;
+        jpurl="/qos_editcls.stm?i="+rule_idx;
+    }
+    else if(type==1){
+        jpurl="/cgi-bin/qos_delcls.exe?rule_idx="+rule_idx;
+    }
+    else if(type==2){
+        jpurl="/cgi-bin/qos_mvcls.exe?rule_idx="+rule_idx+"&up_down=1";
+    }
+    else if(type==3){
+        jpurl="/cgi-bin/qos_mvcls.exe?rule_idx="+rule_idx+"&up_down=0";
+    }
+    document.location.href = jpurl;
+
+    return true;
+}
+
+function evaltF() {
+	return true;
+}
+
+function clear1() {
+	window.status="";
+}
+
+</script>
+</head>
+
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1()">
+<!--#include file="menu.stm" -->
+<form name="tF">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;<!--#Fid_str(1488)-->&gt; <!--#Fid_str(1489)--><br>
+			
+		<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="5" height="25" >&nbsp;</td>
+					<td width="95%" colspan="2" height="25">
+						<table border="0" class="copy_1">
+							<tr>
+								<td>
+									<!--#Fid_str(1800)-->
+								</td>
+							</tr>						
+							<tr>
+								<td>
+									<!--#Fid_str(1503)-->.
+								</td>
+							</tr>
+						</table>
+					</td>
+					<td width="5" height="25">&nbsp;</td>
+				</tr>
+		</table>	
+	 <TABLE border="0" width="85%" cellpadding=2 cellspacing=2 align="center" class="copy_1">
+	 			<tr>
+						<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr bgcolor="#666262">
+					<td width="8%" align=center><font color=#ffffff><!--#Fid_str(1802)--></FONT></td>
+					<td width="20%" align=center><font color=#ffffff><!--#Fid_str(1504)--></FONT></td>
+					<td width="10%" align=center><font color=#ffffff><!--#Fid_str(1505)--></FONT></td>
+					<script language="javascript">
+					if(my_qos==2)
+					    document.write('<td width="10%" align=center><font color=#ffffff><!--#Fid_str(1506)--></FONT></td>');
+					</script>
+					<td width="18%" align=center><font color=#ffffff><!--#Fid_str(1803)--></FONT></td>
+				</tr>
+			<script language="javascript">
+			if(cls_rule_num==0){
+			    document.write('<tr bgcolor="#b4b2b2">');
+				document.write("<td colspan=5 ><font face=Arial size=2 color=Red><center><b><!--#Fid_str(1507)--> !!</b></center></FONT></td>");
+				document.write('</tr>');
+			}
+			
+			var i;
+			for(i=0;i<cls_rule_num;i++){
+				document.write('<tr bgcolor="#b4b2b2">');
+				document.write('<td align=center>',cls_rule_pool[i].name,'</td>');
+				document.write('<td align=center>',cls_rule_pool[i].traffic_desc,'</td>');
+				document.write('<td align=center>',cls_rule_pool[i].fwd_pri,'</td>');
+				if(my_qos==2)
+				    document.write('<td align=center>',cls_rule_pool[i].out_vc,'</td>');
+				document.write('<td><CENTER><input type="button" value="<!--#Fid_str(1804)-->" style="font-size: 8pt" onclick="modify_rule(0,',cls_rule_pool[i].id,')">');
+				document.write('&nbsp;<input type="button" value="<!--#Fid_str(1508)-->" style="font-size: 8pt" onclick="modify_rule(1,',cls_rule_pool[i].id,')">');
+				if(i>0)
+				    document.write('&nbsp;<input type="button" value="<!--#Fid_str(1509)-->" style="font-size: 8pt" onclick="modify_rule(2,',cls_rule_pool[i].id,')">');
+			    if(i<cls_rule_num-1)
+				    document.write('&nbsp;<input type="button" value="<!--#Fid_str(1510)-->" style="font-size: 8pt" onclick="modify_rule(3,',cls_rule_pool[i].id,')">');
+			
+				document.write('</CENTER></td></tr>');
+			}
+			</script>
+	</table>
+	<br><br>
+	<table border=0>
+		<tr><td width="55" height="25">&nbsp;</td>
+		<td><input type="button" value="<!--#Fid_str(1511)-->" onclick="return modify_rule(4, 0);"></td>
+		</tr>
+	 </table>
+
+</td>
+</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

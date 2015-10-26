@@ -1,0 +1,178 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% exec cmd="my_function"; %>
+<% login_timeout(); %>
+
+<%  exec cmd='Lan_IP_Address' -->
+var slan_ip="<%  echo var='lan_ip' -->";
+var slan_mask="<%  echo var='lan_mask' -->";
+var ulLan_ip = IpToLong(slan_ip);
+var ulLan_mask = IpToLong(slan_mask);
+var ulGlobIP = new Array(10);
+var ulLocFromIP = new Array(10);
+var ulLocToIP = new Array(10);
+
+function checkIPValid(idx, gIP1, gIP2, gIP3, gIP4, vIP14, vIP24)
+{
+	var i_str, i;
+	var ulLan_ID, ulIP, ulMaskedIP, ulIP1;
+	var ulLan_Broadcast;
+	var gIP, vIP1, vIP2;
+
+	i = parseInt(idx) - 1;
+
+	if ((isBlank_Zero(gIP1))&&(isBlank_Zero(gIP2))&&(isBlank_Zero(gIP3))&&(isBlank_Zero(gIP4))
+		&&(isBlank_Zero(vIP14))&&(isBlank_Zero(vIP24))) {
+        ulGlobIP[i] = 0;
+        ulLocFromIP[i] = 0;
+        ulLocToIP[i] = 0;
+		return true;
+	}
+	gIP = gIP1+'.'+gIP2+'.'+gIP3+'.'+gIP4;
+	vIP1 = lan_ip[0]+'.'+lan_ip[1]+'.'+lan_ip[2]+'.'+vIP14;
+	vIP2 = lan_ip[0]+'.'+lan_ip[1]+'.'+lan_ip[2]+'.'+vIP24;
+		
+	if (idx=='1')
+		i_str="st";
+	else if (idx=='2')
+		i_str="nd";
+	else if (idx=='3')
+		i_str="rd";
+	else
+		i_str="th";
+		
+	ulLan_ID = ulLan_ip & ulLan_mask;
+	if (ulLan_ID < 0) ulLan_ID += 0x100000000;
+	ulLan_Broadcast = ulLan_ID + (0xffffffff ^ ulLan_mask);
+	
+	ulIP = IpToLong(gIP);
+	ulGlobIP[i] = ulIP;
+	ulMaskedIP = ulIP & ulLan_mask;
+	if (ulMaskedIP < 0) ulMaskedIP += 0x100000000;
+	
+	if (!isValidIP(gIP)|| (ulLan_ID == ulMaskedIP) ) {
+		alert(T_the+idx+i_str+global_ip_err);
+		return false;
+	}
+
+	ulIP = IpToLong(vIP1);
+	ulIP1 = ulIP;
+	ulLocFromIP[i] = ulIP;
+	ulMaskedIP = ulIP & ulLan_mask;
+	if (ulMaskedIP < 0) ulMaskedIP += 0x100000000;
+
+	if (!isValidIP(vIP1) || (ulLan_ID != ulMaskedIP) || (ulIP == ulLan_ID) || (ulIP == ulLan_ip) || (ulIP == ulLan_Broadcast)) {
+		alert(T_the+idx+i_str+from_ip_err);
+		return false;
+	}
+
+	ulIP = IpToLong(vIP2);
+	ulLocToIP[i] = ulIP;
+	ulMaskedIP = ulIP & ulLan_mask;
+	if (ulMaskedIP < 0) ulMaskedIP += 0x100000000;
+
+	if (!isValidIP(vIP2) || (ulLan_ID != ulMaskedIP) || (ulIP == ulLan_ID) || (ulIP == ulLan_ip) || (ulIP == ulLan_Broadcast)) {
+		alert(T_the+idx+i_str+to_ip_err);
+		return false;
+	}
+
+	if (ulIP1 > ulIP) {
+		ulLocToIP[i] = ulIP1;
+		ulLocFromIP[i] = ulIP;
+	}
+ 	return true;
+}
+
+function evaltF()
+{
+	if(checkIPValid('1', document.tF.gIP0_1.value,document.tF.gIP0_2.value,document.tF.gIP0_3.value,document.tF.gIP0_4.value,document.tF.vIP01_4.value,document.tF.vIP02_4.value)==false) return false;
+	if(checkIPValid('2', document.tF.gIP1_1.value,document.tF.gIP1_2.value,document.tF.gIP1_3.value,document.tF.gIP1_4.value,document.tF.vIP11_4.value,document.tF.vIP12_4.value)==false) return false;
+	if(checkIPValid('3', document.tF.gIP2_1.value,document.tF.gIP2_2.value,document.tF.gIP2_3.value,document.tF.gIP2_4.value,document.tF.vIP21_4.value,document.tF.vIP22_4.value)==false) return false;
+	if(checkIPValid('4', document.tF.gIP3_1.value,document.tF.gIP3_2.value,document.tF.gIP3_3.value,document.tF.gIP3_4.value,document.tF.vIP31_4.value,document.tF.vIP32_4.value)==false) return false;
+	if(checkIPValid('5', document.tF.gIP4_1.value,document.tF.gIP4_2.value,document.tF.gIP4_3.value,document.tF.gIP4_4.value,document.tF.vIP41_4.value,document.tF.vIP42_4.value)==false) return false;
+	if(checkIPValid('6', document.tF.gIP5_1.value,document.tF.gIP5_2.value,document.tF.gIP5_3.value,document.tF.gIP5_4.value,document.tF.vIP51_4.value,document.tF.vIP52_4.value)==false) return false;
+	if(checkIPValid('7', document.tF.gIP6_1.value,document.tF.gIP6_2.value,document.tF.gIP6_3.value,document.tF.gIP6_4.value,document.tF.vIP61_4.value,document.tF.vIP62_4.value)==false) return false;
+	if(checkIPValid('8', document.tF.gIP7_1.value,document.tF.gIP7_2.value,document.tF.gIP7_3.value,document.tF.gIP7_4.value,document.tF.vIP71_4.value,document.tF.vIP72_4.value)==false) return false;
+	if(checkIPValid('9', document.tF.gIP8_1.value,document.tF.gIP8_2.value,document.tF.gIP8_3.value,document.tF.gIP8_4.value,document.tF.vIP81_4.value,document.tF.vIP82_4.value)==false) return false;
+	if(checkIPValid('10', document.tF.gIP9_1.value,document.tF.gIP9_2.value,document.tF.gIP9_3.value,document.tF.gIP9_4.value,document.tF.vIP91_4.value,document.tF.vIP92_4.value)==false) return false;
+
+	var i, j;
+	for (i=0; i< 9; i++) {
+	if (ulGlobIP[i]==0) continue;
+		for (j=i+1; j<10; j++) {
+		if (ulGlobIP[j]==0) continue;
+			if (ulGlobIP[i] == ulGlobIP[j]) {
+				alert("No."+(i+1)+"'s and No."+(j+1)+"<% Fid_str(1143); %>");
+				return false;
+			}
+
+			if ((ulLocFromIP[i] >= ulLocFromIP[j] &&  ulLocFromIP[i] <= ulLocToIP[j]) ||
+				(ulLocToIP[i] >= ulLocFromIP[j] &&  ulLocToIP[i] <= ulLocToIP[j]) ) {
+				alert("No."+(i+1)+"'s and No."+(j+1)+"<% Fid_str(1144); %>");
+				return false;
+			}
+		}
+	}
+	return true;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<form name="tF" method="post" action="/cgi-bin/setup_fix_pat.exe">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" height="90%">
+    <tr>
+        <td>
+            <p><b class=subtitle><% Fid_str(422); %></b></p>
+            <p class=normalText>
+          <% Fid_str(423); %></p>
+            <table width="100%" border="0" cellpadding="5" cellspacing="1">
+                <tr>
+                    <td width="98%" class=tdTitle><% Fid_str(422); %></td>
+                </tr>
+				<script language="javascript">
+				var i;
+				for(i=0;i<10;i++)
+				{
+				document.write('<tr>');
+				document.write('<td class=tdText>',i+1,'. <% Fid_str(424); %>');
+				document.write('<input maxlength=3 name=gIP',i,'_1 size=3 value=0>.<input maxlength=3 name=gIP',i,'_2 size=3 value=0>.<input maxlength=3 name=gIP',i,'_3 size=3 value=0>.<input maxlength=3 name=gIP',i,'_4 size=3 value=0><% Fid_str(425); %>');
+				document.write('</td>');
+				document.write('</tr>');
+				document.write('<tr>');
+				document.write('<td class=tdText>&nbsp;&nbsp;&nbsp;&nbsp;<% Fid_str(444); %>&nbsp;');
+				document.write('<% echo var="lan_ip1"; %>.<% echo var="lan_ip2"; %>.<% echo var="lan_ip3"; %>.<input maxlength=3 name=vIP',i,'1_4 size=3 value=0>to');
+				document.write('<% echo var="lan_ip1"; %>.<% echo var="lan_ip2"; %>.<% echo var="lan_ip3"; %>.<input maxlength=3 name=vIP',i,'2_4 size=3 value=0>');
+				document.write('</td>');
+				document.write('</tr>');
+				}
+				</script>
+            </table>
+            <% exec cmd="Fix_PAT"; %>
+        </td>
+    </tr>
+    <tr>
+        <td height="76">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <div align="right">
+                        <input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('help.stm#admap','help','scrollbars=yes,width=600,height=500')">
+                        <input type="submit"  name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+                        <input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">
+                    </div></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

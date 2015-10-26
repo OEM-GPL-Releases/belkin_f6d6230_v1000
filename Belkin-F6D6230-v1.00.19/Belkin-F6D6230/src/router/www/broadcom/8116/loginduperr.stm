@@ -1,0 +1,18 @@
+<html><head>
+
+<% char_set(); %>
+<title></title>
+<script language="javascript">
+<% login_timeout(); %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+<center>
+<h1><% Fid_str(389); %><br><% Fid_str(390); %><br></center></h1>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table>
+</body></html>

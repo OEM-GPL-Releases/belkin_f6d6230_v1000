@@ -1,0 +1,287 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% include file="refreshmenu.txt"; %>
+
+<script language="JavaScript">
+<% login_timeout(); %>
+
+<% File_include("routine.txt"); %>
+<% File_include("data.js"); %>
+<% exec cmd="my_function"; %>
+<% getWirelessSecurity(); %>
+</script>
+</head>
+
+<SCRIPT LANGUAGE="JavaScript">
+var radiuskeyerror = "<% Fid_str(1203); %>";
+var radius_portm = "<% Fid_str(838); %>";
+var ipmLastIP= "<% Fid_str(675); %>";
+var ipmIP = "<% Fid_str(641); %>";
+var keyinterror = "<% Fid_str(840); %>";
+//var leastprekeyerror="<% Fid_str(1186); %>";
+var rekeyintervalerror="<% Fid_str(841); %>";//wenfang 20070111 add for belkin QA bug 102817
+var rekeyintervalstr="<% Fid_str(849); %>";//wenfang 20070111 add for belkin QA bug 102817
+//<% getWirelessSecurity(); %>
+
+//var wirelesserror = "<% Fid_str(1190); %>";
+//var wirelessenable = <% echo var="getWirelessStatus"; %>;
+
+
+function selectedchange(){
+	if(document.tF.security_type.selectedIndex == 0){
+		location.href = "wireless_no_encryption.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 1){
+		location.href = "wireless_64bitwep.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 2){
+		location.href = "wireless_128bitwep.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 3){
+		location.href = "wireless_WPA.stm";
+	}
+	else{
+		location.href = "wireless_PSK.stm";
+	}
+	return true;
+}
+
+function evaltF(){	
+
+	 var minSize = 8;
+	value = document.tF.Dot1X_secret_key.value;
+	len = value.length;
+	
+	/* if(!wirelessenable){
+		alert(wirelesserror);
+		return false;
+	} */
+	if (isNValidIP(document.tF.Dot1X_srv_ip0.value)) 
+	{
+		alert(ipmIP); 
+		return false; 
+	}
+	if (isNValidIP(document.tF.Dot1X_srv_ip1.value))
+	{ 
+		alert(ipmIP);
+		return false; 
+	}
+	if (isNValidIP(document.tF.Dot1X_srv_ip2.value)) 
+	{ 
+		alert(ipmIP); 
+		return false; 
+	}
+	if (isNValidLastIP(document.tF.Dot1X_srv_ip3.value)) 
+	{ 
+		alert(ipmLastIP); 
+		return false; 
+	}
+
+	if (isNValidPort(document.tF.Dot1X_srv_port.value)) {
+		alert(radius_portm);
+		return false;
+	}
+	
+	if(document.tF.Dot1X_secret_key.value ==''){
+		alert(radiuskeyerror);
+		return false;
+	}
+	if(isIncludeDQuote(document.tF.Dot1X_secret_key.value)){ 
+		alert('<% Fid_str(648); %>'+':'+'"');
+		return false;
+	}
+	if(isIncludeBSlash(document.tF.Dot1X_secret_key.value)){ 
+		alert('<% Fid_str(648); %>'+':'+'\\');
+		return false; 
+	}	
+	if(isNValidInt(document.tF.Dot1X_rekeyPeriod.value) || isNegInt(document.tF.Dot1X_rekeyPeriod.value)){
+		alert(keyinterror); 
+		return false;
+	} 
+	//wenfang 20070111 add for belkin QA bug 102817
+	//if(document.tF.Dot1X_rekeyPeriod.value<60){
+		//alert(rekeyintervalstr+rekeyintervalerror);
+		//return false;
+	//}wenfang add end
+	
+	onApply();
+}
+function onApply()
+{
+	document.tF.wl_radius_ipaddr5g.value=document.tF.Dot1X_srv_ip0.value+"."+document.tF.Dot1X_srv_ip1.value+"."+document.tF.Dot1X_srv_ip2.value+"."+document.tF.Dot1X_srv_ip3.value;
+	document.tF.wl_radius_port5g.value=document.tF.Dot1X_srv_port.value;
+document.tF.wl_radius_key5g.value=document.tF.Dot1X_secret_key.value;
+document.tF.wl_net_reauth5g.value=document.tF.Dot1X_rekeyPeriod.value;
+alert(document.tF.wl_net_reauth5g.value);
+	}
+	
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+function init()
+{
+
+var wl_radius_ipaddr="<% nvram_get("wl_radius_ipaddr5g"); %>";
+var wl_radius_port=<% nvram_get("wl_radius_port5g"); %>;
+var wl_net_reauth=<% nvram_get("wl_net_reauth5g"); %>;
+var wl_radius_key="<% nvram_get("wl_radius_key5g"); %>";
+var spli=wl_radius_ipaddr.split(".");
+//alert(spli[0]);
+document.tF.Dot1X_srv_ip0.value=spli[0];
+document.tF.Dot1X_srv_ip1.value=spli[1];
+document.tF.Dot1X_srv_ip2.value=spli[2];
+document.tF.Dot1X_srv_ip3.value=spli[3];
+document.tF.Dot1X_srv_port.value=wl_radius_port;
+document.tF.Dot1X_secret_key.value=wl_radius_key;
+document.tF.Dot1X_rekeyPeriod.value=wl_net_reauth;
+}
+</SCRIPT>
+
+
+
+	<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="init()">
+	<% File_include("menu.stm"); %>
+	<form name="tF" action="apply.cgi" method="post">
+	<input type="hidden" name="location_page" value="wireless_WPA_5.stm">
+	<!-- <input type="hidden" name="Dot1X_enable" value="0">
+	<input type="hidden" name="Dot1X_srv_type" value="1">
+	<input type="hidden" name="Dot1X_nas_id">
+	<input type="hidden" name="Dot1X_idle_session_timeout">
+	<input type="hidden" name="Dot1X_reAuthPeriod">
+	<input type="hidden" name="Dot1X_quietPeriod"> -->
+	<input type="hidden" name="wl_crypto">
+	<input type="hidden" name="wl_radius_ipaddr5g">
+	<input type="hidden" name="wl_radius_port5g">
+	<input type="hidden" name="wl_radius_key5g">
+	<input type="hidden" name="wl_net_reauth5g">
+	
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+		<tr>
+			<td width="36"  colspan="2">&nbsp;</td>
+			<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(800); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<td width="205" class="body"><b><% Fid_str(801); %> &gt;</b><br><br></td>
+								<td width="335">
+								<select size="1" name="security_type" class=selectList  onchange= selectedchange()>;
+									<option value = 0 ><% Fid_str(318); %></option>
+									<option value = 1><% Fid_str(804); %></option>
+									<option value = 2><% Fid_str(803); %></option>
+									<option value = 3 selected><% Fid_str(1297); %></option>
+									<option value = 4><% Fid_str(1296); %></option>									
+								</select>									
+								<br><br></td>
+							</tr>						
+							
+							<tr align=left>
+								<td colspan=3 align=left class="body">
+                                                       <b><% Fid_str(819); %>:</b><% Fid_str(844); %>
+                                                       <a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#encryption");>
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+								<br><br></td>
+							</tr>
+
+							<SCRIPT LANGUAGE="JavaScript">
+								document.write('<tr>');
+								document.write('<td width="205" class="body"><b><% Fid_str(842); %> &gt;</b><br><br></td>');
+								document.write('<td width="335">');
+								document.write('<select size="1" name="authentication" class=selectList  >');
+								//document.write('<% exec cmd="authWPARADIUS"; %>');
+								document.write('</select>');
+								document.write('<br><br></td>');
+			          				document.write('</tr>');
+							</SCRIPT>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+								document.write('<tr>');
+								document.write('<td width="205" class="body"><b><% Fid_str(845); %> &gt;</b><br><br></td>');
+								document.write('<td width="335" class="body">');
+								document.write('<select size="1" name="wl_crypto" class=selectList  >');
+								document.write('<option value="tkip" <% nvram_match("wl_crypto", "tkip", "selected"); %>>TKIP</option>');
+	  document.write('<option value="aes" <% nvram_match("wl_crypto", "aes", "selected"); %>>AES</option>');
+	  document.write('<option value="tkip+aes" <% nvram_match("wl_crypto", "tkip+aes", "selected"); %>>TKIP+AES</option>');
+								document.write('<% exec cmd="cryptoWPA"; %>');
+								document.write('</select>');
+								document.write('<font color=#004263><% Fid_str(853); %></font><br><br></td>');
+			          				document.write('</tr>');
+							</SCRIPT>
+							
+    							<tr>
+      							<td width=154 class="body"><b><font color=#004263><% Fid_str(846); %></font> &gt;</b><br><br></td>
+      							<td width=320 class="body"><font color=#004263>
+      							<input type="text" class="textbox" name="Dot1X_srv_ip0" size="3" maxlength=3 value="">.
+      							<input type="text" class="textbox" name="Dot1X_srv_ip1" size="3" maxlength=3 value="">.
+      							<input type="text" class="textbox" name="Dot1X_srv_ip2" size="3" maxlength=3 value="">.
+      							<input type="text" class="textbox" name="Dot1X_srv_ip3" size="3" maxlength=3 value="">
+      							</font>
+      							<br><br></td>
+      						       </tr>
+      						       
+      						       <tr>
+      							<td width=154 class="body"><b><font color=#004263><% Fid_str(847); %></font> &gt;</b><br><br></td>
+      							<td width=320 class="body"><font color=#004263>
+      							<input  maxLength=5 size=28 name=Dot1X_srv_port></font>
+      							<br><br></td>
+      						       </tr>
+      						       <tr>
+      							<td width=154 class="body"><b><font color=#004263><% Fid_str(848); %></font> &gt;</b><br><br></td>
+      							<td width=320 class="body"><font color=#004263>
+      							<input type=password maxLength=64 size=28 name=Dot1X_secret_key value=""></font>
+      							<br><br></td>
+      						       </tr>
+      						       
+				    			<tr>
+      							<td width=154 class="body"><b><font color=#004263><% Fid_str(849); %></font> &gt;</b><br><br></td>
+      							<td width=320 class="body"><font color=#004263>
+      							<input maxLength=5 size=28 name= Dot1X_rekeyPeriod value=""></font>
+      							<font color=#004263>(<% Fid_str(850); %>)</font><br><br>
+      							</td>
+      						       </tr>
+      						       <SCRIPT LANGUAGE="JavaScript">
+      						        <% exec cmd="wireless1X_show"; %>
+      						       </SCRIPT>
+							
+						</table>
+					</td>
+				</tr>
+			</table>						
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+							<td width="36">&nbsp;</td>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+              				<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+							</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>		
+

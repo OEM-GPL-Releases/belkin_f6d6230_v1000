@@ -1,0 +1,151 @@
+<% gs_NdcUpdate(); %>
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% File_include("routine.txt"); %>
+<% WLANPeerMacAddress();  %>
+<% gs_gateway_stauts() ; %>
+<% exec cmd="Gateway_IsWanConnected" ; %>
+
+var ipm="<% Fid_str(902); %>.";
+var ipmnull = "<% Fid_str(669); %>.";
+function evaltF() 
+{
+	if(!(isBlank(document.tF0.MACaddr1.value))||!(isBlank(document.tF0.MACaddr2.value))||!(isBlank(document.tF0.MACaddr3.value))||
+		!(isBlank(document.tF0.MACaddr4.value))||!(isBlank(document.tF0.MACaddr5.value))||!(isBlank(document.tF0.MACaddr6.value))){
+		if (isNValid(document.tF0.MACaddr1.value)||isNValid(document.tF0.MACaddr2.value)||isNValid(document.tF0.MACaddr3.value)
+			||isNValid(document.tF0.MACaddr4.value) ||isNValid(document.tF0.MACaddr5.value)||isNValid(document.tF0.MACaddr6.value))
+			{
+				alert(ipm); 
+				return false;
+			}
+	}else{
+		alert(ipmnull); 
+		return false;
+	}
+	
+	onApply();
+	return true;
+}
+
+function copyto() {
+	document.tF0.MACaddr1.value = x[0];
+	document.tF0.MACaddr2.value = x[1];
+	document.tF0.MACaddr3.value = x[2];
+	document.tF0.MACaddr4.value = x[3];
+	document.tF0.MACaddr5.value = x[4];
+	document.tF0.MACaddr6.value = x[5];
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function onApply()
+{
+
+document.tF0.wan_hwaddr.value=document.tF0.MACaddr1.value+":"+	document.tF0.MACaddr2.value+":"+
+								document.tF0.MACaddr3.value+":"+
+								document.tF0.MACaddr4.value+":"+
+								document.tF0.MACaddr5.value+":"+
+								document.tF0.MACaddr6.value;	
+								
+}
+
+function onInitial()
+{
+	var macAddr="<% nvram_get("wan0_hwaddr"); %>";
+
+	if(macAddr=="") macAddr="<% nvram_get("lan_hwaddr"); %>";
+	var mac=macAddr.split(":");
+	document.tF0.MACaddr1.value = mac[0];
+	document.tF0.MACaddr2.value = mac[1];
+	document.tF0.MACaddr3.value = mac[2];
+	document.tF0.MACaddr4.value = mac[3];
+	document.tF0.MACaddr5.value = mac[4];
+	document.tF0.MACaddr6.value = mac[5];
+}
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="apply.cgi">
+<input type="hidden" name="page" value="wan_dhpc_mac.stm">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='location.href="wan_dhpc_mac.stm";'>
+<input type="hidden" name="location_page" value="wan_dhpc_mac.stm">
+<input type="hidden" name="wan_hwaddr"  value="<% nvram_get("wan0_hwaddr"); %>">
+<input type="hidden" name="wan_unit" value="0" >
+<input type="hidden" name="wan_ifnames" value="<% nvram_get("wan0_ifnames"); %>">
+<input type="hidden" name="wan_primary" value="1">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td> 
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(714); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<table width=700 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<td colspan=2 class="body"><% Fid_str(715); %></script> 
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#macaddr");><b><font color=0066ff><% Fid_str(47); %></font></b></a>
+									<br><br>
+								</td>
+							</tr>
+							<tr>								
+								<td width="34%" class="body"><b><% Fid_str(716); %>&nbsp;&gt;</b><br>
+							  <br></td>
+								<td width="66%" align=left nowrap=1>
+								<input type=text name=MACaddr1 size=3 maxlength=2 Value="00">-
+								<input type=text name=MACaddr2 size=3 maxlength=2 Value="00">-
+								<input type=text name=MACaddr3 size=3 maxlength=2 Value="00">-
+								<input type=text name=MACaddr4 size=3 maxlength=2 Value="00">-
+								<input type=text name=MACaddr5 size=3 maxlength=2 Value="00">-
+								<input type=text name=MACaddr6 size=3 maxlength=2 Value="00">
+								<br><br>
+								<script> onInitial(); </script>
+							  </td>
+							</tr>
+							<tr>								
+								<td width="34%" class="body"><b><% Fid_str(717); %> &gt;</b><br>
+							  <br></td>
+								<td align=left>
+									<input type="button" name="Clone" class="submitBtn" value="<% Fid_str(718); %>" onClick="copyto();">
+									<br><br></td>
+							</tr>
+							<tr>				
+								<td colspan=2 align=center><br>
+									<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;<a href="#" onClick="return evaltF();"><input type="submit"  name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn"></a>
+							  </td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

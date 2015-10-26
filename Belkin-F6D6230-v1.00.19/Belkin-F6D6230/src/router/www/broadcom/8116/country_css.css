@@ -1,0 +1,111 @@
+A {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #000000;
+}
+A:VISITED {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #000000;
+}
+A:ACTIVE {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #000000;
+}
+A:LINK {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #000000;
+}
+A:HOVER {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : underline;
+color : #000000;
+font-weight : normal;
+}
+A.section {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #FFFFFF;
+font-weight : bold;
+}
+A.LINK.section {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #FFFFFF;
+font-weight : bold;
+}
+A:VISITED.section {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #FFFFFF;
+font-weight : bold;
+letter-spacing : 1;	
+}
+A:HOVER.section {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : underline;
+color : #FFFFFF;
+font-weight : bold;
+}
+A:ACTIVE.section {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+text-decoration : none;
+color : #FFFFFF;
+font-weight : bold;
+}
+
+TD {
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-size : 11px;
+color : #FFFFFF;
+font-weight : bold;
+}
+.subtitle {
+color: #336699;
+font-family: Verdana, Arial, sans-serif; font-size: 13pt;
+text-align: left;
+}
+.normalText {
+color: #003366;
+font-family: Verdana, Arial, sans-serif; font-size: 10pt;
+text-align: left;
+}
+.tdText {
+BACKGROUND: #CED3D2; color: #000000;
+font-family: Verdana, Arial, sans-serif; font-size: 10pt;
+text-align: left;
+}
+.formsbutton {
+font-family: Verdana, Arial, sans-serif;
+font-size:12px;
+background-color:white;
+}
+
+.p1 {
+font-family: Arial, sans-serif; font-size: 9pt;
+color : #FF0000;
+font-weight : bold;
+}
+.p2 {
+font-family: Arial, sans-serif; font-size: 9pt;
+color : #FFFFFF;
+font-weight : bold;
+}
+.tdm4 {
+height:3px; text-align: left;
+}
+
+.txt4		{color: #000000;	font-family: Arial, sans-serif; font-size: 10pt;}
+

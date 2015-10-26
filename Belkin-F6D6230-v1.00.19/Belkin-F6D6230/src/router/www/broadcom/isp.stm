@@ -1,0 +1,40 @@
+<html>
+<head>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+
+function evaltF()
+{
+	return true;
+}
+
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<form name="BRNTForm" METHOD="POST" action="/cgi-bin/Bisp.exe">
+<table width="100%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+    <tr>
+        <td>
+            <font color="#336699" face="Arial" size="4"><B><% Fid_str(355); %></B></font><br>
+            <p><strong><font color="#003366" face="arial" size=2 ><% Fid_str(356); %></font></strong><br>
+            <ul type="square">
+            <strong><font color="#003366" face="arial" size=2><li><% Fid_str(357); %><br><br></li></font></strong>
+            <% exec cmd="bIspInfo"; %>
+            </ul></p>
+            <br>
+            <div align="right">
+            <input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('help.stm#isp','help','scrollbars=yes,width=600,height=500')">
+            <input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+            <input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">
+            </div>
+        </td>
+    </tr>
+</table>
+</form>
+</BODY>
+</HTML>

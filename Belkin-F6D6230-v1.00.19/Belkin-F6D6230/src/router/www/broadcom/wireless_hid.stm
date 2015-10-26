@@ -1,0 +1,178 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+
+
+<script language="JavaScript">
+<% getWirelessSecurity(); %>
+<% login_timeout(); %>
+
+var wireless_oper_mode=1;//'<% echo var="wireless_oper_mode"-->';
+ssidvalue = "<% Fid_str(1184); %>";
+
+var wirelesserror = "<% Fid_str(362); %>";
+var wirelessenable = <% echo var="getWirelessStatus"; %>;
+
+function changeMode()
+{
+	if (wireless_oper_mode != 3 ) //velu 03242005 to avoid runtime error on client mode.  need to think later.
+	{
+	if(navigator.appName != "Netscape")
+	{
+		if(document.forms[0].wbr.selectedIndex == 4) //11b
+		{
+		}
+		else
+		{
+			if(document.forms[0].wbr.selectedIndex == 2 || document.forms[0].wbr.selectedIndex == 3) //turbo should use channel 6 and can't change
+			{
+				document.forms[0].wchan.value = 6;
+				if(document.forms[0].wbr.selectedIndex == 3) //static turbo can't use with XR together
+				{
+				}
+				else
+				{
+				}
+			}
+			else // document.forms[0].wbr.selectedIndex == 0, 1
+			{
+				document.forms[0].wchan.disabled = false;
+			}
+		}
+		return true;
+		}
+	}
+}
+
+function evaltF()
+{
+	if(!wirelessenable){
+		alert(wirelesserror);
+		return false;
+	}
+	if (document.tF.ssid.value=='') {
+		alert(ssidvalue);
+		return false;
+	}
+	return true;
+}
+
+<% gs_gateway_stauts(); %>
+//<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<FORM NAME=tF METHOD=POST ACTION="/cgi-bin/wireless_ssid.exe">
+<input NAME=wmd TYPE=hidden VALUE=0>
+<% exec cmd="wireopt"; %>
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<script language="javascript">
+			if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+			    document.write('<br>&nbsp;&nbsp;<% Fid_str(251); %>');
+			else //client
+				document.write('<br>&nbsp;<% Fid_str(16); %> &gt; SSID');
+			</script>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="1">&nbsp;</td></tr>
+				<tr>
+					
+					<td>
+						<table width=550 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+							<tr align=left>
+								<td colspan=2 align=left>
+							        <script language="javascript">
+									if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+									{
+											document.write('<br><% Fid_str(252); %>');
+									}
+									else
+									{
+											document.write('<% Fid_str(515); %>');
+											document.write('.&nbsp;<% Fid_str(1670); %>.');
+									}
+									</script>
+									<a href="javascript:void(0);" onClick="window.open('glossary.stm#channel_ssid','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<b><font color=#0066FF><% Fid_str(231); %></font></b></a>
+								<br><br></td>
+							</tr>
+							<script language="javascript">
+//								<% exec cmd="WirelessG_get_para"; %>
+								if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+								{
+									//document.write('<tr><td width="36">&nbsp;</td>');
+									document.write('<tr><td width="174"><b><% Fid_str(254); %> &gt;</b></td>');
+									document.write('<td width="335">');
+									document.write('<select size="1" name="wchan" class=selectList>');
+									document.write('<% exec cmd="wchan"; %>');
+									document.write('</select>');
+									document.write('</td>');
+									document.write('</tr>');	
+								}
+							</script>
+
+							<tr>
+								<td width="174"><b><% Fid_str(255); %> &gt;</b></td>
+								<td width="335">
+									<input type="text" class="textbox" name="ssid" size=27 maxlength=32 value="<% exec cmd="ssidname"; %>">
+								</td>
+							</tr>
+					        <script language="javascript">
+//							<% exec cmd="WirelessG_get_para"; %>
+
+							if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+							{
+								//document.write('<tr><td width="36">&nbsp;</td>');
+								document.write('<tr><td width="174"><b><% Fid_str(256); %>&gt;</b></td>');
+								document.write('<td width="335">');
+								document.write('<select size="1" name="wbr" class=selectList>');
+								document.write('<% exec cmd="wbr"; %>');
+								document.write('</select>');
+								document.write('</td>');
+								document.write('</tr>');								
+								//document.write('<tr><td width="36">&nbsp;</td>');
+								document.write('<tr><td width="174"><b><% Fid_str(257); %> &gt;</b></td>');
+								document.write('<td width="335">');
+								document.write('<input type="radio" name="hidessid" value=0><% Fid_str(247); %>&nbsp;&nbsp;');
+								document.write('<input type="radio" name="hidessid" value=1><% Fid_str(248); %>');
+								var iDOD = <% echo var="hidessid"; %>;
+								document.forms[0].hidessid[iDOD].defaultChecked = true;
+								document.forms[0].hidessid[iDOD].checked = true;
+								document.write('</td>');
+								document.write('</tr>');								
+							}
+							</script>
+							<tr>
+								<td width="36">Tx Burst</td>
+								<td><input type='checkbox' name='txburst_enable' value='1'></td>
+								
+							</tr>
+							<tr>
+								<td colspan=3>&nbsp;</td>
+							</tr>
+							<tr>
+								
+								<td colspan="2" align=center>
+									<input type="button" value="<% Fid_str(264); %>" style="{height=22px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+              					<input type="submit" name="arc_action" value="<% Fid_str(265); %>" style="{height=22px;}" class="submitBtn" onClick="return evaltF();">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</table>
+</body>
+</html>
+

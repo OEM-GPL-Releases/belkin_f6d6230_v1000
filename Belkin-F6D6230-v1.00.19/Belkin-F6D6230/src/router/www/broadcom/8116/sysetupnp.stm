@@ -1,0 +1,94 @@
+<html>
+   <head>
+      <meta HTTP-EQUIV='Pragma' CONTENT='no-cache' charset=iso-8859-1>
+      <link rel="stylesheet" href='stylemain.css' type='text/css'>
+         <link rel="stylesheet" href='colors.css' type='text/css'>
+         <link rel="stylesheet" href="main_router.css" type='text/css'>
+            <script language="javascript" src="util.js"></script>
+            <script language="javascript">
+<!-- hide
+var state = '0';
+if ( state == '1' ) {
+   window.location = "lancfg2.cgi?lanRefresh=0";
+}
+
+
+var dhcpStart = '192.168.2.2';
+var dhcpEnd = '192.168.2.100';
+var dhcpLease = '8760';
+var proto = 'PPPoE';
+var ipExt = '0';
+var dhcpEnbl = '1';
+var natEnbl = '1';
+var ethIpAddress = '192.168.2.111';
+var ethSubnetMask = '255.255.255.0';
+
+var buildUpnp = '1';
+
+var enblUpnp = <% echo var="upnp_enable_var"; %>;
+
+function frmLoad() {
+   with ( document.forms[0] ) {
+     
+     if ( enblUpnp == 1 )
+        upnp_enable[0].checked = true;
+     else
+        upnp_enable[1].checked = true;
+
+   }
+}
+
+function btnSave(reboot) {
+   
+   var loc = 'lancfg2Reset.cgi?';
+   
+   with ( document.forms[0] ) {
+   
+      if ( chkUpnp[0].checked == true )
+         loc += 'enblUpnp=1';
+      else
+         loc += 'enblUpnp=0';
+   }
+   
+   window.location = loc;
+}
+
+
+// done hiding -->
+      </script>
+</head>
+   <body onLoad='frmLoad()'>
+      <blockquote>
+         <form name="tF3" method="post" action="/cgi-bin/upnp_eb.exe">
+            <table border="0"  width="95%">
+            <tr class="head_bold">
+           		<b><% Fid_str(804); %></b><br>
+            </tr>
+            <tr>
+	            <br><font face="Verdana" color="#004263" size="1"><% Fid_str(805); %>.</font><a style="text-decoration: none" href="javascript:void(0);" onClick="window.open('glossary.stm#upnp','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');"><font  face=Verdana color="#0066FF" size="1"><b><% Fid_str(708); %></b></font></a>
+	            <font color="#003366" face="Verdana">
+	            </font>
+	     </tr>
+	     </table>
+            <table border="0" cellpadding="0" cellspacing="0" width="594" height="61">        	
+               <tr>
+                  <td width="191" height="22">
+                  <font face="Verdana" color="#003366">&nbsp;</font><b><font size="1" color="#004263" face="Verdana"><% Fid_str(806); %></font></b></td> 
+                  <td width="403" height="22">
+                  <font face="Verdana" size="2" color="#003366"><input type='radio' name="upnp_enable" value=1><% Fid_str(263); %><input type='radio' name="upnp_enable" value=0><% Fid_str(262); %></font></td>
+               </tr>                              
+            </table>
+             <center>
+               <p align="left">
+
+                  <input type='button' style=" HEIGHT: 22px" onClick="javascript:window.location.reload(true);return false" value='<% Fid_str(634); %>' class='submitBtn'>
+                  &nbsp;&nbsp;
+                  <input type='submit' style=" HEIGHT: 22px" value='<% Fid_str(635); %>' class='submitBtn'>
+
+
+               </p>
+            </center>
+         </form>
+         
+   </body>
+

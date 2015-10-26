@@ -1,0 +1,540 @@
+<table width="100%" border="0" argin="0" cellspacing="0" cellpadding="0" height="100%" id="cont_table">
+<tr>
+<td style="word-break:break-all;width:142"  height="100%">
+
+<script type="text/javascript" language="JavaScript">
+
+var ap_mode= '<!--#exec cmd="device_mode_script" -->';
+var html_array = parent.mainFrame.location.href.split ("/");
+var htmlstr = html_array[3];
+
+function javamagic(srcElement, pageName, pageOpen)
+{
+	var targetId;
+	if (pageOpen == 1){
+  		parent.mainFrame.location.href = pageName;
+	}
+}
+
+</script>
+
+<table width="141" border="0" cellspacing="0" cellpadding="0" height="100%">
+<TBODY>
+	<tr bgcolor='666666'>
+		<td>
+			<div><a href="wiz_main.stm"><img border="0" src="/images/wiz_white_46.gif"/></a></div>
+			<div><hr style="margin:0px"></div>
+			<div><a href="setup.htm"><img border="0" src="/images/man_blue_46.gif"/></a></div>
+		</td>
+	</tr>
+	<TR bgcolor='666666'>
+    		<TD vAlign=top width=130 height="100%">
+      			<TABLE  cellSpacing=0  cellPadding=2 width=140 align=left bgcolor='666666' style="margin-left:5px">
+        		<TBODY>        
+        			<script>
+        			if(ap_mode == 0) {
+        				document.write('<TR id="Out2d">');
+        					if((htmlstr=="lan_main_0.stm")||(htmlstr=="lan_main.stm")||(htmlstr=="lan_dhcp.stm")) { 
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write('<a href=javascript:javamagic("Out2","lan_main_0.stm",1);><font color=#ffff00><!--#Fid_str(8)--></font></a></TD>');
+        					}else{
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write('<a href=javascript:javamagic("Out2","lan_main_0.stm",1); ><font color=#ffffff><!--#Fid_str(8)--></font></a></TD>');
+						}
+        				document.write('</TR>');
+        			
+        				document.write('<TR id="Out2d">');
+        					if(htmlstr=="lan_main.stm"){  
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(9)--></font></TD>');
+        					}else{
+        						document.write('<TD class="Menu_leftLink">');
+							document.write('<a href=lan_main.stm target=mainFrame class="menuharf"><!--#Fid_str(9)--></a><br></TD>');
+					}										
+					document.write('</TR>');
+				
+        				document.write('<TR id="Out2d">');
+	        				if(htmlstr=="lan_dhcp.stm"){
+	        					document.write('<TD class="Menu_leftLink">');
+	        					document.write('<font color=#6699ff><!--#Fid_str(1431)--></font></TD>');
+	        				}else{
+	        					document.write('<TD class="Menu_leftLink">');
+							document.write('<a href=lan_dhcp.stm target=mainFrame class="menuharf"><!--#Fid_str(1431)--></a><br></TD>');
+						}
+					document.write('</TR>');
+        
+        				document.write('<TR id="Out1d">');
+        				       					
+        					var subhtmlstr= htmlstr.substring(0,4);      					
+        					if((htmlstr=="Wan_main_0.stm")||(htmlstr=="Wan_main.stm")||(htmlstr=="setup_dns.stm")||(htmlstr=="Wan_dhpc_mac.stm") ||(subhtmlstr=="wan_")){
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write('<a href=javascript:javamagic("Out1","Wan_main_0.stm",1); ><font color=#ffff00><!--#Fid_str(11)--></font></a></td>');
+        					}else{
+							document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write('<a href=javascript:javamagic("Out1","Wan_main_0.stm",1); ><font color=#ffffff><!--#Fid_str(11)--></font></a></td>');
+						}
+					document.write('</TR>');
+        			
+        				document.write('<TR id="Out1d">');
+        				
+        					if(htmlstr=="Wan_main.stm" || htmlstr=="wan_bigpond.stm"  || htmlstr=="wan_dhpc.stm"  || htmlstr=="wan_pppoe.stm"  || htmlstr=="wan_pptp.stm"  || htmlstr=="wan_static.stm" ){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(335)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=Wan_main.stm target=mainFrame class="menuharf"><!--#Fid_str(335)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+        				document.write('<TR id="Out1d">');
+        				
+        					if(htmlstr=="setup_dns.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(13)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=setup_dns.stm target=mainFrame class="menuharf"><!--#Fid_str(13)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+					document.write('<TR id="Out1d">');
+    				
+        					if(htmlstr=="Wan_dhpc_mac.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(14)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=Wan_dhpc_mac.stm target=mainFrame class="menuharf"><!--#Fid_str(14)--></a></td>');
+        					}
+        				document.write('</TR>');
+        				
+								document.write('<TR id="Out1d">');    				
+        					if(htmlstr=="wan_static_route.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff>Static Route</font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=wan_static_route.stm target=mainFrame class="menuharf">Static Route</a></td>');
+        					}
+        				document.write('</TR>');        				
+				}
+				</script>
+      				<TR id="Out3d">
+					<script>
+        					var subhtmlstr= htmlstr.substring(0,8);         					
+        					if((htmlstr=="wireless_main_0.stm")||(subhtmlstr=="wireless")){
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write('<a href=javascript:javamagic("Out3","wireless_main_0.stm",1);><font color=#ffff00><!--#Fid_str(16)--></font></a></td>');
+        					}else{
+							document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write('<a href=javascript:javamagic("Out3","wireless_main_0.stm",1);><font color=#ffffff><!--#Fid_str(16)--></font></a></td>');
+						}
+					</script>
+        			</TR>
+        			
+<!--24-->
+
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_main_24.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(1605)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=wireless_main_24.stm target=mainFrame class="menuharf"><!--#Fid_str(1605)--></a></td>');
+        					}
+        				</script>
+				</TR>
+        			
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_id.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<font color=#6699ff><!--#Fid_str(17)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<a href=wireless_id.stm target=mainFrame class="menuharf"><!--#Fid_str(17)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_e.stm" || htmlstr=="wireless_128bitwep.stm"  || htmlstr=="wireless_64bitwep.stm"  || htmlstr=="wireless_PSK.stm"  || htmlstr=="wireless_WPA.stm"  || htmlstr=="wireless_no_encryption.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<font color=#6699ff><!--#Fid_str(18)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<a href=wireless_e.stm target=mainFrame class="menuharf"><!--#Fid_str(18)--></a></td>');
+        					}
+        				</script>
+				</TR>
+<!--24end -->
+<!--5 -->
+
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_main_5.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(1606)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=wireless_main_5.stm target=mainFrame class="menuharf"><!--#Fid_str(1606)--></a></td>');
+        					}
+        				</script>
+				</TR>
+        			
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_id_5.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<font color=#6699ff><!--#Fid_str(17)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<a href=wireless_id_5.stm target=mainFrame class="menuharf"><!--#Fid_str(17)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+        			<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_e_5.stm" || htmlstr=="wireless_128bitwep_5.stm"  || htmlstr=="wireless_64bitwep_5.stm"  || htmlstr=="wireless_PSK_5.stm"  || htmlstr=="wireless_WPA_5.stm"  || htmlstr=="wireless_no_encryption_5.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<font color=#6699ff><!--#Fid_str(18)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('&nbsp;&nbsp;<a href=wireless_e_5.stm target=mainFrame class="menuharf"><!--#Fid_str(18)--></a></td>');
+        					}
+        				</script>
+				</TR>
+<!--5end -->				
+
+				<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_WPS.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<font color=#6699ff><!--#Fid_str(1319)--></font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=wireless_WPS.stm target=mainFrame class=menuharf><!--#Fid_str(1319)--></a></td>");
+        					}
+        				</script>
+				</TR>       
+				
+				<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_guest.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<font color=#6699ff><!--#Fid_str(1613)--></font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=wireless_guest.stm target=mainFrame class=menuharf><!--#Fid_str(1613)--></a></td>");
+        					}
+        				</script>
+				</TR>				   
+				
+				<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_apt.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<font color=#6699ff><!--#Fid_str(19)--></font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=wireless_apt.stm target=mainFrame class=menuharf><!--#Fid_str(19)--></a></td>");
+        					}
+        				</script>
+				</TR>
+<!--				
+				<TR id="Out3d">
+        				<script>
+        					if(htmlstr=="wireless_mac.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<font color=#6699ff><!--#Fid_str(833)--></font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=wireless_mac.stm target=mainFrame class=menuharf><!--#Fid_str(833)--></a></td>");
+        					}
+        				</script>
+				</TR>         
+-->
+				<TR id="Out5d">
+					<script>
+        					var subhtmlstr= htmlstr.substring(0,3);  
+        					if(subhtmlstr=="qos"){
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write("<a href=javascript:javamagic('Out5','qos_main_0.stm',1);><font color=#ffff00><!--#Fid_str(1440)--></font></a></td>");
+        					}else{
+							document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write("<a href=javascript:javamagic('Out5','qos_main_0.stm',1);><font color=#ffffff><!--#Fid_str(1440)--></font></a></td>");
+						}
+					</script>
+        		</TR>
+        			
+        		<TR id="Out5d">
+        			<script>
+        				if(htmlstr=="qos_main2.stm"){
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<font color=#6699ff><!--#Fid_str(1441)--></font></TD>');
+        				}
+        				else{
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<a href=qos_main2.stm target=mainFrame class="menuharf"><!--#Fid_str(1441)--></a></td>');
+        				}
+        			</script>
+				</TR>
+        		<!--
+				<TR id="Out5d">
+        			<script>
+        				if(htmlstr=="qos_clsmap.stm"){
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<font color=#6699ff>Traffic Mapping</font></TD>');
+        				}
+        				else{
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<a href=qos_clsmap.stm target=mainFrame class="menuharf">Traffic Mapping</a></td>');
+        				}
+        			</script>
+				</TR>
+				-->
+				<TR id="Out5d">
+        			<script>
+        				if(htmlstr=="qos_stats.stm"){
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<font color=#6699ff><!--#Fid_str(1442)--></font></TD>');
+        				}
+        				else{
+        					document.write('<TD class="Menu_leftLink">');
+        					document.write('<a href=qos_stats.stm target=mainFrame class="menuharf"><!--#Fid_str(1442)--></a></td>');
+        				}
+        			</script>
+				</TR>
+
+				<script>
+        			if(ap_mode == 0) {
+        				var subhtmlstr= htmlstr.substring(0,8);   
+        				
+        				        			
+        				document.write('<TR id="Out4d">');
+    					       					
+        					if((htmlstr=="firewall_main_0.stm")||(htmlstr=="nat_v.stm")||(htmlstr=="log.stm")||(subhtmlstr=="firewall")||(htmlstr=="ddns.stm")){
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write('<a href=javascript:javamagic("Out4","firewall_main_0.stm",1);><font color=#ffff00><!--#Fid_str(23)--></font></a></td>');
+        					}else{
+							document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write('<a href=javascript:javamagic("Out4","firewall_main_0.stm",1);><font color=#ffffff><!--#Fid_str(23)--></font></a></td>');
+						}
+					document.write('</TR>');
+					
+        				document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="nat_v.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(24)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=nat_v.stm target=mainFrame class="menuharf"><!--#Fid_str(24)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+        				/*document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="firewall_a.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+    						document.write("<font color=#6699ff><!--#Fid_str(25)--></font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=firewall_a.stm target=mainFrame class=menuharf><!--#Fid_str(25)--></a></td>");
+        					}
+					document.write('</TR>');*/
+				
+					document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="firewall_ac.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+    						document.write("<font color=#6699ff>Access Control</font></TD>");
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write("<a href=firewall_ac.stm target=mainFrame class=menuharf>Access Control</a></td>");
+        					}
+					document.write('</TR>');
+
+					/*document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="firewall_mac.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(26)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=firewall_mac.stm target=mainFrame class="menuharf"><!--#Fid_str(26)--></a></td>');
+        					}
+        				document.write('</TR>');*/
+				
+					document.write('<TR id="Out4d">');
+					
+        					if(htmlstr=="firewall_d.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(27)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=firewall_d.stm target=mainFrame class="menuharf"><!--#Fid_str(27)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+					document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="ddns.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(41)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=ddns.stm target=mainFrame class="menuharf"><!--#Fid_str(41)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+        				document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="firewall_ping.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(28)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=firewall_ping.stm target=mainFrame class="menuharf"><!--#Fid_str(28)--></a></td>');
+        					}
+        				document.write('</TR>');
+				
+					document.write('<TR id="Out4d">');
+        				
+        					if(htmlstr=="log.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(29)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=log.stm target=mainFrame class="menuharf"><!--#Fid_str(29)--></a></td>');
+        					}
+        				
+					document.write('</TR>');
+				}
+				</script>
+				
+	 			<TR id="Out5d">
+					<script>
+        					var subhtmlstr= htmlstr.substring(0,5);  
+        					var subhtmlstr1= htmlstr.substring(0,6);        					
+        					if((htmlstr=="tl_main_0.stm")||(subhtmlstr=="tools")||(subhtmlstr1=="system")){
+        						document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+        						document.write("<a href=javascript:javamagic('Out5','tl_main_0.stm',1);><font color=#ffff00><!--#Fid_str(30)--></font></a></td>");
+        					}else{
+							document.write('<TD colspan="2" height="20" width="140" class="Menu_section">');
+							document.write("<a href=javascript:javamagic('Out5','tl_main_0.stm',1);><font color=#ffffff><!--#Fid_str(30)--></font></a></td>");
+						}
+					</script>
+        			</TR>
+        			
+        			<TR id="Out5d">
+        				<script>
+        					if(htmlstr=="system_r.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(32)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=system_r.stm target=mainFrame class="menuharf"><!--#Fid_str(32)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+        			<TR id="Out5d">
+        				<script>
+        					if(htmlstr=="tools_restore.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(34)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=tools_restore.stm target=mainFrame class="menuharf"><!--#Fid_str(34)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+				<TR id="Out5d">
+        				<script>
+        					if(htmlstr=="system_c.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(35)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=system_c.stm target=mainFrame class="menuharf"><!--#Fid_str(35)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+				<TR id="Out5d">
+					<script>
+        					if(htmlstr=="tools_backup.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(36)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=tools_backup.stm target=mainFrame class="menuharf"><!--#Fid_str(36)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+        			<TR id="Out5d">
+        				<script>
+        					if(htmlstr=="system_f.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(37)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=system_f.stm target=mainFrame class="menuharf"><!--#Fid_str(37)--></a></td>');
+        					}
+        				</script>
+				</TR>
+				
+				<TR id="Out5d">
+        				<script>
+        					if(htmlstr=="system.stm"){
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<font color=#6699ff><!--#Fid_str(38)--></font></TD>');
+        					}
+        					else{
+        						document.write('<TD class="Menu_leftLink">');
+        						document.write('<a href=system.stm target=mainFrame class="menuharf"><!--#Fid_str(38)--></a></td>');
+        					}
+        				</script>
+				</TR>   
+			</TBODY>
+	     		</TABLE>
+		<TD style="BACKGROUND-COLOR: #666262" width=1></TD>
+		</TD>
+	</TR>
+</TBODY>
+</TABLE>
+</td>
+<td valign="top">

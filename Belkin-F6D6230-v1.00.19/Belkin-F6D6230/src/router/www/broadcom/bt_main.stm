@@ -1,0 +1,37 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript">
+<% login_timeout(); %>
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%" id="error_table" style="display:none;padding:20px">
+	<tr>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(1820); %>&nbsp;&gt;<br>
+			<table border=0 class="copy_1" width="100%">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>					
+					<td>
+						<% Fid_str(1821); %>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<script>
+var usb_conn = "<% is_usb_connected(); %>";
+if(usb_conn == 1)
+	document.location.href = "http://<% nvram_get("lan_ipaddr"); %>:8082/gui.html";
+else
+	document.getElementById("error_table").style.display = "";
+</script>
+</body>
+</html>

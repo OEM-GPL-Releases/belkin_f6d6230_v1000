@@ -1,0 +1,112 @@
+upnpcommands.o upnpcommands.o: upnpcommands.c \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/stdlib.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/features.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_config.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/cdefs.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/include/stddef.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/types.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/types.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/kernel_types.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/pthreadtypes.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sched.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/time.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/endian.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/endian.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/select.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/select.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sigset.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/time.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/alloca.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/stdio.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_stdio.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_mutex.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/pthread.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sched.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_clk_tck.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/signal.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/initspin.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sigthread.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_pthread.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/include/stdarg.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/stdio_lim.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/string.h \
+  upnpcommands.h upnpreplyparse.h \
+  /opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/queue.h \
+  declspec.h miniupnpc.h igd_desc_parse.h
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/stdlib.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/features.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_config.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/cdefs.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/include/stddef.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/types.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/types.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/kernel_types.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/pthreadtypes.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sched.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/time.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/endian.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/endian.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/select.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/select.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sigset.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/time.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/alloca.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/stdio.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_stdio.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_mutex.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/pthread.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sched.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_clk_tck.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/signal.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/initspin.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/sigthread.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_pthread.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/include/stdarg.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/bits/stdio_lim.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/string.h:
+
+upnpcommands.h:
+
+upnpreplyparse.h:
+
+/opt/toolchain/hndtools-mipsel-linux-uclibc-4.1.2-32/bin/../lib/gcc/mipsel-linux-uclibc/4.1.2/../../../../mipsel-linux-uclibc/sys-include/sys/queue.h:
+
+declspec.h:
+
+miniupnpc.h:
+
+igd_desc_parse.h:

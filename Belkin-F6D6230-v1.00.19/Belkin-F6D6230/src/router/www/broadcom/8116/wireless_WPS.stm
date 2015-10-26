@@ -1,0 +1,446 @@
+<html>
+	<head>
+		<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% getWirelessSecurity(); %>
+</script>
+</head>
+<SCRIPT LANGUAGE="JavaScript">
+	var WSC_Mode = "<% nvram_get("wl0_wps_mode"); %>";		// 1: disable 2: enable
+	var wireless_Mode ="<% nvram_get("wl0_wps_mode"); %>";
+	<% wps_get_key(); %>
+
+function evaltF(){	
+	if(document.tF0.wl_wps_mode[document.tF0.wl_wps_mode.selectedIndex].value=="enabled")
+   		document.tF0.wl_wps_reg.value="enabled";
+	else
+   		document.tF0.wl_wps_reg.value="disabled";
+	return true;	
+}
+
+function selectedchange(){
+
+	if(WSC_Mode != "enabled" ){
+		document.getElementById("PIN_set").style.display="none";
+   		document.getElementById("PBC_set").style.display="none";	
+   		document.getElementById("manual_set").style.display="none";
+	}else{
+		document.getElementById("PIN_set").style.display="";
+   		document.getElementById("PBC_set").style.display="";	
+   		document.getElementById("manual_set").style.display="";
+   		if( wireless_Mode=="disabled"){	//off
+	   		document.getElementById("enroll_button").disabled=true;
+	   		document.getElementById("start_pbc_button").disabled=true;
+   		}
+   		else{
+	   		document.getElementById("enroll_button").disabled=false;
+	   		document.getElementById("start_pbc_button").disabled=false;
+   		}
+	}
+}
+
+
+function newPIN(){
+	document.getElementById("newPIN_value").value = document.getElementById("pin").value;
+	return true;
+}
+
+function defaultPIN(){
+	document.tF1.wps_sta_pin.value="12345670";	
+	return true;
+}
+
+function PINValueCheck(PIN)
+{
+	var accum = 0;
+	accum += 3 * parseInt((PIN / 10000000) % 10); 
+	accum += 1 * parseInt((PIN / 1000000) % 10); 
+	accum += 3 * parseInt((PIN / 100000) % 10); 
+	accum += 1 * parseInt((PIN / 10000) % 10); 
+	accum += 3 * parseInt((PIN / 1000) % 10); 
+	accum += 1 * parseInt((PIN / 100) % 10); 
+	accum += 3 * parseInt((PIN / 10) % 10); 
+	accum += 1 * parseInt((PIN / 1) % 10); 
+	
+	if(0 == (accum % 10))
+    return 1;
+	else
+		return 0;
+}
+function Enroll(){
+	var len;
+	var pin_value = document.tF1.pin.value;
+       
+	if(document.getElementById("enroll_button").disabled == true){
+		return false;
+	}
+	if( isNValidInt(pin_value)){
+		alert("<% Fid_str(1391); %>");
+		return false;
+	}
+	len = document.tF1.pin.value.length;
+	//if(4 != len  && 8 != len){
+	if(8 != len){
+		alert("<% Fid_str(1391); %>");
+		return false;
+	}
+	
+	var pin_value_long = parseInt(document.tF1.pin.value);
+	
+	if(PINValueCheck(pin_value_long) == 0){
+		alert("<% Fid_str(1394); %>");
+		return false;
+	}
+	document.tF1.wps_sta_pin.value=pin_value;
+	window.open('WPS_stautsShow.stm','WPS','toolbar=0,status=0,menubar=0,scrollbars=0,resizable=0,width=400,height=200,left=150,top=150, resizable=0,depended=1, location=0');
+	return true;
+}
+
+function ExternalRegist()
+{
+	document.tF1.action.value="Arc_WpsExRegist"; 
+	window.open('WPS_stautsShow.stm','WPS','toolbar=0,status=0,menubar=0,scrollbars=0,resizable=0,width=400,height=200,left=150,top=150, resizable=0,depended=1, location=0');
+	return true;		
+}
+
+function startpbc(){
+	if(document.getElementById("start_pbc_button").disabled == true){
+		return false;
+	}
+	window.open('WPS_stautsShow.stm','WPS','toolbar=0,status=0,menubar=0,scrollbars=0,resizable=0,width=400,height=200,left=150,top=150,resizable=0,depended=1, location=0');
+	return true;		
+}
+
+function doload(){
+	if (WSC_Mode=="enabled" ){
+		document.tF0.wl_wps_mode.selectedIndex = 1;
+	}
+	selectedchange();
+	return true;		
+}
+
+	</SCRIPT>
+	<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="doload()">
+		<% File_include("menu.stm"); %>
+		<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+			<tr>
+				<td width="36" colspan="2">&nbsp;</td>
+				<td valign="top" width="95%" height="100%" class="head_bold">
+					<br> <% Fid_str(16); %> &nbsp;&gt;<% Fid_str(1319); %> (WPS)<br>
+					<table border="0" class="copy_1">
+						<tr>
+							<td width="5" colspan="2">&nbsp;</td>
+						</tr>
+						<tr>
+							<td>
+							<!--TF0  Enable/disable WPS -->
+								<form name="tF0" action="apply.cgi" method="post">
+								<!--<input type="hidden" name="wps_device_name" value="BroadcomAP">
+								<input type="hidden" name="wl_wps_config_state">-->
+								<input type="hidden" name="location_page" value="wireless_WPS.stm">	
+								<input type="hidden" name="wl_wps_reg">
+								<input type="hidden" name="wl_unit", value="0">
+								<input type="hidden" name="wl_bssid", value="0">
+								
+								<input type="hidden" name="wl_action" value="1">	
+  
+						<!--		<input type="hidden" name="wl_ssid" value="<% nvram_get("wl0_ssid"); %>">
+								<input type="hidden" name="wl_bss_enabled" value="<% nvram_get("wl0_bss_enabled"); %>">
+								
+								<input type="hidden" name="wl_wep", value="<% nvram_get("wl0_wep"); %>">
+	              <input type="hidden" name="wl_wpa_psk" value="<% nvram_get("wl0_wpa_psk"); %>">
+	              <input type="hidden" name="wl_auth" value="<% nvram_get("wl_auth"); %>">	
+	              <input type="hidden" name="wl_auth_mode" value="<% nvram_get("wl_auth_mode"); %>">
+	              <input type="hidden" name="wl_akm" value="">
+	              <input type="hidden" name="wl_crypto" value="<% nvram_get("wl0_crypto"); %>">
+
+               	<input type="hidden" name="wl_akm_psk" value="<% nvram_inlist("wl0_akm", "psk", "enabled"); %>">
+	              <input type="hidden" name="wl_akm_psk2" value="<% nvram_inlist("wl0_akm", "psk2", "enabled"); %>">
+	              <input type="hidden" name="wl_akm_wpa" value="<% nvram_inlist("wl0_akm", "wpa", "enabled"); %>">
+	              <input type="hidden" name="wl_akm_wpa2" value="<% nvram_inlist("wl0_akm", "wpa2", "enabled"); %>">
+            -->    
+								<table width="550" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+										<tr>
+											<td width="180" class="body"><b><% Fid_str(1319); %> (WPS)</b><br>
+												<br>
+											</td>
+											<td colspan="2">
+												<select size="1" name="wl_wps_mode" class="selectList" onChange="selectedchange()">
+													<option value="disabled" <% nvram_match("wl0_wps_mode", "disabled", "selected"); %>><% Fid_str(318); %></option>
+													<option value="enabled" <% nvram_match("wl0_wps_mode", "enabled", "selected"); %>><% Fid_str(317); %></option>
+												</select>
+												<br>
+												<br>
+											</td>
+										</tr>
+										<tr>
+										      <td width="180" class="body"><b>WPS hardware button </b><br>
+												<br>
+											</td>
+											<td colspan="2">
+												<select size="1" name="wps_hw_enable" class="selectList">
+													<option value="1" <% nvram_match("wps_hw_enable", "1", "selected"); %>><% Fid_str(317); %></option><!--enable-->
+													<option value="0" <% nvram_match("wps_hw_enable", "0", "selected"); %>><% Fid_str(318); %></option><!--disable-->
+												</select>
+												<br>
+												<br>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="3" class="body"><% Fid_str(1320); %><br>
+												<br>
+											</td>
+											<br>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align="right">
+								<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+								<br>
+								<br>
+							</td>
+						</tr>
+					</table>
+					</form>
+				</td>
+			</tr>
+			<tr id="PIN_set" style="display:none">
+				<td>
+					<table width="550" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+						<tr>
+							<td colspan="3"><hr noshade size="1" color="#006699">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" class="body"><b>1)<% Fid_str(1321); %></b><br>
+								<br>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" class="body"><% Fid_str(1322); %><br>
+								<br>
+							</td>
+						</tr>
+						<!--TF1  WPS PIN method -->
+						<form name="tF1" action="apply.cgi" method="post">
+						<input type="hidden" name="page" value="wireless_WPS.stm">
+						<input type="hidden" name="location_page" value="wireless_WPS.stm">
+						<input type="hidden" name="wps_method" value="PIN">
+						<input type="hidden" name="wps_sta_pin" value="<% nvram_get("wps_sta_pin"); %>">
+						<input type="hidden" name="wps_addER" value="1">
+						<input type="hidden" name="action" value="Arc_WpsEnroll">
+							<tr>
+								<td width="180" class="body"><% Fid_str(1323); %><br>
+									<br>
+								</td>
+								<td width="200" class="body">
+									<input type="text" maxLength="8" size="20" name="pin" value=""><br><br>
+								</td>
+								<td align="right">
+									<input type="submit" value="<% Fid_str(1324); %>" style="{height=22px;}" onClick="return Enroll();" class="submitBtn" id="enroll_button">
+									&nbsp;
+									<script language="JavaScript">
+									//var f_configure=<% nvram_get("wl_wps_config_state"); %>;
+									//if(f_configure==1) 
+									//	document.write('<input type="submit" value="External Registrar" style="{height=22px;}" onClick="return ExternalRegist();" class="submitBtn" id="extRegist_button">');
+									</script>
+									<br>
+									<br>
+								</td>
+							</tr>
+						</form>
+						<tr>
+							<td colspan="3" class="body"><% Fid_str(1325); %><br>
+								<br>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="180" class="body"><nobr><b><% Fid_str(1326); %> :<% nvram_get("wps_device_pin"); %> </b><nobr>
+							</td>
+							<!--TF2  New PIN method -->
+							<td colspan="1" class="body" align="left">
+									<form name="tF2"  action="apply.cgi" method="post">
+									<input type="hidden" name="location_page" value="wireless_WPS.stm">
+									<input type="hidden" name="action" value="Arc_WpsGeneratePin">
+									<input type="submit"  value="<% Fid_str(1327); %>" style="{height=22px;}" class="submitBtn" onClick="return newPIN();">
+									</form>
+							</td>
+							<!--TF3  Default PIN method -->
+							<td colspan="1" class="body" align="right">
+								<form name="tF3"  action="apply.cgi" method="post">
+								<input type="hidden" name="location_page" value="wireless_WPS.stm">						
+								<input type="hidden" name="action" value="Arc_WpsDefaultPin">
+									<input type="submit"  name="defaultPin" value="<% Fid_str(1328); %>" style="{height=22px;}" class="submitBtn"> </a>
+								</form>
+								</nobr>
+								<br>
+								<br>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr id="PBC_set" style="display:none">
+			        <!--TF5  PBC method -->
+				<td>
+					<form name="tF5" action="apply.cgi" method="post">
+						<input type="hidden" name="page" value="wireless_WPS.stm">
+						<input type="hidden" name="location_page" value="wireless_WPS.stm">						
+						<input type="hidden" name="wps_method" value="PBC">
+						<input type="hidden" name="wps_sta_pin" value="<% nvram_get("wps_device_pin"); %>">
+						<input type="hidden" name="action" value="Arc_WpsEnroll">
+												
+						<table width="550" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+							<tr>
+								<td colspan="3"><hr noshade size="1" color="#006699">
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" class="body"><b>2)<% Fid_str(1329); %></b><br>
+									<br>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" class="body"><% Fid_str(1330); %><br>
+									<br>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" align="right">
+								<input type="submit"  id="start_pbc_button" value="<% Fid_str(1331); %>" style="{height=22px;}" class="submitBtn"
+											onClick="startpbc();">
+									<br>
+									<br>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+			<tr id="manual_set" style="display:none">
+				<td>
+					<table width="550" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+						<tr>
+							<td colspan="3"><hr noshade size="1" color="#006699">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" class="body"><b>3)<% Fid_str(1332); %></b><br>
+								<br>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" class="body"><% Fid_str(1333); %><br>
+								<br>
+							</td>
+						</tr>
+						<script language="JavaScript">	
+							var f_configure=<% nvram_get("wl_wps_config_state"); %>;
+							if(PWS_type>=2 && PWS_type<=8 ){
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1335); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									document.write(PWS_ssid);	
+									document.write('</td>');
+								document.write('</tr>');
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1334); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									if(f_configure==1)
+										document.write("<% Fid_str(1392); %>");	
+									else 
+										document.write("unconfigured");	
+									document.write('</td>');
+								document.write('</tr>');
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1336); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									  	switch (PWS_type) {
+									    	case 1:	
+												document.write("<% Fid_str(1306); %>");
+												break;
+									    	case 2:	
+												document.write("WEP");
+												break;
+									    	case 3:	
+												document.write("WPA+PSK");
+												break;
+									    	case 4:	
+												document.write("WPA2+PSK");
+												break;	
+									    	case 5:	
+												document.write("WPA-PSK + WPA2-PSK");
+												break;
+									    	case 6:	
+												document.write("WPA");
+												break;
+									    	case 7:	
+												document.write("WPA2");
+												break;
+									    	case 8:	
+												document.write("WPA+WPA2");
+												break;																				
+											default:
+												document.write("<% Fid_str(1306); %>");
+												break;										
+									     }
+									document.write('</td>');
+								document.write('</tr>');
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1337); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									  	switch (PWS_encrType) {
+									    	case 1:	
+												document.write("TKIP");
+												break;
+									    	case 2:	
+												document.write("AES");
+												break;
+									    	case 3:	
+												document.write("TKIP+AES");
+												break;
+											default:
+												document.write("<% Fid_str(1393); %>");
+												break;										
+									     }
+									document.write('</td>');
+								document.write('</tr>');
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1338); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									document.write(PWS_key);	
+									document.write('</td>');
+								document.write('</tr>');
+							}
+							else{
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1335); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+									document.write(PWS_ssid);	
+									document.write('</td>');
+								document.write('</tr>');
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><b><% Fid_str(1334); %> :</b></td>');
+									document.write('<td colspan="2" class="body" align="left">');
+												document.write("<% Fid_str(1395); %>");	
+									document.write('</td>');
+								document.write('</tr>');		
+								document.write('<tr>');
+									document.write('<td width="180" class="body"><nobr><b><% Fid_str(1396); %>&nbsp;<a href="wireless_e.stm"><font color=#0066FF><% Fid_str(1397); %></font></a></b></nobr></td>');
+									document.write('<td colspan="2" class="body" align="left">&nbsp;</td>');
+								document.write('</tr>');								
+							}							
+						</script>
+					</table>
+				</td>
+			</tr>
+		</table>
+		</td> </tr> </table>
+	</body>
+</html>

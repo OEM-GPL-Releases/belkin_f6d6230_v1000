@@ -1,0 +1,12 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+
+</head>
+<body text="#000000" bgColor="#eeeeee" leftMargin="10" topMargin="50" marginheight="0" marginwidth="0">
+<b><% Fid_str(196); %></br>
+  <% Fid_str(197); %></b>
+</body>
+</html>

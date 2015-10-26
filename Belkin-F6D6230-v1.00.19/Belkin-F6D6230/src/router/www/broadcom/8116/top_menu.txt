@@ -1,0 +1,14 @@
+						<nobr>
+						<a href="/index.stm" class="top_nav"><!--#Fid_str(530)--></a> |
+						<a href="/setupw.stm" class="top_nav">Wizard</a> |
+						<a href="/help.stm" class="top_nav"><!--#Fid_str(279)--></a> |
+						<a href="/cgi-bin/logout.exe" class="top_nav"><!--#Fid_str(532)--></a> &nbsp; &nbsp;
+						<span class="top_nav">Internet Status:<b>
+						<script language="javascript">
+						<!--#exec cmd="gateway_status" -->
+						if(bWanConnected==1)
+							document.write('<font face="verdana,arial" size="2" color="#33FF33">CONNECTED</font></b></span>');
+						else
+							document.write('<font face="verdana,arial" size="2" color="#33FF33">DISCONNECTED</font></b></span>');
+						</script>
+						</nobr>

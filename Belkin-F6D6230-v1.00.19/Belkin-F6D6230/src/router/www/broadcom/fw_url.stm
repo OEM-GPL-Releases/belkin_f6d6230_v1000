@@ -1,0 +1,82 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+
+<script language="JavaScript">
+<% login_timeout(); %>
+
+<% include file="routine.txt"; %>
+
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+
+function evaltF() 
+{
+   	return true;
+}
+
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form name="tF0" method="post" action="/cgi-bin/fw_url.exe">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="fw_url.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(203); %> &gt;  <br>
+			<table width="600" border="0" cellspacing="3" cellpadding="0" align=left class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+						</table>
+						<table width=600 border="0" cellspacing="5" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td width="88">&nbsp;</td>
+								<td width="151"><b><% Fid_str(204); %>&gt;</b></td>
+								<td width="226">
+									<input type="text" name="server_name" size="64" maxlength="64" value="<% echo var="fw_server_name"; %>">
+								</td>
+							</tr>
+							<tr>
+								<td width="88">&nbsp;</td>
+								<td width="151"><b><% Fid_str(205); %> &gt;</b></td>
+								<td width="226">
+									<input type="text" name="file_location" size="64" maxlength="64" value="<% echo var="fw_file_location"; %>">
+								</td>
+							</tr>
+							<tr>
+								<td width="35">&nbsp;</td>
+								<td>&nbsp;</td>
+								<td><nobr><br><br>
+									<input type="button" value="<% Fid_str(78); %>" style="{height=22px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+									<input type="submit" name="arc_action" value="<% Fid_str(986); %>" style="{height=22px;}" class="submitBtn" onClick="return evaltF();"></td>
+								</nobr></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>

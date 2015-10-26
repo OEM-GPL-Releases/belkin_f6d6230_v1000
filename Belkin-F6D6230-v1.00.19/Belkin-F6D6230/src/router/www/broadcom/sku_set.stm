@@ -1,0 +1,16 @@
+<html>
+	<head>
+		<title>SKU</title>
+	</head>
+	<body>
+		<form method="post" action="/cgi-bin/SKU_set.exe">
+			<table>
+				<tr>
+					<td>
+						<input name="sku" value='<% nvram_get("gs_sku_id"); %>' maxlength="2" type="hidden">
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

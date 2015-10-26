@@ -1,0 +1,8 @@
+menu "Silex USB Deviceserver Support"
+
+config USB_DEVICESERVER_USBMODE
+	tristate "USB port mode selector"
+	depends on USB_DEVICESERVER
+
+endmenu
+

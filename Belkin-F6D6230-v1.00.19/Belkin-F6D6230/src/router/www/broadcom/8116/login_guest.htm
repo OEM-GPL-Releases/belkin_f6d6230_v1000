@@ -1,0 +1,26 @@
+<html>
+<head>
+<title></title>
+<!--<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">-->
+<!--#exec cmd="char_set" -->
+ </HEAD>
+<SCRIPT LANGUAGE="JavaScript">
+	 if (window.name=="mainFrame")
+	 {
+		window.location.href = 'login_guest.stm';
+		top.topFrame.location.reload(true);
+	 }
+	 else
+{
+	    document.write('<FRAMESET border="0" frameSpacing="0" rows="67,*" frameBorder="0">');
+	         document.write('<FRAME name="topFrame" src="setup_top_guest.htm" noResize scrolling="no">');
+	        document.write('<FRAMESET  name="right_frame" border="0" frameSpacing="0" frameBorder="0" cols="*,0">');
+	         document.write('<FRAME name="mainFrame" src="login_guest.stm">');
+				 document.write('<NOFRAMES>');
+		  			 document.write('<body bgcolor="#FFFFFF" text="#000000"></body>');
+		  		 document.write('</NOFRAMES>');
+		   document.write('</FRAMESET>');
+	  	 document.write('</FRAMESET>');
+}
+</SCRIPT>
+</HTML>

@@ -1,0 +1,38 @@
+<html>
+<head>
+<script>
+function CreateInput(form, name, value)
+{  
+	var input = document.createElement("INPUT");  
+	input.type = "hidden";  
+	input.name = name;
+	input.value = value;
+	form.appendChild(input);  
+}
+</script>
+</head>
+<body>
+<form action="apply.cgi" method="post" name="tF">
+</form>
+
+<script>
+function form_submit()
+{
+	var param_str=location.href.split("?")[1];
+	var params = param_str.split("&");
+	var f = document.tF;
+	for(var i=0;i<params.length;i++)
+	{
+		p = params[i].split("=");
+		if(p[0] == "form_action")
+			f.action = p[1];
+		else
+			CreateInput(f, p[0], p[1]);
+	}
+	if(params.length > 0)
+		f.submit();
+}
+
+form_submit();
+</script>
+</body>

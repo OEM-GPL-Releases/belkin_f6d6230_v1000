@@ -1,0 +1,24 @@
+//bobo modifiy for multiply language
+var ipm='<!--#Fid_str_Js(164)-->.';
+var idle_sessionm='<!--#Fid_str_Js(108)-->';
+var re_authrnm='<!--#Fid_str_Js(108)-->';
+var radius_portm='<!--#Fid_str_Js(108)-->';
+var err_ipm = '<!--#Fid_str_Js(346)-->';
+var macm='<!--#Fid_str_Js(243)-->.';
+var err_idle_time='<!--#Fid_str_Js(1287)--> ';
+var dup_mac='<!--#Fid_str_Js(1360)-->'; //wireless_wds.stm
+var ac=' , ';
+var T_the=' ';
+var global_ip_err=' <!--#Fid_str_Js(1381)-->';
+var from_ip_err='<!--#Fid_str_Js(1381)-->';
+var to_ip_err='<!--#Fid_str_Js(1381)-->';
+var pwd_match='<!--#Fid_str_Js(796)-->';
+var pwd_match_1='<!--#Fid_str_Js(796)-->';
+var time_out_err='<!--#Fid_str_Js(816)-->';
+var q_period_err='<!--#Fid_str_Js(1375)-->';
+var user_pool_err='Error modify user pool !!!';
+var username_err='<!--#Fid_str_Js(1276)-->';
+var username_dup='<!--#Fid_str_Js(1276)-->';
+var ssid_blank='<!--#Fid_str_Js(266)-->';
+var name_err='<!--#Fid_str_Js(1276)-->';
+var dup_1_2_srv='<!--#Fid_str_Js(63)--> <!--#Fid_str_Js(64)--> <!--#Fid_str_Js(1273)-->';

@@ -1,0 +1,57 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+
+<% char_set(); %>
+<title></title>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="my_function"; %>
+
+var WAN_TYPE_DHCP = 0;
+var WAN_TYPE_FIX = 1;
+var WAN_TYPE_PPPOE = 2;
+var WAN_TYPE_DIALUP = 4;
+var WAN_TYPE_BRIDGE = 3;
+<% gs_gateway_stauts(); %>
+</script>
+</head>
+<body bgcolor="#FFFFFF">
+<table width="98%" border="0" cellspacing="0" cellpadding="5">
+<tr>
+	<td valign="top" >&nbsp;
+  
+	</td></tr></table><br>
+	<form action="/cgi-bin/statusprocess.exe" method="post" name="tF0">
+	<p>
+	<p>
+	<table width="90%" border=0>
+		<tr>
+			<td width=80% valign=top>
+				<font face=Arial size=2>
+				<script language="javascript">
+				if(bWanUseModem==1){
+					if(bWanConnected==1)	
+						document.write('<p align=center><font size=4 face=arial> <% Fid_str(1252); %>.</font></p>');
+					else	
+						document.write('<p align=center><font size=4 face=arial> <% Fid_str(1253); %>.</font></p>');
+					
+				}
+				else{
+					if(wan_type==WAN_TYPE_BRIDGE)
+						document.write('&nbsp;<br>');
+					else if(bWanConnected==1)	
+						document.write('<p align=center><font size=4 face=arial> <% Fid_str(1252); %>.</font></p>');
+					else	
+						document.write('<p align=center><font size=4 face=arial> <% Fid_str(1253); %>.</font></p>');
+				}
+				document.write('</font><br></td>');
+				document.write('</tr>');
+				</script>
+
+	</table>
+	</form>	
+	</table>
+
+	<br>
+</body>

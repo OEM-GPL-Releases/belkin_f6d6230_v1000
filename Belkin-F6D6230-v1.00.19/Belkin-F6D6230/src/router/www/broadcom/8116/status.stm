@@ -1,0 +1,1274 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<link rel="stylesheet" href="main_router.css" type='text/css'>
+<script type="text/javascript" src="jquery.js"></script>
+<style type="text/css">
+ a{ FONT: bold 9pt Arial,Helvetica, sans-serif; text-decoration: none; color: #000000}
+ a:link {
+     color: #000000;
+     font-size: 9pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+    a:visited {
+     color: #000000;
+     font-size: 9pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+    a:active {
+     color: #000000;
+     font-size: 9pt;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+a.menuharf{FONT: 8pt Arial,Helvetica, sans-serif; text-decoration: none; color: #cccccc}
+a.menuharf:link{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+   }
+a.menuharf:visited{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+a.menuharf:active{
+     color: #cccccc;
+     font-size: 8pt;
+     text-decoration: none;
+    }
+a.menuharf:hover{  text-decoration: underline; color: #0000ff}
+
+#language_icon a
+{
+	padding-right: 5px;
+	padding-top: 3px;
+	cursor: pointer;
+}
+
+.home_table
+{
+	font-size:9pt;
+	font-family:Arial,Helvetica,sans-serif;
+	margin-bottom:20px;
+	background-color:#CCC;
+}
+
+.home_table th
+{
+	color:#FFFFFF;
+	background-color:#666;
+	text-align:left;
+	height:20px;
+}
+
+.home_table td
+{
+	color:#000000;
+	height:20px;
+}
+
+ </style>
+<!--<meta http-equiv="content-type" content="no-cache" charset=iso-8590-1-->
+<% char_set(); %>
+<!--meta http-equiv="refresh" content="25"-->
+<title></title>
+<base target="_self">
+<script language="javascript">
+
+var enfirewall = 1-<% nvram_get("fw_disable"); %>;
+
+var dhcpStart = '192.168.2.2';
+var dhcpEnd   = '192.168.2.100';
+var dhcpLease = '8760';
+var hwaddr    = '00:11:50:E1:41:C7';
+var dhcpEnbl  = '<% nvram_get("lan_proto"); %>';
+var natEnbl   = '1';
+var buildUpnp = '1';
+var iplan     = '192.168.2.111';
+var subnetlan = '255.255.255.0';
+
+var adsl_noise_margin_ds='&nbsp';
+var adsl_noise_margin_us='&nbsp';
+var adsl_data_rate_ds='&nbsp';
+var adsl_data_rate_us='&nbsp';
+var adsl_attenuation_ds='&nbsp';
+var adsl_attenuation_us='&nbsp';
+var wan_gateway='';
+var adsl_status='<% Fid_str(858); %>';
+var amode='pppoa';
+
+var nat = 1; //<% echo var="nat_enable_var"; %>;;
+var enblUpnp = <% nvram_get("upnp_enable"); %>;
+
+var wireless_channel =1;// <% wl_cur_country(); %>;
+var wireless_curchannel = 1;//<% wl_cur_country(); %>;
+var wlenbl = '1'; // '0': disabled
+
+var wlssid = '<% nvram_get("wl0_ssid"); %>';
+var wlbssid = '00:11:50:E1:91:CC';
+var hide = '0';
+var channel = '1';
+var gmode = '1';
+var hide = '0';
+var pro = 'auto';
+var hasafterburner = '0';
+var afterburneren = 'off';
+var fburst = 'off';
+var mode = 'open';
+var wep = 'disabled';
+
+var skuid=<% nvram_get("gs_sku_id"); %>; //<% echo var="sku_id"; %>;
+var WAN_TYPE_PPPOA = 7;
+var WAN_TYPE_PPPOE = 2;
+var prtcl ="<% nvram_get("wan_proto"); %>";
+var enable_pptp="<% nvram_get("wan_pptp_enable"); %>";
+if(enable_pptp=="1")
+prtcl="pptp";
+
+var primary_dns ="<% nvram_list("wan0_dns", 0); %>";	
+var secondary_dns="<% nvram_list("wan0_dns", 1); %>";;
+var adsl_version ='1.0.1.0';
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+<% gs_gateway_stauts(); %>
+<% getWirelessSecurity(); %>
+
+var wan_type_name= "";
+var wireless_mode = "<% nvram_get("wl0_bss_enabled"); %>";
+var guest_radio = "<% nvram_get("wl0.1_bss_enabled"); %>";
+var lanstr="<% nvram_get("lang_code"); %>";
+<% dhcp_client_list(); %>
+var dhcp_client_num=dhcp_count;
+ <% wl_auth_count(); %>
+var dhcp_wlanclient_num=wireless_client;
+
+var wan_subnet_mask="<% nvram_get("wan0_netmask"); %>";
+var wan_ip="<% nvram_get("wan0_ipaddr"); %>";
+var wan_gateway="<% nvram_get("wan0_gateway"); %>";
+var pid="<% nvram_get("project_id"); %>";
+var pid2="<% nvram_get("project_id2"); %>";
+if(pid=="00n2")
+{
+var wlssid_5g = '<% nvram_get("wl1_ssid"); %>';
+var wireless_mode_5g = "<% nvram_get("wl1_bss_enabled"); %>";
+<% get5G_WirelessSecurity(); %>
+}
+
+
+if(bWanConnected == 0)
+{
+	wan_subnet_mask = "<% Fid_str(1393); %>";
+	wan_ip = "<% Fid_str(1393); %>";
+	wan_gateway = "<% Fid_str(1393); %>";
+	primary_dns = "<% Fid_str(1393); %>";
+	secondary_dns = "<% Fid_str(1393); %>";
+}
+
+function ChangeLang_ID(i)
+{	
+	 switch(i)
+	 {
+	 	case 0:
+	 		document.tF.lang_code.value=0;
+	 		break ;
+	 	case 1:
+	  		document.tF.lang_code.value=1;
+	 		break;
+	 	case 2:
+	  		document.tF.lang_code.value=2;
+	 		break;
+	 	case 3: 
+	 		document.tF.lang_code.value=3;
+	 		break;
+	 	case 4: 
+	  		document.tF.lang_code.value=4;
+	  		break;
+	 	case 5: 
+	  		document.tF.lang_code.value=5;
+	 		break;
+	 	case 6: 
+	  		document.tF.lang_code.value=6;
+	 		break;
+	 	case 7: 
+	  		document.tF.lang_code.value=7;
+	 		break;
+	 	case 8: 
+	  		document.tF.lang_code.value=8;
+	 		break;
+	 	case 9:
+	  		document.tF.lang_code.value=9;
+	 		break;
+	 }  
+	 if(ht_isLogined==1)
+	document.tF.submit();
+}
+
+function ppp_connect() 
+{
+	document.tF1.PPP_Connect.value = 1;
+	document.tF1.submit();
+	return true;
+}
+
+function ppp_disconnect() 
+{
+	document.tF1.PPP_Disconnect.value = 1;
+	document.tF1.submit();
+	return true;
+}
+
+function viewip(){
+
+   var options;
+   options = 'menubar=no,resizable=no,scrollbars=no,titlebar=yes,toolbar=no';
+   window.open('wancfg.cmd?action=viewip','wanip','toolbar=0,status=0,menubar=0,scrollbars=0,resizable=0, width=350,height=150,left=150,top=150');
+
+}
+
+function refreshload(){
+	//document.location.reload(true);
+	top.topFrame.location.reload(true);
+}
+
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v4.0
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && document.getElementById) x=document.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+<% File_include("clock.js"); %>
+
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<blockquote>
+ <form name="tF" method ="POST" action="apply.cgi" style="width:750px">
+<input type="hidden" name="location_page" value="status.stm">
+<input type="hidden" name="lang_code" value="<% nvram_get("lang_code"); %>">
+<input type="hidden" name="arc_action" value="change_lang" >
+	<table width="750" border="0" cellspacing="0" cellpadding="0" class="copy_1">
+	<tr>
+		<td class="head_bold"><br><b><% Fid_str(320); %></b>&nbsp;&nbsp;&nbsp;
+			<!--<input type=button onclick="refreshload()" value=<% Fid_str(1385); %> class="submitBtn">-->
+		</td>		
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	
+	<tr>
+		<td align="center" class="test"><b>
+			<script language="javascript">
+				<% LoginStatus(); %>
+				//if(islogin=='Connected') ht_isLogined=1;
+				//else ht_isLogined=0;
+				if(ht_isLogined == 1)
+					document.write('&nbsp;');
+				else
+					document.write("<% Fid_str(347); %>");
+			</script>		
+		</b></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	 	
+		<table width="750" border="0" cellspacing="0" cellpadding="0" class="copy_2"><br>
+			<tr>
+				<td colspan=2 width="35" style="background-color: #666666" height="20" class="wbody">
+                			<B>&nbsp;<% Fid_str(1388); %></B>
+            			</td>
+			</tr>
+			<tr>
+				<td  style="background-color: #cccccc" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" width="155" height="20" class="bbody">
+                  			<span style="font-weight: 400"><B>&nbsp;&nbsp;&nbsp;<% Fid_str(1387); %></B></span>
+                  		</td>
+            			<td align="left" style="background-color: #cccccc" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" height="20" class="copy_2">
+				 <script>
+				 		if(lanstr=="0"){
+					 		//document.write('<font face=Arial size="9pt" color=#000000>');
+	            					document.write('English');
+	            					//document.write('</font>');
+            					}else if(lanstr=="1"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('Deutsch');
+	            					//document.write('</font>');
+            					}else if(lanstr=="2"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('Fran&ccedil;ais');
+	            					//document.write('</font>');
+            					}else if(lanstr=="3"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('Espa&ntilde;ol');
+	            					//document.write('</font>');
+            					}else if(lanstr=="4"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('Nederlands');
+	            					//document.write('</font>');
+	            				}else if(lanstr=="5"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('Italiano');
+	            					//document.write('</font>');
+            					}else if(lanstr=="6"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('&#31616;&#20307;&#20013;&#25991;');
+	            					//document.write('</font>');
+            					}else if(lanstr=="7"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('&#32321;&#39636;&#20013;&#25991;');
+	            					//document.write('</font>');
+            					}else if(lanstr=="8"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('&#26085;&#26412;&#35486;');
+	            					//document.write('</font>');
+            					} else if(lanstr=="9"){
+					 		//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('&#54620;&#44397;&#50612;');
+	            					//document.write('</font>');
+	            				}else{
+	            					//document.write('<font face=Verdana size=1 color=#000000>');
+	            					document.write('English');
+	            					//document.write('</font>');
+	            				}
+            			</script>
+                  			</font>
+                  		
+              		</td>
+              	</tr>
+                      		
+			<tr>
+				<td  style="background-color: #ECFEFE" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" width="155" height="20" class="bbody">
+                  			<span style="font-weight: 400"><B>&nbsp;&nbsp;&nbsp;<% Fid_str(1389); %></B></span>
+                  		</td>
+            			<td align="left" style="background-color: #ECFEFE" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF"  height="20" >
+		              		<nobr>
+		              		<!--a href=" javascript:ChangeLang_ID(0);">English</a>
+		            		<a href=" javascript:ChangeLang_ID(1);">&nbsp;Deutsch</a>
+		            		<a href=" javascript:ChangeLang_ID(2);">&nbsp;Fran&ccedil;ais</a>
+		          			<a href=" javascript:ChangeLang_ID(3);">&nbsp;Espa&ntilde;ol</a>
+		          			<a href=" javascript:ChangeLang_ID(4);">&nbsp;Nederlands</a>
+		          			<a href=" javascript:ChangeLang_ID(5);">&nbsp;Italiano</a>
+		          			<a href=" javascript:ChangeLang_ID(6);">&nbsp;&#31616;&#20307;&#20013;&#25991;</a>
+		          			<a href=" javascript:ChangeLang_ID(7);">&nbsp;&#32321;&#39636;&#20013;&#25991;</a>
+		          			<a href=" javascript:ChangeLang_ID(8);">&nbsp;&#26085;&#26412;&#35486;</a>
+		          			<a href=" javascript:ChangeLang_ID(9);">&nbsp;&#54620;&#44397;&#50612;</a-->
+		          			<div id="language_icon">
+		          			<a onClick="ChangeLang_ID(0)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image1','','images/en2.gif',1)" target="_parent">
+	  								<img src="../images/en1.gif" border="0" name="Image1"></a>
+	  							<a onClick="ChangeLang_ID(1)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image2','','images/de2.gif',1)" target="_parent">
+	  								<img src="../images/de1.gif" border="0" name="Image2"></a>
+	  							<a onClick="ChangeLang_ID(2)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image3','','images/fr2.gif',1)" target="_parent">
+	  								<img src="../images/fr1.gif" border="0" name="Image3"></a>
+	  							<a onClick="ChangeLang_ID(3)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image4','','images/es2.gif',1)" target="_parent">
+	  								<img src="../images/es1.gif" border="0" name="Image4"></a>
+	  							<a onClick="ChangeLang_ID(4)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image5','','images/ne2.gif',1)" target="_parent">
+	  								<img src="../images/ne1.gif" border="0" name="Image5"></a>
+	  							<a onClick="ChangeLang_ID(5)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image6','','images/it2.gif',1)" target="_parent">
+	  								<img src="../images/it1.gif" border="0" name="Image6"></a>
+	  							<a onClick="ChangeLang_ID(6)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image7','','images/chs2.gif',1)" target="_parent">
+	  								<img src="../images/chs1.gif" border="0" name="Image7"></a>
+	  							<a onClick="ChangeLang_ID(7)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image8','','images/cht2.gif',1)" target="_parent">
+	  								<img src="../images/cht1.gif" border="0" name="Image8"></a>
+	  							<a onClick="ChangeLang_ID(8)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image9','','images/jp2.gif',1)" target="_parent">
+	  								<img src="../images/jp1.gif" border="0" name="Image9"></a>
+		          			<a onClick="ChangeLang_ID(9)" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image10','','images/kr2.gif',1)" target="_parent">
+	  								<img src="../images/kr1.gif" border="0" name="Image10"></a>
+	  							</div>
+						</nobr>
+            			</td>
+			</tr>
+			<tr>
+				<td style="background-color: #cccccc" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" width="155" height="20" class="bbody">
+					<span style="font-weight: 400"><B>&nbsp;&nbsp;&nbsp;<% Fid_str(70); %></B></span>
+				</td>
+				<td align="left" style="background-color: #cccccc" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" height="20" class="copy_2">
+					<script>
+					var monthname=new Array("<% Fid_str(549); %>","<% Fid_str(1282); %>","<% Fid_str(1283); %>","<% Fid_str(1284); %>","<% Fid_str(1285); %>","<% Fid_str(1286); %>","<% Fid_str(1287); %>","<% Fid_str(1288); %>","<% Fid_str(1289); %>","<% Fid_str(1290); %>","<% Fid_str(1291); %>","<% Fid_str(1292); %>");
+
+					initVariables();
+
+					document.write(monthname[clock_mon-1] + " ");
+					document.write(clock_day + ", ");
+					document.write(clock_year +' ');
+					document.write('&nbsp;<SPAN id=clock style="POSITION: relative"></SPAN></NOBR>');
+					</script>
+
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color: #FFFFFF" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" width="155" height="20">
+				</td>
+				<td align="left" style="background-color: #FFFFFF" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" height="20">
+				</td>
+			</tr>
+		</table>
+
+		<div style="width:360px;float:left;margin-right:27px">
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<!-- Version Info -->
+				<tr>
+					<th colspan="2">
+						<b>&nbsp;<% Fid_str(321); %></b>
+					</th>
+				</tr>
+				<!-- Hardware -->
+				<tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(324); %></B>
+					</td>
+					<td>
+						<script>document.write(hardware_version);</script>
+					</td>
+				</tr>
+				<!-- Firmware -->
+				<tr>
+					<td width="160">
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(322); %></B>
+					</td>
+					<td>
+						<script>document.write(runtime_code_version);</script>
+					</td>
+				</tr>
+				<!-- Boot Loader -->
+				<tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(323); %></B>
+					</td>
+					<td >
+						<script>document.write(boot_code_version);</script>
+					</td>
+				</tr>
+				<!-- Wireless Driver -->
+				<tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(1720); %></B>
+					</td>
+					<td >
+						<script>document.write(wl_driver_version);</script>
+					</td>
+				</tr>
+				<!-- Firewall -->
+				<tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(23); %></B>
+					</td>
+					<td >
+						<script>document.write(firewall_version);</script>
+					</td>
+				</tr>
+				<!-- GUI -->
+				<tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(1702); %></B>
+					</td>
+					<td >
+						<script>document.write(gui_version);</script>
+					</td>
+				</tr>
+				<!-- Serial No. -->
+				<!--tr>
+					<td>
+						<B>&nbsp;&nbsp;&nbsp;<% Fid_str(325); %></B>
+					</td>
+					<td>
+						<script>document.write(serial_number);</script>
+					</td>
+				<tr-->
+			</table>
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0px">
+				<!-- Internet Settings -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<th colspan="2">');
+					document.writeln('<b>&nbsp;<% Fid_str(333); %></b></th>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- WAN MAC Address -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td width="160">');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_dhpc_mac.stm><B><% Fid_str(334); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.writeln(wan_mac_addr);
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Connection Type -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(335); %></B></a></span></td>');
+					document.writeln('<td>');
+					if(wan_type ==0)
+						document.writeln('<% Fid_str(690); %>');
+					else if(wan_type ==1)
+						document.writeln('<% Fid_str(692); %>');
+					else if(wan_type ==2)
+						document.writeln('<% Fid_str(694); %>');
+					else if(wan_type ==5)
+						document.writeln('<% Fid_str(696); %>');
+					else if(wan_type ==6)
+						document.writeln('<% Fid_str(698); %>');
+					else 
+						document.writeln('<% Fid_str(690); %>');
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Subnet Mask -->
+				<script>
+				if((ap_mode ==0)&&(((wan_type!=2)&&(skuid==33))||(skuid!=33))){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(372); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+wan_subnet_mask+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}			
+				</script>			
+				<!-- WAN IP -->
+				<script>
+				if((ap_mode ==0)&&(((wan_type!=2)&&(skuid==33))||(skuid!=33))){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(337); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.writeln(wan_ip);
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Default Gateway -->
+				<script>
+				if((ap_mode ==0)&&(((wan_type!=2)&&(skuid==33))||(skuid!=33))){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(338); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.writeln(wan_gateway);
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- DNS Address -->
+				<script>
+				if((ap_mode ==0)&&(((wan_type!=2)&&(skuid==33))||(skuid!=33))){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=setup_dns.stm><B><% Fid_str(339); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write(primary_dns);
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Condition -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td width="160">');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<B><% Fid_str(1703); %></B></span></td>');
+					document.writeln('<td>');
+					var uptime = "<% ConnectionUpTime(); %>";
+					if(bWanConnected==1 && uptime != "")
+						document.writeln(uptime);
+					else
+						document.writeln('<% Fid_str(7); %>');
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>		
+			</table>
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%" id="multi_pppoe_table">
+				<!-- Session 1 (Master Session) and Session 2 (Slave Session) -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td colspan="3"></td>');
+					document.writeln('</tr>');
+					document.writeln('<tr>');
+					document.writeln('<td width="160"></td>');
+					document.writeln('<td width="100">');
+					var t1 = "<% Fid_str(1413); %>";
+					var t2 = "<% Fid_str(1414); %>";
+					var tmp_s;
+					tmp_s = t1.split("(");
+					t1 = tmp_s[0] + "<br>(" + tmp_s[1];
+					tmp_s = t2.split("(");
+					t2 = tmp_s[0] + "<br>(" + tmp_s[1];
+					document.writeln('<b>&nbsp;'+t1+'</b></td>');
+					document.writeln('<td>');
+					document.writeln('<b>&nbsp;'+t2+'</b></td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Subnet Mask -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(372); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION0_mask+'</font>');
+					document.write('</td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION1_mask+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- WAN IP -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(337); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION0_wan_ip+'</font>');
+					document.write('</td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION1_wan_ip+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Default Gateway -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_main.stm><B><% Fid_str(338); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION0_gateway+'</font>');
+					document.write('</td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION1_gateway+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- DNS Address -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=setup_dns.stm><B><% Fid_str(339); %></B></a></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION0_dns1+'</font>');
+					document.write('</td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION1_dns1+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Connection Time -->
+				<script>
+				if((wan_type ==2)&&(skuid==33)){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<B><% Fid_str(1415); %></B></span></td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION0_time+'</font>');
+					document.write('</td>');
+					document.writeln('<td>');
+					document.write('<font color="#000000">'+PPPOE_SESSION1_time+'</font>');
+					document.write('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+			</table>
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<!-- LAN Settings -->
+				<tr>
+					<th colspan="2">
+						<b>&nbsp;<% Fid_str(326); %></b>
+					</th>
+				</tr>
+				<!-- LAN/WLAN MAC -->
+				<tr>
+					<td width="160">
+						&nbsp;&nbsp;&nbsp;<B><% Fid_str(327); %></B>
+					</td>
+					<td>
+						<script>document.write(lan_mac_addr);</script>
+					</td>
+				</tr>
+				<!-- IP Address -->
+				<tr>
+					<td>
+						&nbsp;&nbsp;&nbsp;<a href='lan_main.stm' ><B><% Fid_str(371); %></B></a>
+					</td>
+					<td>
+						<script>document.write(lan_ipaddr);</script>
+					</td>
+				</tr>
+				<!-- Subnet Mask -->
+				<tr>
+					<td>
+						&nbsp;&nbsp;&nbsp;<a href='lan_main.stm' ><B><% Fid_str(372); %></B></a>
+					</td>
+					<td>
+						<script>document.write(lan_gateway_mask);</script>
+					</td>
+				</tr>
+				<!-- DHCP Server -->
+				<script>
+				if(ap_mode ==0){
+					var lanclient=dhcp_client_num-dhcp_wlanclient_num;
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=lan_main.stm><B><% Fid_str(332); %></B></a></td>');
+					document.writeln('<td>');
+					if(dhcpEnbl == 'static' )
+						document.writeln("<% Fid_str(318); %>");
+					else{
+						document.writeln("<% Fid_str(317); %>");
+
+						switch (dhcp_client_num) {
+							case 0:
+								document.writeln(" (<% Fid_str(1305); %>)");
+								break;
+							case 1:
+								if(dhcp_wlanclient_num)
+									document.writeln(" (0 LAN, 1 WLAN <% Fid_str(1295); %>)");
+								else
+									document.writeln(" (1 LAN, 0 WLAN <% Fid_str(1295); %>)");
+								break;
+							default:
+								if(dhcp_wlanclient_num)
+									document.writeln("("+lanclient+" LAN,  "+dhcp_wlanclient_num+" WLAN "+" <% Fid_str(1294); %>)");
+								else
+									document.writeln("("+lanclient+" LAN,  "+dhcp_wlanclient_num+" WLAN "+" <% Fid_str(1294); %>)");
+								break;
+						}
+					}
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+			</table>
+		</div>
+		<div style="width:360px;float:right">
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<!-- Router Status -->
+				<tr>
+					<th colspan="2">
+						<b>&nbsp;<% Fid_str(340); %></b>
+					</th>
+				</tr>
+				<!-- Power -->
+				<tr>
+					<td width="160">
+						<span>
+						&nbsp;&nbsp;&nbsp;<a href="system.stm"><B><% Fid_str(1704); %></B></a></span>
+					</td>
+					<td>
+					<script>
+					var eco_dim = "<% nvram_get("eco_led_dim"); %>";
+					var eco_wlan = "<% nvram_get("eco_wlan"); %>";
+					if (eco_dim == "1" || eco_wlan == "1")
+						document.writeln("<% Fid_str(1620); %>");
+					else
+						document.writeln("<% Fid_str(1721); %>");
+					</script>
+					</td>
+				</tr>
+				<!-- Firewall Setting -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=firewall_main_0.stm><B><% Fid_str(342); %></B></a></span></td>');
+					document.writeln('<td>');
+					if (enfirewall =='0')
+						document.writeln("<% Fid_str(318); %>");
+					else
+						document.writeln("<% Fid_str(317); %>");
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- Access Control -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=firewall_ac.stm><B><% Fid_str(1710); %></B></a></span></td>');
+					document.writeln('<td>');
+					if (enfirewall =='0')
+						document.writeln("<% Fid_str(318); %>");
+					else
+						document.writeln("<% Fid_str(317); %>");
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- DDNS -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=ddns.stm><B><% Fid_str(41); %></B></a></span></td>');
+					document.writeln('<td>');
+					<% getDDNSstatus(); %>
+					if (ddnsstatus == "disabled.")
+						document.writeln("<% Fid_str(375); %>");
+					else
+						document.writeln("<% Fid_str(1722); %>");
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- USB -->
+				<script>
+				if(ap_mode ==0){
+					document.writeln('<tr>');
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<B><% Fid_str(1723); %></B></span></td>');
+					document.writeln('<td>');
+					var usb_conn = "<% is_usb_connected(); %>";
+					if (usb_conn == "1")
+						document.writeln("<% Fid_str(6); %>");
+					else
+						document.writeln("<% Fid_str(1724); %>");
+					document.writeln('</td>');
+					document.writeln('</tr>');
+				}
+				</script>
+				<!-- NAT -->
+				<!--tr>
+					<td width="160">
+						<span>
+						&nbsp;&nbsp;&nbsp;<B><% Fid_str(341); %></B></span>
+					</td>
+					<td>
+
+					<script>
+					if (nat =='0')
+						document.writeln("<% Fid_str(318); %>");
+					else
+						document.writeln("<% Fid_str(317); %>");
+					</script>
+					</td>
+				</tr-->
+				<!-- UPnP -->
+				<!--tr>
+					<script>
+					if(ap_mode ==0){
+						document.writeln('<td><span>	&nbsp;&nbsp;&nbsp;<a href="system.stm"><B>UPnP</B></a></span></td>');
+						document.writeln('<td>');
+						if (upnp_enable =='0')
+							document.writeln("<% Fid_str(318); %>");
+						else
+							document.writeln("<% Fid_str(317); %>");
+						document.writeln('</td>');
+					}else{
+						document.writeln('<td><span>	&nbsp;&nbsp;&nbsp;<a href="system.stm"><B>UPnP</B></a></span></td>');
+						document.writeln('<td>');
+						if (upnp_enable =='0')
+							document.writeln("<% Fid_str(318); %>");
+						else
+							document.writeln("<% Fid_str(317); %>");
+						document.writeln('</td>');			
+					}
+					</script>
+				</tr-->
+				<!-- Remote Management -->
+				<!--tr>
+					<script>
+					if(ap_mode ==0){
+						document.writeln('<td><span>	&nbsp;&nbsp;&nbsp;<a href="system.stm"><B><% Fid_str(1106); %></B></a></span></td>');
+						document.writeln('<td>');
+						if (r_mgnt_enabled =='0')
+							document.writeln("<% Fid_str(318); %>");
+						else
+							document.writeln("<% Fid_str(317); %>");
+						document.writeln('</td>');
+					}else{
+						document.writeln('<td><span>	&nbsp;&nbsp;&nbsp;<a href="system.stm"><B><% Fid_str(1106); %></B></a></span></td>');
+						document.writeln('<td>');
+						if (r_mgnt_enabled =='0')
+							document.writeln("<% Fid_str(318); %>");
+						else
+							document.writeln("<% Fid_str(317); %>");
+						document.writeln('</td>');			
+					}
+					</script>
+				</tr-->
+			</table>
+			<table class="home_table" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<!-- WLAN Settings -->
+				<tr>
+					<th colspan="2">
+						<b>&nbsp;<% Fid_str(1712); %></b>
+					</th>
+				</tr>
+				<!-- Wireless -->
+				<tr>
+					<script>
+					document.writeln('<td>');
+					document.writeln('<span>');
+					if(pid=="00n2")
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id.stm><B><% Fid_str(16); %>-2.4G</B></a></span></td>');
+					else	
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id.stm><B><% Fid_str(16); %></B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode == "1" )
+						document.write('<% Fid_str(317); %>');
+					else
+						document.write('<% Fid_str(318); %>');
+					document.writeln('</td>');
+					</script>
+				</tr>
+				<script>
+				     if(pid=="00n2")
+				     {  
+			                document.writeln('<tr>');	
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id_5.stm><B><% Fid_str(16); %>-5G</B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode_5g == "1" )
+						document.write('<% Fid_str(317); %>');
+					else
+						document.write('<% Fid_str(318); %>');
+					document.writeln('</td>');
+					document.writeln('</tr>');		
+				     }	
+				</script>
+				<!-- SSID -->
+				<tr>
+					<script>
+					document.writeln('<td>');
+					document.writeln('<span>');
+					if(pid=="00n2")
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id.stm><B><% Fid_str(343); %>-2.4G</B></a></span></td>');
+					else
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id.stm><B><% Fid_str(343); %></B></a></span></td>');
+												
+					document.writeln('<nobr><td>');
+					if( wireless_mode == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else
+						document.write(wlssid);
+					document.writeln('</nobr></td>');
+					</script>
+				</tr>
+				<script>
+				    if(pid=="00n2")
+				    {
+					document.writeln('<tr>');					
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_id_5.stm><B><% Fid_str(343); %>-5G</B></a></span></td>');
+					document.writeln('<nobr><td>');
+					if( wireless_mode_5g == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else
+						document.write(wlssid_5g);
+					document.writeln('</nobr></td>');
+					document.writeln('</tr>');	
+				     }										
+				</script>
+				<!-- Security -->
+				<tr>
+					<script>	
+					document.writeln('<td>');
+					document.writeln('<span>');
+					if(pid=="00n2")
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e.stm><B><% Fid_str(344); %>-2.4G</B></a></span></td>');
+					else
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e.stm><B><% Fid_str(344); %></B></a></span></td>');
+						
+					document.writeln('<td>');
+					if( wireless_mode == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else	
+					{			
+						if(enableOS)
+							document.writeln('<% Fid_str(318); %>');
+						else if(enableWEP){
+								document.writeln('WEP');
+						}
+						else {
+							if(enableSSNPSK){
+								document.writeln('<% Fid_str(1367); %>');
+							}
+							else{
+								document.writeln('<% Fid_str(805); %>');
+							}
+						}
+					}			
+					document.writeln('</td>');
+					</script>
+				</tr>
+				<script>
+				    if(pid=="00n2")
+				    {
+					document.writeln('<tr>');					
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e_5.stm><B><% Fid_str(344); %>-5G</B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode_5g == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else	
+					{			
+						if(enableOS_5g)
+							document.writeln('<% Fid_str(318); %>');
+						else if(enableWEP_5g){
+								document.writeln('WEP');
+						}
+						else {
+							if(enableSSNPSK_5g){
+								document.writeln('<% Fid_str(1367); %>');
+							}
+							else{
+								document.writeln('<% Fid_str(805); %>');
+							}
+						}
+					}			
+					document.writeln('</td>');
+					document.writeln('</tr>');	
+				     }										
+				</script>
+				<!-- Encryption Type -->
+				<tr>
+					<script>	
+					document.writeln('<td>');
+					document.writeln('<span>');
+					if(pid=="00n2")
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e.stm><B><% Fid_str(1716); %>-2.4G</B></a></span></td>');
+					else
+						document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e.stm><B><% Fid_str(1716); %></B></a></span></td>');
+						
+					document.writeln('<td>');
+					if( wireless_mode == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else	
+					{			
+						if(enableOS)
+							document.writeln('<% Fid_str(318); %>');
+						else if(enableWEP){
+							if(WEPKEYTYPE)
+								document.writeln('<% Fid_str(803); %>');
+							else
+								document.writeln('<% Fid_str(804); %>');
+
+						}
+						else {
+							if(WPAKEYTYPE == "tkip"){
+								document.writeln('TKIP');
+							}
+							else if(WPAKEYTYPE == "aes"){
+								document.writeln('AES');
+							}
+							else{
+								document.writeln('TKIP+AES');
+							}
+						}
+					}			
+					document.writeln('</td>');
+					</script>
+				</tr>
+				<script>
+				    if(pid=="00n2")
+				    {
+					document.writeln('<tr>');					
+					document.writeln('<td>');
+					document.writeln('<span>');
+					document.writeln('&nbsp;&nbsp;&nbsp;<a href=wireless_e_5.stm><B><% Fid_str(1716); %>-5G</B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode_5g == "0" )				
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');										
+					else	
+					{			
+						if(enableOS_5g)
+							document.writeln('<% Fid_str(318); %>');
+						else if(enableWEP_5g){
+							if(WEPKEYTYPE_5g)
+								document.writeln('<% Fid_str(803); %>');
+							else
+								document.writeln('<% Fid_str(804); %>');
+
+						}
+						else {
+							if(WPAKEYTYPE_5g == "tkip"){
+								document.writeln('TKIP');
+							}
+							else if(WPAKEYTYPE_5g == "aes"){
+								document.writeln('AES');
+							}
+							else{
+								document.writeln('TKIP+AES');
+							}
+						}
+					}			
+					document.writeln('</td>');
+					document.writeln('</tr>');	
+				     }										
+				</script>
+				<!-- WLAN MAC Address -->
+				<script>
+				document.writeln('<tr>');
+				document.writeln('<td width="160">');
+				document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wan_dhpc_mac.stm><B><% Fid_str(1717); %></B></a></span></td>');
+				document.writeln('<td>');
+				document.writeln(wlan_24g_mac_addr);
+				document.writeln('</td>');
+				document.writeln('</tr>');
+				</script>
+				<!-- WPS -->
+				<tr>
+					<script>		
+					var WSC_Mode = '<% nvram_get("wl0_wps_mode"); %>';		// 0: disable 1: enable
+					document.writeln('<td>');
+					document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wireless_WPS.stm><B>WPS</B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode == "0" )
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');
+					else
+					{
+						if (WSC_Mode == 'enabled')
+							document.writeln("<% Fid_str(317); %>");
+						else
+							document.writeln("<% Fid_str(318); %>");
+					}
+					document.writeln('</td>');
+					</script>
+				</tr>
+				<!-- Guest Access -->
+				<tr>
+					<script>		
+					document.writeln('<td>');
+					if(pid2=="00n2")
+						document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wireless_guest2.stm><B><% Fid_str(1718); %></B></a></span></td>');
+					else
+						document.writeln('<span>&nbsp;&nbsp;&nbsp;<a href=wireless_guest.stm><B><% Fid_str(1718); %></B></a></span></td>');
+					document.writeln('<td>');
+					if( wireless_mode == "0" )
+						document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');
+					else
+					{
+						if (guest_radio == "1")
+							document.writeln("<% Fid_str(317); %>");
+						else
+							document.writeln("<% Fid_str(318); %>");
+					}
+					document.writeln('</td>');
+					</script>
+				</tr>
+				<!-- Guest Access SSID-->
+				<tr>
+					<script>
+					{
+						document.writeln('<td>');
+						if(pid2=="00n2")
+							document.writeln('<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=wireless_guest2.stm><B><% Fid_str(343); %></B></a></span></td>');
+						else
+							document.writeln('<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=wireless_guest.stm><B><% Fid_str(343); %></B></a></span></td>');
+						document.writeln('<td>');
+						if( wireless_mode == "0" )
+							document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');
+						else if (guest_radio == "0")
+							document.write('<% Fid_str(1718); %>&nbsp;<% Fid_str(318); %>');
+						else
+						{
+							var guest_ssid = "<% nvram_js_get("wl0.1_ssid"); %>";
+							document.writeln(guest_ssid);
+						}
+						document.writeln('</td>');
+					}
+					</script>
+				</tr>
+				<!-- Guest Access Password/PSK-->
+				<tr>
+					<script>
+					{
+						document.writeln('<td>');
+						if(pid2=="00n2")
+							document.writeln('<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=wireless_guest2.stm><B><% Fid_str(1719); %></B></a></span></td>');
+						else 
+							document.writeln('<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=wireless_guest.stm><B><% Fid_str(1719); %></B></a></span></td>');
+						document.writeln('<td>');
+						if( wireless_mode == "0" )
+							document.write('<% Fid_str(16); %>&nbsp;<% Fid_str(318); %>');
+						else if (guest_radio == "0")
+							document.write('<% Fid_str(1718); %>&nbsp;<% Fid_str(318); %>');
+						else
+						{
+							var guest_security = "<% nvram_get("wl_guest_mode"); %>";
+							if(guest_security == "0") // hotel style
+								document.writeln("<% nvram_get("wl_guest_passwd"); %>");
+							else if(guest_security == "1")
+								document.writeln("<% nvram_get("wl0.1_wpa_psk"); %>");
+							else if(guest_security == "2" && pid2=="00n2")
+								document.writeln("<% nvram_get("wl0.1_key1"); %>");
+							else if(guest_security == "3" && pid2=="00n2")
+								document.writeln("Open mode");								
+								
+						}
+						document.writeln('</td>');
+					}
+					</script>
+				</tr>
+			</table>		
+		</div>
+		
+	</form>
+</blockquote>
+      
+			</td>
+		</tr>
+	</table>
+	<script>
+	$(".home_table tr:odd").css("background-color", "#ECFEFE");
+	
+	if(ap_mode != 0)
+	{
+		document.getElementById("multi_pppoe_table").style.display = "none";
+	}
+	</script>
+</body>
+</html>
+
+

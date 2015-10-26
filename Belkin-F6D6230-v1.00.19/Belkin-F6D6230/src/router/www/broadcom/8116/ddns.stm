@@ -1,0 +1,272 @@
+<% File_include("NdcUpdate"); %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<style type="text/css">
+ a:link {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:visited {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:active {
+      color:#6464c3;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+}
+ </style>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+var ch;
+
+function selectedchange(){
+
+	if(document.ddns0.ddns_provider.selectedIndex== 0){
+		document.getElementById("dnsorg").style.display="none";
+   		document.getElementById("ddnsstatus").style.display="none";	
+   		//document.getElementById("upgradeDDNS").style.display="none";	
+ 	}
+  	else {
+  		document.getElementById("dnsorg").style.display="";
+   		document.getElementById("ddnsstatus").style.display="";
+   		//document.getElementById("upgradeDDNS").style.display="";	
+  	}	
+}
+
+function open_ddnsSever_websit() {  // added by andrew for select websit
+	if(document.ddns0.ddns_provider.selectedIndex== 1)  //dyndns
+		window.open("http://www.dyndns.org");
+	if(document.ddns0.ddns_provider.selectedIndex== 2) //tzo
+		window.open("http://www.tzo.com");
+
+}
+function autoupgradeddns()
+{
+	/*if(document.getElementById("autoupgrade").style.display=="")
+		document.getElementById("autoupgrade").style.display="none";
+	else
+		document.getElementById("autoupgrade").style.display=""
+	if(document.getElementById("autoupgrade").style.display=="none")  //added by andrew
+	        document.getElementById("DDNS_days").value="0";*/
+	       
+}
+		
+function frmload(){
+	selectedchange();
+}
+
+var ch;
+function specialshar(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='@' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token=='.' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function evaltF()
+{
+/*	
+	var alldomainame = document.ddns0.ddns_domainame1.value+document.ddns0.ddns_domainame2.value+document.ddns0.ddns_domainame3.value;
+	if(document.ddns0.ddns_provider.selectedIndex == 1 || document.ddns0.ddns_provider.selectedIndex == 2)
+	{	
+		var iDOD = <% nvram_get("ddns_autoupdate"); %>;
+		if(isBlank(document.ddns0.ddns_account.value)){ alert('<% Fid_str(742); %>'); return false; }
+//		if(isIncludeDQuote(document.ddns0.ddns_account.value) ||isIncludeBSlash(document.ddns0.ddns_account.value))
+		{ 
+			if( specialshar(document.ddns0.ddns_account.value) ){
+			 	alert(document.ddns0.ddns_account.value+' '+'<% Fid_str(822); %>');
+			 	return false; 
+		 	}
+		 }
+		
+		if(isBlank(document.ddns0.ddns_password.value)){ alert('<% Fid_str(757); %>'); return false; }
+		
+//		if(isIncludeDQuote(document.ddns0.ddns_password.value) ||isIncludeBSlash(document.ddns0.ddns_password.value))
+		{ 
+			if( specialshar(document.ddns0.ddns_password.value)){
+			 	alert(document.ddns0.ddns_password.value+' '+'<% Fid_str(822); %>');
+			 	return false; 
+		 	}
+		 }
+		if(isBlank(alldomainame)){ alert(alldomainame+' '+'<% Fid_str(822); %>'); return false; }
+//		if(isIncludeDQuote(alldomainame) ||isIncludeBSlash(alldomainame))
+		{ 
+			if(  specialshar(alldomainame) ){
+			 	alert(alldomainame+' '+'<% Fid_str(822); %>');
+			 	return false; 
+		 	}
+		 }		
+             	if( iDOD == 1 && isNValidNum(document.ddns0.ddnsdays.value) ) {alert("The nonlegal string on auto update"); return false;}
+	}
+*/
+        document.ddns0.ddns_server.value= document.ddns0.ddns_provider[document.ddns0.ddns_provider.selectedIndex].value;
+        document.ddns0.action.value="ddns_restart";
+	return true;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="frmload()">
+<% File_include("menu.stm"); %>
+<FORM name="ddns0" action="apply.cgi" method="post">
+<input type="hidden" name="location_page" value="ddns.stm">
+<input type="hidden" name="ddns_server">
+<input type="hidden" name="action">
+			<TABLE cellSpacing=0 cellPadding=0 width=600 border=0 calss ="head_hold">
+    			<TBODY><BR>
+    			<TR>
+    		<td width="50"></td>
+      				<TD colSpan=2><B><FONT style="{font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 17px; font-weight: bold; color: #0000ff; text-decoration: none}"><% Fid_str(97); %>
+        			</FONT></B> </TD>
+   			</TR>
+    			<TR>
+    		<td width="50">&nbsp;</td>
+      				<TD colSpan=2 height=10></TD>
+   			</TR>
+    			<TR>
+    		<td width="50">&nbsp;</td>
+      				<TD colSpan=2 class="body"><% Fid_str(98); %><% Fid_str(99); %><A onclick=moreinfowin("glossary.stm#ddns"); href="javascript:void(0);"><B>
+	  			<FONT color=#0066FF><% Fid_str(47); %></FONT></B>  </TD>
+    			</TR>
+    			<TR>
+    		<td width="50">&nbsp;</td>
+      				<TD colSpan=2 height=10></TD>
+    			</TR>
+    			</TBODY>
+			</TABLE>
+
+			<TABLE cellSpacing=0 cellPadding=0 width=600 border=0 class="copy_1">
+			<TBODY>
+    			<TR height=25>
+    		<td width="50">&nbsp;</td>
+      				<TD width=120 class="body"><B><% Fid_str(1308); %>&nbsp;&gt;</B><br></TD>
+      				<TD nowrap>
+      				<select size="1" name="ddns_provider" class=selectList  onchange="selectedchange()">
+				<option value ="0" selected><% Fid_str(318); %></option>
+				<option value ="dyndns" ><% Fid_str(1307); %></option>
+				</select>
+				<input type=button  name="website" size="25" maxlength="21" value="<% Fid_str(1310); %>" onClick="open_ddnsSever_websit()">
+      				<br></TD>
+   			</TR>
+			<script language="JavaScript">
+				var iDOD="<% nvram_get("ddns_server"); %>";
+				if(iDOD=="dyndns")
+				document.ddns0.ddns_provider.selectedIndex = 1;
+				else
+				document.ddns0.ddns_provider.selectedIndex =0;
+			</SCRIPT>
+			<TR id="ddnsstatus" style="display:none" height=25>
+		<td width="50">&nbsp;</td>
+				<TD width="120" class="body"><B>
+				<% Fid_str(1309); %>&nbsp;&gt;</B></TD>
+				<TD class="body">		
+				<b>
+				<script language="JavaScript">
+				<% getDDNSstatus(); %>
+			  if(ddnsstatus.indexOf("ddns_status:")>=0)
+			  {
+			    var ddns_state=ddnsstatus.split(":");
+			    ddnsstatus=ddns_state[1];			  
+			  } 
+					document.write(ddnsstatus);
+				</SCRIPT>
+				</b>		
+				</TD>
+			</TR>
+			</TBODY>
+			</TABLE>
+
+			<TABLE id=dnsorg width=600 cellSpacing=0 cellPadding=0  border=0  class="copy_1">
+    			<TBODY>
+    			<TR height=25>
+    		<td width="50">&nbsp;</td>
+				<TD width=120 class="body"><B><% Fid_str(100); %></B></TD>
+				<TD><input maxLength=63 size=20 name="ddns_username" value="<% nvram_get("ddns_username"); %>" ></TD>
+    			</TR>
+    
+    			<TR height=25>
+    		<td width="50">&nbsp;</td>
+      				<TD width=120 class="body"><B><% Fid_str(101); %></B></TD>
+      				<TD><input type=password maxLength=20 size=22 name="ddns_password" value="<% nvram_get("ddns_password"); %>" ></TD>
+      			</TR>
+   
+    			<TR height=25>
+    		<td width="50">&nbsp;</td>
+      				<TD width=120 class="body"><B><% Fid_str(102); %></B></TD>
+      				<TD nowrap>
+      					<input maxLength=63 size=32 name="ddns_hostname" value="<% nvram_get("ddns_hostname"); %>" >.
+      					<!--<input maxLength=63 size=12 name="ddns_domainame2" value="<% nvram_get("ddns_hostname"); %>" >.
+      					<input maxLength=63 size=8 name="ddns_domainame3" value="<% nvram_get("ddns_hostname"); %>" >-->
+      				</TD>
+    			</TR>
+ 			</TBODY>
+ 			</TABLE>  
+ 
+ 			<!--<TABLE id=upgradeDDNS width=600 cellSpacing=0 cellPadding=0  border=0  class="copy_1">
+ 			<TBODY>
+    			<TR>
+    				<td width="50">&nbsp;</td>
+      				<TD class="body"><input type=checkbox name="upgradeddns" value="1" onClick="autoupgradeddns()" ><% Fid_str(1315); %></TD>
+    			</TR>
+    			<TR id="autoupgrade"  style="display:none;">
+    				<td width="50">&nbsp;</td>
+      				<TD class="body">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<% Fid_str(1316); %><input type=text id=DDNS_days maxLength=3 size=3 name="ddnsdays" value="<% echo var="ddns_days"; %>"><% Fid_str(1317); %></TD>
+    			</TR>
+			</TBODY>
+			</TABLE>-->
+			<Script language="JavaScript">
+				//var iDOD = <% nvram_get("ddns_autoupdate"); %>;
+				//if(iDOD == 1){
+					//document.ddns0.upgradeddns.defaultChecked = true;
+					//document.ddns0.upgradeddns.checked = true;
+					//document.getElementById("autoupgrade").style.display="";
+				//}
+			</Script>
+			<BR>
+			<TABLE cellSpacing=0 cellPadding=0 width=600 border=0>
+			<TBODY>
+    			<TR>
+    				<td width="50">&nbsp;</td>
+      				<!--<TD width=120></TD>-->
+      				<TD><input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+				&nbsp;&nbsp;
+				<input type="submit" name="arc_action" value="<% Fid_str(50); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+      				</TD>
+      			</TR>
+ 			</TBODY>
+</TABLE> 
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0046)scsrvcntr.cmd?action=view -->
+<HTML><HEAD>
+
+<% char_set(); %>
+
+<LINK href="stylemain.css" type=text/css rel=stylesheet>
+<LINK href="colors.css" type=text/css rel=stylesheet>
+<LINK href="main_router.css" type=text/css rel=stylesheet>
+<META http-equiv=Pragma content=no-cache>
+<% include file="refreshmenu.txt"; %>
+<SCRIPT language=javascript src="portName.js"></SCRIPT>
+
+<SCRIPT language=javascript>
+<% login_timeout(); %>
+<% gs_gateway_stauts(); %>
+
+<% exec cmd="Gateway_IsWanConnected"; %>
+<!-- hide
+
+function applyClick() {
+	var loc = 'scsrvcntr.cmd?action=save';
+	//window.location = loc;
+	if(document.tF.ping.checked) 
+		document.tF.gs_pingWanBlock.value=1;
+	else
+		document.tF.gs_pingWanBlock.value=0;
+	
+	document.tF.submit();
+}
+
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+// done hiding -->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+<FORM  name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="location_page" value="firewall_ping.stm">
+<input type="hidden" name="gs_pingWanBlock">
+<input type="hidden" name="arc_action" value="Apply">
+<input type="hidden" name="page" value="firewall_ping.stm">
+
+<TABLE width=600>
+	<TR>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+  		<br><B><% Fid_str(120); %></b></td>
+    	</TR>
+    	<tr>
+    		<td class="body">
+	  		<FONT color=#004263>
+	  		<BR>
+	  		<% Fid_str(121); %></FONT>
+	  		<A onclick=moreinfowin("glossary.stm#block_icmp_ping"); href="javascript:void(0);"><B>
+	  		<FONT color=#0066FF><% Fid_str(47); %></FONT></B> 
+	  		</A>
+	 		<BR>
+	  		<BR>
+	  		<TABLE cellSpacing=0 cellPadding=2 border=0>
+    				<TBODY>
+    					<TR>
+      						<TD class="body"><B>
+	      						<FONT color=#004263><% Fid_str(122); %>
+	      						</FONT></B>
+      						</TD>
+      						<TD align=middle>
+      							<INPUT type=checkbox name=ping>
+      						</TD>
+      					</TR>
+      				</TBODY>
+      			</TABLE>
+			<Script language="JavaScript">
+				var iDOD = <% nvram_get("gs_pingWanBlock"); %>;
+				if(iDOD == 1){
+					document.tF.ping.defaultChecked = true;
+					document.tF.ping.checked = true;
+				}
+			</Script>
+      			<BR>
+      			<input  type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+			&nbsp;&nbsp;
+      			 <INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onclick="applyClick()" type=button value="<% Fid_str(49); %>"> 
+  			<CENTER></CENTER>
+  		</td>
+  	</tr>
+ </TABLE>	
+</FORM>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table>
+</BODY>
+</HTML>

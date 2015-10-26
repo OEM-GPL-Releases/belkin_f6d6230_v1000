@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+
+<specVersion>
+	<major>1</major>
+	<minor>0</minor>
+</specVersion>
+
+<device>
+	<deviceType>urn:schemas-upnp-org:device:InternetGatewayDevice:1</deviceType>
+	<friendlyName>Belkin N Wireless Router</friendlyName>
+	<manufacturer>Belkin International</manufacturer>
+	<manufacturerURL>http://www.Belkin.com/</manufacturerURL>
+	<modelDescription>802.11n wireless router</modelDescription>
+	<modelName><!--# echo var="Upnp_UniversalProductCode" --></modelName>
+	<modelNumber><!--# echo var="Upnp_FirmwareVersion" --></modelNumber>
+	<modelURL>http://www.Belkin.com/</modelURL>
+	<serialNumber><!--# echo var="Upnp_SerialNumber" --></serialNumber>
+	<UDN>uuid:00000000-0000-0001-0000-<!--# exec cmd="Upnp_UUID" --></UDN>
+	<UPC />
+
+	<serviceList>
+	<service>
+		<serviceType>urn:schemas-microsoft-com:service:OSInfo:1</serviceType>
+		<serviceId>urn:microsoft-com:serviceId:OSInfo1</serviceId>
+		<SCPDURL>/igd_osf.xml</SCPDURL>
+		<controlURL>/upnp/control?OSInfo</controlURL>
+		<eventSubURL>/upnp/event?OSInfo</eventSubURL>
+	</service>
+
+	<service>
+		<serviceType>urn:schemas-upnp-org:service:Layer3Forwarding:1</serviceType>
+		<serviceId>urn:upnp-org:serviceId:L3Forwarding1</serviceId>
+		<SCPDURL>/igd_l3f.xml</SCPDURL>
+		<controlURL>/upnp/control?Layer3Forwarding</controlURL>
+		<eventSubURL>/upnp/event?Layer3Forwarding</eventSubURL>
+	</service>
+	</serviceList>
+
+	<deviceList>
+	<device>
+		<deviceType>urn:schemas-upnp-org:device:WANDevice:1</deviceType>
+		<friendlyName>Belkin N Wireless Router(WAN)</friendlyName>
+		<manufacturer>Belkin International</manufacturer>
+		<manufacturerURL>http://www.Belkin.com/</manufacturerURL>
+		<modelDescription>802.11n wireless router</modelDescription>
+		<modelName><!--# echo var="Upnp_UniversalProductCode" --> WAN Interface</modelName>
+		<modelNumber><!--# echo var="Upnp_FirmwareVersion" --></modelNumber>
+		<modelURL>http://www.Belkin.com/</modelURL>
+		<serialNumber><!--# echo var="Upnp_SerialNumber" --></serialNumber>
+    	<UDN>uuid:00000000-0000-0001-0001-<!--# exec cmd="Upnp_UUID" --></UDN>
+    	<UPC />
+		<serviceList>
+		<service>
+			<serviceType>urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1</serviceType>
+			<serviceId>urn:upnp-org:serviceId:WANCommonIFC1</serviceId>
+			<SCPDURL>/igd_wcic.xml</SCPDURL>
+			<controlURL>/upnp/control?WANCommonInterfaceConfig</controlURL>
+			<eventSubURL>/upnp/event?WANCommonInterfaceConfig</eventSubURL>
+		</service>
+		</serviceList>
+
+		<deviceList>
+		<device>
+			<deviceType>urn:schemas-upnp-org:device:WANConnectionDevice:1</deviceType>
+			<friendlyName>Belkin N Wireless Router(WAN Con)</friendlyName>
+			<manufacturer>Belkin International</manufacturer>
+			<manufacturerURL>http://www.Belkin.com/</manufacturerURL>
+			<modelDescription>802.11n wireless router (WAN Connection Device)</modelDescription>
+			<modelName><!--# echo var="Upnp_UniversalProductCode" --> WAN Connector</modelName>
+			<modelNumber><!--# echo var="Upnp_FirmwareVersion" --></modelNumber>
+			<modelURL>http://www.Belkin.com/</modelURL>
+			<serialNumber><!--# echo var="Upnp_SerialNumber" --></serialNumber>
+        	<UDN>uuid:00000000-0000-0001-0002-<!--# exec cmd="Upnp_UUID" --></UDN>
+        	<UPC />			
+
+			<serviceList>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:WANEthernetLinkConfig:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:WANEthLinkC1</serviceId>
+				<SCPDURL>/igd_wec.xml</SCPDURL>
+				<controlURL>/upnp/control?WANEthernetLinkConfig</controlURL>
+				<eventSubURL>/upnp/event?WANEthernetLinkConfig</eventSubURL>
+			</service>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:WANPPPConnection:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:WANPPPConn1</serviceId>
+				<SCPDURL>/igd_wpc.xml</SCPDURL>
+				<controlURL>/upnp/control?WANPPPConnection</controlURL>
+				<eventSubURL>/upnp/event?WANPPPConnection</eventSubURL>
+			</service>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:WANIPConnection:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:WANIPConn1</serviceId>
+				<SCPDURL>/igd_wic.xml</SCPDURL>
+				<controlURL>/upnp/control?WANIPConnection</controlURL>
+				<eventSubURL>/upnp/event?WANIPConnection</eventSubURL>
+			</service>
+			</serviceList>
+		</device>
+		</deviceList>
+	</device>
+
+		<device>
+			   <deviceType>urn:schemas-wifialliance-org:device:WFADevice:1</deviceType>
+			  <friendlyName>Belkin Wireless Router(WFA)</friendlyName>
+				<manufacturer>Belkin International</manufacturer>
+				<manufacturerURL>http://www.Belkin.com/</manufacturerURL>
+				<modelDescription>802.11n wireless router</modelDescription>
+				<modelName><!--# echo var="Upnp_UniversalProductCode" --></modelName>
+				<modelNumber><!--# echo var="Upnp_FirmwareVersion" --></modelNumber>
+				<modelURL>http://www.Belkin.com/</modelURL>
+				<serialNumber><!--# echo var="Upnp_SerialNumber" --></serialNumber>
+				<UDN>uuid:00000000-0000-0001-1000-<!--# exec cmd="Upnp_UUID" --></UDN>
+        			<UPC></UPC>
+			  <serviceList>
+			    <service>
+			      <serviceType>urn:schemas-wifialliance-org:service:WFAWLANConfig:1</serviceType>
+			      <serviceId>urn:wifialliance-org:serviceId:WFAWLANConfig1</serviceId>
+			      <SCPDURL>/igd_WSC_UPnP.xml</SCPDURL>
+						<controlURL>/upnp/control?WFAWLANConfig</controlURL>
+						<eventSubURL>/upnp/event?WFAWLANConfig</eventSubURL>
+			    </service>
+			  </serviceList>
+		</device>
+	</deviceList>
+	
+	
+
+	      <presentationURL>/</presentationURL>
+</device>
+
+
+</root>

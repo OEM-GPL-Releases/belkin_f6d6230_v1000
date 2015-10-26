@@ -1,0 +1,61 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" type="text/javascript" src="overlib.js"></script>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form method="link" action="nvramdl.cgi">
+<input type="hidden" name="config" value="0">
+<input type="hidden" name="page" value="status.stm">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+	<td width="36" height="100%">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>
+			&nbsp;<% Fid_str(537); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td>
+						<table width=600 border="0" cellspacing="3" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<td class="body">
+									<% Fid_str(451); %>
+								</td>
+							</tr>
+							<tr>
+								<td><br><br>
+									<div align="center">
+									<input type="submit"  name="arc_action" value="<% Fid_str(539); %>" style="{width:150px;height=22px;}" class="submitBtn"></div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

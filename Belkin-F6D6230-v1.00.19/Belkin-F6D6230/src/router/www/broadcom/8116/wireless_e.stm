@@ -1,0 +1,125 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+<% exec cmd="my_function"; %>
+<% getWirelessSecurity(); %>
+</script>
+</head>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+function selectedchange()
+{
+	if(document.tF.security_type.selectedIndex == 0){
+		location.href = "/wireless_no_encryption.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 1){
+		location.href = "/wireless_64bitwep.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 2){
+		location.href = "/wireless_128bitwep.stm";
+	}
+	//else if(document.tF.security_type.selectedIndex == 3){
+	//	location.href = "/wireless_WPA.stm";
+	//}
+	else{
+		location.href = "/wireless_PSK.stm";
+	}
+	return true;
+}
+
+function frmload()
+{
+	if(enableOS) {
+		location.href = "wireless_no_encryption.stm";
+	} else if(enableWEP) {
+		if(WEPKEYTYPE)	{
+			location.href = "wireless_128bitwep.stm";
+		} else {
+			location.href = "wireless_64bitwep.stm";
+		}
+	} else {
+		if(enableSSNPSK)
+			{location.href = "wireless_PSK.stm";}
+		else
+			{location.href = "wireless_WPA.stm";}
+	}
+}
+</SCRIPT>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload = frmload()>
+<% File_include("menu.stm"); %>
+<form name="tF" action="/cgi-bin/wireless_e.exe" method="post">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(800); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<!--<tr>
+								<td width="205" class="body"><b><% Fid_str(801); %></b></td>
+								<td width="335" >
+								<select size="1" name="security_type" class=selectList  onchange= selectedchange()>;
+									<option value = 0 selected><% Fid_str(318); %></option>
+									<option value = 1><% Fid_str(804); %></option>
+									<option value = 2><% Fid_str(803); %></option>									
+									<option value = 4><% Fid_str(1296); %></option>									
+								</select>									
+								<br><br></td>
+							</tr>-->
+							<SCRIPT LANGUAGE="JavaScript">
+							</SCRIPT>
+							<!--<tr align=left>
+								<td colspan=3 align=left>
+										<% Fid_str(278); %>
+                    <a href="javascript:void(0);" onClick="window.open('glossary.stm#encryption','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+								<br><br><% Fid_str(1185); %><br><br></td>
+							</tr>-->
+							
+						</table>
+					</td>
+				</tr>
+			</table>						
+			<table border=0 class="copy_1">
+				<!--<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+							<td width="36">&nbsp;</td>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+              					<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+							</td>
+							</tr>
+						</table>
+					</td>
+				</tr>-->
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>		
+

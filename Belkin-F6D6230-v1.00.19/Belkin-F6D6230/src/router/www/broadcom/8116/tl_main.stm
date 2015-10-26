@@ -1,0 +1,23 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="javascript">
+<% login_timeout(); %>
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+  <tr>
+    <td>
+        <p><b class=subtitle><% Fid_str(659); %></b></p>
+        <p class=normalText><% Fid_str(660); %></p>
+      </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>BT Management</title>
+
+<link rel="stylesheet" href="css/content.css" type="text/css" />
+<link rel="stylesheet" href="css/ui.css" type="text/css" />
+<link rel="stylesheet" href="css/main_router.css" type="text/css" />
+<link rel="stylesheet" href="css/progressbar.css" type="text/css" />
+<link rel="stylesheet" href="css/smoothness/jquery-ui-1.7.2.custom.css" type="text/css" />
+<link rel="stylesheet" href="css/jquery.tooltip.css" />
+<!--link rel="stylesheet" href="css/clickmenu.css" /-->
+<link rel="stylesheet" type="text/css" href="css/menu.css" title="styles1"  media="screen" />
+
+<!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
+<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+<!--script type="text/javascript" src="jquery_flot.js"></script-->
+<script type="text/javascript" src="js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="progressbar.js"></script>
+<script type="text/javascript" src="js/tablednd.js"></script>
+<script type="text/javascript" src="js/jquery.bgiframe.js"></script>
+<!--script type="text/javascript" src="js/jquery.dimensions.js"></script-->
+<script type="text/javascript" src="js/jquery.tooltip.js" type="text/javascript"></script>
+<!--script type="text/javascript" src="js/jquery.clickmenu.js" type="text/javascript"></script-->
+<script type="text/javascript" src="js/jquery.metadata.js"></script>
+<script type="text/javascript" src="js/mbMenu.js"></script>
+<script type="text/javascript" src="js/jquery.hoverIntent.js"></script>
+<!--[if IE]>
+	<script type="text/javascript" src="scripts/excanvas-compressed.js"></script>
+<![endif]-->
+
+<script type="text/javascript" src="bt_main.js"></script>
+<script type="text/javascript">
+$(function () {
+	Init();
+});
+</script>
+</head>
+<body>
+
+<div id="proceeding_dlg" title="" class="dialog">
+	<div id="proceeding_dlg_msg">Proceeding, please wait a minute...</div>
+</div>
+
+<script>
+	$('#proceeding_dlg').dialog({
+		autoOpen: true,
+		width: 300,
+		minHeight: 50,
+		modal: true,
+		closeOnEscape: false
+	});
+	$('#proceeding_dlg').parent().find('.ui-dialog-titlebar-close').hide();
+	$('#proceeding_dlg').parent().find('.ui-dialog-titlebar').hide();
+</script>
+
+<div id="message_dlg" title="Warning" class="dialog">
+	<img src="../images/warning_48.png" width="48" height="48" class="icon">
+	<div id="message_dlg_msg"></div>
+</div>
+
+<div id="delete_dlg" title="Confirming" class="dialog">
+	<img src="../images/question_48.png" width="48" height="48" class="icon">
+	<div>Are you sure you want to delete the selected torrent and file?</div>
+</div>
+
+<div id="g_setting_dlg" title="Options" class="dialog">
+	<img src="../images/settings.png" width="48" height="48" class="icon" style="position:absolute">
+	<form>
+	<p>
+		<label style="height:22px">Concurrent downloads</label>
+		<span id="con_msg" style="float:right"></span>
+		<!--input type="text" name="con_down" id="con_down" class="text ui-widget-content ui-corner-all txt_short" value="3"/>
+		items at a time-->
+	</p>
+	<div style="float:left;width:200px;margin-top:-17px;">
+		<div id="con_slider"></div>
+	</div>
+	
+	<p>
+		<label style="height:50px">Auto-hide "done" items</label>
+		<input type="radio" name="auto_hide" id="auto_hide1" value="after" />
+		After 
+		<input type="text" name="auto_hide_t" id="auto_hide_t" class="text ui-widget-content ui-corner-all txt_short" value="24"/>
+		<select name="auto_hide_u" id="auto_hide_u">
+			<option value="86400">Days</option>
+			<option value="3600" selected>Hours</option>
+			<option value="60">Minutes</option>
+			<option value="1">Seconds</option>
+		</select>
+		<br>
+		<input type="radio" name="auto_hide" id="auto_hide2" value ="imme" />
+		Immediately
+		<br>
+		<input type="radio" name="auto_hide" id="auto_hide3" value ="never" />
+		Never
+	</p>
+	
+	<p>
+		<label>Save content in folder</label>
+		<input type="text" name="cont_folder" id="cont_folder" class="text ui-widget-content ui-corner-all txt_long" value="/download"/>
+		<input type="button" id="browse_content" value="Browse">
+		<label style="height:40px">Save .torrent files in folder</label>
+		<input type="text" name="torr_folder" id="torr_folder" class="text ui-widget-content ui-corner-all txt_long" value="/torrent"/>
+		<input type="button" id="browse_torrent" value="Browse">
+		<br>
+		<input type="checkbox" id="auto_dis_torrent" name="auto_dis_torrent" checked> Automatically discard completed .torrent files
+	</p>
+	
+	<p>
+		<label style="height:22px">Stop uploading at ratio</label>
+		<span id="ratio_msg" style="float:right"></span>
+	</p>
+	<div style="float:left;width:200px;margin-top:-17px;">
+		<div id="ratio_slider"></div>
+	</div>
+	<p>
+		<label style="height:22px">Stop uploading after</label>
+		<span id="after_msg" style="float:right"></span>
+	</p>
+	<div style="float:left;width:200px;margin-top:-17px;">
+		<div id="after_slider"></div>
+	</div>
+	<p>
+		<label style="height:60px">Maximum trasfer rates</label>
+		<input type="checkbox" name="auto_rate" id="auto_rate" checked> Auto
+		<br>
+		<label class="sub_label">Download</label>
+		<input type="text" name="down_rate" id="down_rate" class="text ui-widget-content ui-corner-all txt_short" value="50"/> kBps
+		<br>
+		<label class="sub_label">Upload</label>
+		<input type="text" name="up_rate" id="up_rate" class="text ui-widget-content ui-corner-all txt_short" value="20"/> kBps
+	</p>
+	
+	</form>
+</div>
+
+<div id="t_setting_dlg" title="Task Property" class="dialog">
+	<p>
+		<label class="content_lbl">Name: </label>
+		<span id="t_setting_dlg_name"></span>
+	</p>
+	<p>
+		<label class="content_lbl">Size: </label>
+		<span id="t_setting_dlg_size"></span>
+	</p>
+	<div style="overflow-y:scroll;overflow-x:hidden;height:300px">
+	<table id="task_file_table" class="info_table" style="width:100%">
+		<tr>
+			<th width="">Name</th>
+			<th width="100">Size</th>
+			<th width="50">%</th>
+		</tr>
+	</table>
+	</div>
+</div>
+
+<div id="folder_dlg" title="Folder Chooser" class="dialog">
+	<p style="font-size:1.2em">
+		<label class="content_lbl" style="float:none">Folder: </label>
+		<span id="folder_dlg_name"></span>
+	</p>
+	<div style="overflow-y:scroll;overflow-x:hidden;height:300px">
+	<table id="task_folder_table" class="info_table" style="width:100%"></table>
+	</div>
+</div>
+
+<!--div id="t_setting_dlg" title="Task Property">
+	<form>
+	<fieldset>
+		<legend>Save As</legend>
+		<label for="name">Location:</label>
+		<input type="text" name="gur" id="gur" class="text ui-widget-content ui-corner-all gsetting" style="width: 70%" />
+	</fieldset>
+	<fieldset>
+		<legend>Torrent Contents</legend>
+		<label for="name" class="content_lbl">Name: Fedora-11-Preview-i386-DVD<label>
+		<label for="name" class="content_lbl">Comment:<label>
+		<label for="name" class="content_lbl">Size: 3.70 GB<label>
+		<label for="name" class="content_lbl">Date: 2009/4/28 08:21:07 PM<label>
+		<table id="task_peer_table" class="info_table" style="width:100%">
+			<tr>
+				<th width="80%" colspan="2">Name</th>
+				<th width="20%">Size</th>
+			</tr>
+			<tr>
+				<td><input type="checkbox" checked></td>
+				<td>Fedora_11_Preview_i686_Live_KDE_cd1.iso</td>
+				<td>720 MB</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" checked></td>
+				<td>Fedora_11_Preview_i686_Live_KDE_cd2.iso</td>
+				<td>720 MB</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" checked></td>
+				<td>Fedora_11_Preview_i686_Live_KDE_cd3.iso</td>
+				<td>720 MB</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" checked></td>
+				<td>Fedora_11_Preview_i686_Live_KDE_cd4.iso</td>
+				<td>720 MB</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" checked></td>
+				<td>Fedora_11_Preview_i686_Live_KDE_cd5.iso</td>
+				<td>720 MB</td>
+			</tr>
+		</table>
+	</fieldset>
+	</form>
+</div-->
+
+<!--div id="add_task_dlg_bak" title="Torrent Folder">
+	<table id="torrent_list_table" class="info_table" style="width:100%">
+		<tr>
+			<th>Name</th>
+			<th width="50">Size</th>
+			<th width="80">Action</th>
+		</tr>
+	</table>
+</div-->
+
+<div id="add_task_dlg" title="Add a Torrent" class="dialog">
+	<img src="../images/add.png" width="48" height="48" class="icon" style="position:absolute">
+	<form target="hidden_frame" id="upload_form" action="upload" method="post" enctype="multipart/form-data">
+		<p>
+			<label for="gwt-uid-14">Upload file: </label></span>
+			<input type="file" class="gwt-FileUpload" name="Upload" id="upload_file"/>
+		</p>
+	</form>
+</div>
+
+<iframe name="hidden_frame" id="hidden_frame"  width="0" height="0" frameborder="0"></iframe>
+
+<div id="desktop">
+
+		<!--div id="header">
+			<h1>BT Management</h1>
+		</div-->
+
+<div id="desktopNavbar">
+	<div class="toolbox">
+		<div class="btn1" onclick="AddTask()" title="Add a new torrent for download" id="btn_add_task">
+			<img class="tool_btn" src="images/btn_add.gif" width="32" height="32" alt="" />
+		</div>
+		<div class="btn2" onclick="StartTask()" title="Restart downloading / uploading the selected torrent" id="btn_start_task">
+			<img class="tool_btn" src="images/btn_start_l.gif" width="32" height="32" alt="" />
+		</div>
+		<div class="btn3" onclick="PauseTask()" title="Pause downloading / uploading the selected torrent" id="btn_pause_task">
+			<img class="tool_btn" src="images/btn_pause_l.gif" width="32" height="32" alt="" />
+		</div>
+		<div class="btn3" onclick="StopTask()" title="Stop downloading / uploading the selected torrent" id="btn_stop_task">
+			<img class="tool_btn" src="images/btn_stop_l.gif" width="32" height="32" alt="" />
+		</div>
+		<div class="btn4" onclick="DeleteTask()" title="Delete the selected torrent" id="btn_delete_task">
+			<img class="tool_btn" src="images/btn_del.gif" width="32" height="32" alt="" />
+		</div>
+		<div class="btn_pref">
+			<table border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="container">
+				<tr>
+					<td class="myMenu" align="right">
+						<table class="rootVoices" cellspacing='0' cellpadding='0' border='0'><tr>
+							<td class="rootVoice {menu: 'menu_1'}" ><div class="pref"></div></td>
+						</tr></table>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- menues -->
+<div id="menu_1" class="menu" style="display:none">
+	<a class="{action: 'ShowHideDoneTask()'}">Hide/show "done" items</a>
+	<a class="{action: 'PauseAllTask()'}">Pause all torrents</a>
+	<a class="{action: '$(\'#g_setting_dlg\').dialog(\'open\')'}">Options..</a>
+</div>
+
+<div id="task_info"></div>
+
+<div id="dockWrapper">
+	<div id="dock">
+		<div id="dockPlacement"></div>
+		<div id="dockAutoHide"></div>
+		<div id="dockSort"><div id="dockClear" class="clear"></div></div>
+	</div>
+</div>	
+
+<div id="pageWrapper">
+
+<div id="task_list">
+	<table class="info_table" style="width:100%">
+		<tr>
+			<th width="34"></th>
+			<th width="78">Health</th>
+			<th width="18"><input type="checkbox" id="check_all"></th>
+			<th width="">Name</th>
+			<th width="62"></th>
+			<th width="198">Download</th>
+			<th width="58">Upload</th>
+			<th width="30"></th>
+		</tr>
+	</table>
+	<table id="task_list_table" class="info_table" style="width:100%"></table>
+</div
+
+</div><!-- pageWrapper end -->
+
+
+</div><!-- desktop end -->
+
+<!-- for IE debug -->
+<!--textarea id="debug_panel" style="width:100%;height:200px;overflow:auto"></textarea-->
+<textarea style="width:100%;height:0px;overflow:hidden;border:0"></textarea>
+
+</body>
+</html>

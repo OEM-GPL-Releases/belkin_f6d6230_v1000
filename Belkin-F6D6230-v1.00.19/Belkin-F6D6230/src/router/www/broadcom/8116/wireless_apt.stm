@@ -1,0 +1,326 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% File_include("routine.txt"); %>
+<% File_include("routine_data.js"); %>
+
+<% gs_Lan_IP_Addr("gs_Lan_IP_Address"); %> // get lan_ip[]
+<% gs_Wan_IP_Subnet("gs_Wan_IP_Subnet"); %> // get wan_subnet[]
+
+
+var ipm='<% Fid_str(395); %>';
+var ipmEnd='<% Fid_str(400); %>';
+//var sm='<% Fid_str(1332); %>';
+//var netm='<% Fid_str(1333); %> ';
+//var endm='<% Fid_str(1334); %>.';
+//var poolm='<% Fid_str(1335); %>.';
+var wanm='<% Fid_str(1281); %>.';
+
+function isValid_LAN_IP_Range() {
+	if(document.tF.lan_ip1.value == 10) return true; //10.*.*.*
+	if(document.tF.lan_ip1.value == 172 && (document.tF.lan_ip2.value > 15 && document.tF.lan_ip2.value < 32 ) )
+		return true; //172.16.0.0 ~ 172.31.255.255
+	if(document.tF.lan_ip1.value == 192 && document.tF.lan_ip2.value == 168) return true; //192.168.*.*
+	return false;
+}
+
+function ipcheck() {
+	if(document.tF.lan_ip1.value<128)
+	 {
+	   document.tF.lan_mask2.value = 0;
+	   document.tF.lan_mask3.value = 0;
+	   document.tF.lan_mask4.value = 0;
+	 }
+	 if((document.tF.lan_ip1.value<192)&&(document.tF.lan_ip1.value>127))
+	 {
+	   document.tF.lan_mask2.value = 255;
+	   document.tF.lan_mask3.value = 0;
+	   document.tF.lan_mask4.value = 0;
+	 }
+	 if((document.tF.lan_ip1.value<240)&&(document.tF.lan_ip1.value>191))
+	 {
+	   document.tF.lan_mask2.value = 255;
+	   document.tF.lan_mask3.value = 255;
+	   document.tF.lan_mask4.value = 0;
+	 } 
+}
+
+function evaltF()
+{
+	var lanIP = document.tF.lan_ip1.value + "." + document.tF.lan_ip2.value + "." + document.tF.lan_ip3.value + "." + document.tF.lan_ip4.value;
+	var lIP4 = parseInt(document.tF.lan_ip4.value);
+	if(isValidIP(lanIP)==false)
+	{
+		alert("<% Fid_str(1240); %>");
+		return false;
+	}
+	
+	if(isValid_LAN_IP_Range() == false){
+		alert("<% Fid_str(1240); %>");
+		return false;
+	}
+	
+	ipcheck();
+	
+	if(!(isBlank_Zero(document.tF.lan_ip1.value))||!(isBlank_Zero(document.tF.lan_ip2.value))||!(isBlank_Zero(document.tF.lan_ip3.value))||!(isBlank_Zero(document.tF.lan_ip4.value))){
+		if(isNValidIP(document.tF.lan_ip1.value)) { alert(ipm); return false; }
+		if(isNValidIP(document.tF.lan_ip2.value)) { alert(ipm); return false; }
+		if(isNValidIP(document.tF.lan_ip3.value)) { alert(ipm); return false; }
+		if(isNValidLastIP(document.tF.lan_ip4.value)) { alert(ipmEnd); return false; }
+	}
+    	/*if(wan_subnet_len>=24){
+        	if((document.tF.lan_ip1.value & 255) == wan_subnet[0]){
+            		if((document.tF.lan_ip2.value & 255) == wan_subnet[1]){
+                		if((document.tF.lan_ip3.value & 255) == wan_subnet[2]){
+                    			alert(wanm); return false;
+                		}
+            		}
+        	}
+    	}
+    	*/
+ 	if((document.tF.lan_ip1.value != lan_ip[0]) || (document.tF.lan_ip2.value != lan_ip[1]) ||
+ 		(document.tF.lan_ip3.value != lan_ip[2]) || (document.tF.lan_ip4.value != lan_ip[3]))
+ 	{
+		if (!confirm("<% Fid_str(406); %>"))
+		{
+			return false;
+		}
+		alert("<% Fid_str(404); %>.");
+	}
+	onApply();
+   	return true;
+}
+
+<% gs_gateway_stauts(); %>
+//<% exec cmd="Gateway_IsWanConnected"; %>
+
+function itemSelectDns()
+{
+	var show = 'none' ;
+	if ( document.tF.wlan_apt_enable[0].checked==true )
+	{
+		if ((navigator.appName == 'Netscape') || (navigator.appName == 'Opera'))
+		{
+			document.getElementById('apt_ip').style.display = 'table-row';
+			document.getElementById('apt_mask').style.display = 'table-row';
+		}
+		else
+		{
+			document.getElementById('apt_ip').style.display = 'block';
+			document.getElementById('apt_mask').style.display = 'block';
+		}
+		
+	}
+	else
+	{
+		document.getElementById('apt_ip').style.display = 'none';
+		document.getElementById('apt_mask').style.display = 'none';
+	}
+	
+	//new added
+	var lanIp;
+	var lanNetmask;
+	if(ap_mode == 0 && document.tF.wlan_apt_enable[0].checked==true)
+	{
+		lanIp="<% nvram_get("lan_ap_ipaddr"); %>";
+		lanNetmask="<% nvram_get("lan_ap_netmask"); %>";
+	}
+	else
+	{
+		lanIp="<% nvram_get("lan_ipaddr"); %>";
+		lanNetmask="<% nvram_get("lan_netmask"); %>";
+	}
+	var f1 = new Array(); 
+	f1=lanIp.split(".");
+	document.tF.lan_ip1.value=f1[0];
+	document.tF.lan_ip2.value=f1[1];
+	document.tF.lan_ip3.value=f1[2];
+	document.tF.lan_ip4.value=f1[3];
+
+	var f2 = new Array();
+	f2=lanNetmask.split(".");
+	document.tF.lan_mask1.value=f2[0];
+	document.tF.lan_mask2.value=f2[1];
+	document.tF.lan_mask3.value=f2[2];
+	document.tF.lan_mask4.value=f2[3];
+
+	//end new added
+	/*if ( document.tF.wlan_apt_enable[0].checked==true )
+	{document.tF.router_disable.value=1;}
+	else
+	{document.tF.router_disable.value=0;
+	}*/
+}
+function onApply()
+{
+	var ip = document.tF.lan_ip1.value+"."+
+		document.tF.lan_ip2.value+"."+
+		document.tF.lan_ip3.value+"."+
+		document.tF.lan_ip4.value;
+
+	var mask = document.tF.lan_mask1.value+"."+
+		document.tF.lan_mask2.value+"."+
+		document.tF.lan_mask3.value+"."+
+		document.tF.lan_mask4.value;
+
+	if ( document.tF.wlan_apt_enable[0].checked==true )
+	{
+		document.tF.router_disable.value=1;
+		document.tF.gs_apMode.value=1;
+		document.tF.fw_disable.value=1;
+		document.tF.lan_proto.value="static";
+		if(ap_mode == 1)
+		{
+			document.tF.lan_ipaddr.value=ip;
+			document.tF.lan_netmask.value=mask;
+			document.tF.lan_ap_ipaddr.value="<% nvram_get("lan_ap_ipaddr"); %>";
+			document.tF.lan_ap_netmask.value="<% nvram_get("lan_ap_netmask"); %>";
+		}
+		else
+		{
+			document.tF.lan_ipaddr.value=ip;
+			document.tF.lan_netmask.value=mask;
+			document.tF.lan_ap_ipaddr.value="<% nvram_get("lan_ipaddr"); %>";
+			document.tF.lan_ap_netmask.value="<% nvram_get("lan_netmask"); %>";
+		}
+		alert("LAN DHCP server will be turned off!");
+	}
+	else
+	{
+		document.tF.gs_apMode.value=0;
+		document.tF.router_disable.value=0;
+		document.tF.fw_disable.value=0;
+		document.tF.lan_proto.value="dhcp";
+		if(ap_mode == 1)
+		{
+			document.tF.lan_ipaddr.value="<% nvram_get("lan_ap_ipaddr"); %>";
+			document.tF.lan_netmask.value="<% nvram_get("lan_ap_netmask"); %>";
+			document.tF.lan_ap_ipaddr.value="<% nvram_get("lan_ipaddr"); %>";
+			document.tF.lan_ap_netmask.value="<% nvram_get("lan_netmask"); %>";
+		}
+		else
+		{
+			document.tF.lan_ipaddr.value="<% nvram_get("lan_ipaddr"); %>";
+			document.tF.lan_netmask.value="<% nvram_get("lan_netmask"); %>";
+			document.tF.lan_ap_ipaddr.value="<% nvram_get("lan_ap_ipaddr"); %>";
+			document.tF.lan_ap_netmask.value="<% nvram_get("lan_ap_netmask"); %>";
+		}
+	}
+}
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="itemSelectDns()">
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="page" value="wireless_apt.stm">
+<input type="hidden" name="location_page" value="wireless_apt.stm">
+<input type="hidden" name="router_disable">
+<input type="hidden" name="gs_apMode">
+<input type="hidden" name="fw_disable">
+<input type="hidden" name="lan_ipaddr">
+<input type="hidden" name="lan_netmask">
+<input type="hidden" name="lan_ap_ipaddr">
+<input type="hidden" name="lan_ap_netmask">
+<input type="hidden" name="lan_proto">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(777); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<table width=700 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td class="body"><b><% Fid_str(609); %></b><% Fid_str(778); %>
+								<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#Access_Point");>
+								<b><font color=0066ff><% Fid_str(47); %></font></b></a><br><br>
+								</td>
+							</tr>
+						</table>
+						<table width="700" border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>								
+								<td width="220" class="body"><b><% Fid_str(779); %>&gt;</b><br><br></td>
+								<td nowrap class="body">
+									<input type="radio" name="wlan_apt_enable" value=1 onClick="itemSelectDns()"><% Fid_str(96); %>&nbsp;&nbsp;
+									<input type=radio name="wlan_apt_enable" value=0 onClick="itemSelectDns()">
+									<SCRIPT LANGUAGE="JavaScript">
+										var iDOD = 1- <% nvram_get("router_disable"); %>;
+										document.tF.wlan_apt_enable[iDOD].defaultChecked = true;
+										document.tF.wlan_apt_enable[iDOD].checked = true;
+									</SCRIPT>
+									<% Fid_str(119); %>
+								<br><br></td>								
+							</tr>
+            		        			<tr id="apt_ip" style="display: none;">            		        				
+            			        			<td width="220" class="body"><b>	<% Fid_str(780); %>&gt;</b><br><br></td>
+            			        			<td nowrap>
+									<input maxLength="3" name="lan_ip1" size="3" value="0">.
+									<input maxLength="3" name="lan_ip2" size="3" value="0">.
+									<input maxLength="3" name="lan_ip3" size="3" value="0">.
+									<input maxLength="3" name="lan_ip4" size="3" value="0">
+            			        			<br><br></td>
+                            			</tr>
+                            			<tr id="apt_mask" style="display: none;">
+                            				
+            			        			<td width="220" class="body"><b><% Fid_str(781); %> &gt;</b><br><br></td>
+                                				<td nowrap>
+									<input maxLength="3" name="lan_mask1" size="3" value="0">.
+									<input maxLength="3" name="lan_mask2" size="3" value="0">.
+									<input maxLength="3" name="lan_mask3" size="3" value="0">.
+									<input maxLength="3" name="lan_mask4" size="3" value="0">
+            			        			<br><br></td>
+                            			</tr>
+<!--
+                            			<tr id="apt_gateway" style="display: none;">
+                            				
+            			        			<td width="220" class="body"><b><% Fid_str(990); %>&gt;</b></td>
+                                				<td nowrap>
+									<input type="text" name="default_gw1" size=3 maxlength=3>.
+									<input type="text" name="default_gw2" size=3 maxlength=3>.
+									<input type="text" name="default_gw3" size=3 maxlength=3>.
+									<input type="text" name="default_gw4" size=3 maxlength=3>
+            			        			</td>
+                            			</tr> -->                            
+							<tr>
+								<td width="220"></td>
+								<td>
+								<br><br>
+									<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+									<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

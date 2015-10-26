@@ -1,0 +1,716 @@
+<html>
+<head>
+<title>Utilities</title>
+
+<% char_set(); %>
+<link rel="stylesheet" href='stylemain.css' type='text/css'>
+<link rel="stylesheet" href='colors.css' type='text/css'>
+<link rel="stylesheet" href="main_router.css" type='text/css'>
+<style type="text/css">
+ a{ FONT: bold 9pt Arial,Helvetica, sans-serif; text-decoration: none; color: #000000}
+ a:link {
+     color: #000000;
+     font-size: 9pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+    a:visited {
+     color: #000000;
+     font-size: 9pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+    a:active {
+     color: #000000;
+     font-size: 9pt;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+a.menuharf{FONT: 8pt Arial,Helvetica, sans-serif; text-decoration: none; color: #cccccc}
+a.menuharf:link{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+   }
+a.menuharf:visited{
+     color: #cccccc;
+     font-size: 8pt;
+     font-family: Arial,Helvetica, sans-serif;
+     text-decoration: none;
+    }
+a.menuharf:active{
+     color: #000000;
+     font-size: 8pt;
+     text-decoration: none;
+    }
+a.menuharf:hover{  text-decoration: underline; color: #0000ff}
+ </style>
+</head>
+	<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<% File_include("menu.stm"); %>
+	<BLOCKQUOTE>	
+		<A NAME='TOP'></A>
+		<table height="100%" cellSpacing="0" cellPadding="0" width="100%" align="left" border="0" ID="Table1">
+			<tr>
+				<td class="head_bold" vAlign="top" width="99%" height="100%"><b> <font color="#000000"><br> <% Fid_str(2); %></font></b><font size="1" face="Verdana" color="#000000"><br>
+					</font><font size="1" color="#000000">&nbsp;</font>
+					<table class="copy_1" cellSpacing="3" cellPadding="0" width="600" align="left" border="0" ID="Table2">
+						<TBODY>
+      							<tr>
+								<td width="5" colSpan="2"><font size="1" face="Verdana" color="#000000">&nbsp; </font></td>
+							</tr>
+      							<tr>
+								<td width="5"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+								<td>
+									<table class="copy_1" height="100%" cellspacing="0" cellpadding="0" width="558" align="left" border="0" ID="Table3">
+										<TBODY>
+          										<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="copy_1" valign="top" width="548"><div align="left">
+														<font color="#0000ff"><% Fid_str(284); %></font></div>
+												</td>
+											</tr>
+         	 									
+          										<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+											</tr>
+          										
+          										<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+											</tr>
+											
+											<tr>
+											<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><a name='lanip'></a><div align="left">
+													<font color="#0000ff"><b><% Fid_str(371); %></b><br></font> 
+													<% Fid_str(909); %><% Fid_str(910); %><% Fid_str(911); %><% Fid_str(912); %>
+													<% Fid_str(913); %><% Fid_str(914); %><% Fid_str(915); %><% Fid_str(916); %></div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+											<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><a name='subnetmask'></a><div align="left">
+													<font color="#0000ff"><b><% Fid_str(372); %></b></font> <br>
+													<% Fid_str(917); %><% Fid_str(918); %><% Fid_str(919); %></div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+											<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help"  valign="top" width="548"><a name='dhcpserver'></a><div align="left">
+													<font color="#0000ff"><b><% Fid_str(373); %></b></font> <br>
+													<% Fid_str(929); %><% Fid_str(930); %><% Fid_str(931); %>
+													<% Fid_str(932); %><% Fid_str(933); %><% Fid_str(934); %>
+													</div>
+												</td>
+											</tr>											
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='local_domain_name'></a><font color="#0000ff"><b><% Fid_str(392); %></b></font><br>
+												<% Fid_str(935); %> <% Fid_str(936); %> <% Fid_str(937); %></div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3"> <% Fid_str(282); %></font></a></td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+          										<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='dynamicip'></a><font color="#0000ff"><b><% Fid_str(938); %></b></font><br>
+												<% Fid_str(939); %> <% Fid_str(940); %>
+												<% Fid_str(941); %> <% Fid_str(942); %> <% Fid_str(943); %>
+												<% Fid_str(944); %> <% Fid_str(945); %>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='staticip'></a><font color="#0000ff"><b><% Fid_str(94); %></b></font><br>
+												<% Fid_str(946); %> <% Fid_str(947); %> <% Fid_str(948); %>
+												<% Fid_str(949); %> <% Fid_str(950); %> 
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='pppoe'></a><font color="#0000ff"><b><% Fid_str(694); %></b></font><br>
+												<% Fid_str(954); %> <% Fid_str(955); %> <% Fid_str(956); %>
+												<% Fid_str(957); %> <% Fid_str(958); %> <% Fid_str(959); %>
+												<% Fid_str(960); %> <% Fid_str(961); %> <% Fid_str(962); %>
+												<% Fid_str(963); %> <% Fid_str(964); %> <% Fid_str(965); %>
+												<% Fid_str(966); %> 
+												</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<!--
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='multipppoe'></a><font color="#0000ff"><b><% Fid_str(1401); %></b></font><br>
+												<% Fid_str(1426); %> 
+												</div>
+												</td>
+											</tr>
+											-->
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='pptp'></a><font color="#0000ff"><b><% Fid_str(696); %></b></font><br>
+												<% Fid_str(967); %> <% Fid_str(968); %> <% Fid_str(969); %>												
+												<% Fid_str(970); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<!--
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='bpa'></a><font color="#0000ff"><b><% Fid_str(698); %></b></font><br>
+												<% Fid_str(971); %> <% Fid_str(972); %> <% Fid_str(973); %>
+												<% Fid_str(974); %> <% Fid_str(975); %> <% Fid_str(976); %>
+												<% Fid_str(977); %>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='routingtable_id'></a><font color="#0000ff"><b><% Fid_str(1419); %></b></font><br>
+												<% Fid_str(1427); %> <% Fid_str(1428); %> <% Fid_str(1429); %>
+												<% Fid_str(1417); %><% Fid_str(1418); %>												
+												</div>
+												</td>
+											</tr>
+											-->											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='mtu'></a><font color="#0000ff"><b><% Fid_str(978); %></b></font><br>
+												<% Fid_str(979); %> <% Fid_str(980); %> <% Fid_str(981); %>					
+												</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='disconnect'></a><font color="#0000ff"><b><% Fid_str(982); %></b></font><br>
+												<% Fid_str(983); %> <% Fid_str(984); %> <% Fid_str(985); %>
+												<% Fid_str(986); %> <% Fid_str(987); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='dns'></a><font color="#0000ff"><b><% Fid_str(13); %></b></font><br>
+												<% Fid_str(920); %> <% Fid_str(921); %> <% Fid_str(922); %>
+												<% Fid_str(923); %> <% Fid_str(924); %> <% Fid_str(925); %>
+												<% Fid_str(926); %> <% Fid_str(927); %> <% Fid_str(928); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='macaddr'></a><font color="#0000ff"><b><% Fid_str(357); %></b></font><br>
+												<% Fid_str(988); %> <% Fid_str(989); %> <% Fid_str(990); %>
+												<% Fid_str(991); %> <% Fid_str(992); %> <% Fid_str(993); %>
+												<% Fid_str(994); %> <% Fid_str(995); %> <% Fid_str(996); %>
+												<% Fid_str(997); %> <% Fid_str(998); %> <% Fid_str(999); %>
+												<% Fid_str(1000); %>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3"> <% Fid_str(282); %></font></a></td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='channel_ssid'></a><font color="#0000ff"><b><% Fid_str(17); %></b></font><br>
+												<% Fid_str(1001); %> <% Fid_str(1002); %> <% Fid_str(1003); %>
+												<% Fid_str(1004); %> </font>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='broad_ssid'></a><font color="#0000ff"><b><% Fid_str(794); %></b></font><br>
+												<% Fid_str(1005); %> <% Fid_str(1006); %> <% Fid_str(1007); %>
+												<% Fid_str(1008); %><% Fid_str(1009); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='Access_Point'></a><font color="#0000ff"><b><% Fid_str(829); %></b></font><br>
+												<% Fid_str(1010); %> <% Fid_str(1011); %> <% Fid_str(1012); %>
+												<% Fid_str(1013); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='wireless_mode'></a><font color="#0000ff"><b><% Fid_str(790); %></b></font><br>
+												<% Fid_str(1014); %> <% Fid_str(1015); %> <% Fid_str(1016); %>
+												<% Fid_str(1017); %> <% Fid_str(1018); %> <% Fid_str(1019); %>
+												<% Fid_str(1020); %> <% Fid_str(1021); %> 
+												</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+		
+											<tr>
+											  <td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='wireless_mode'></a><font color="#0000ff"><b><% Fid_str(2600); %></b></font><br>
+												1) <% Fid_str(2601); %><br>
+												<% Fid_str(2602); %><br>
+												2) <% Fid_str(2603); %><br>
+												<% Fid_str(2604); %><br>
+												3) <% Fid_str(2605); %> <br>
+												<% Fid_str(2606); %><br>
+												4) <% Fid_str(375); %><br>
+												 <% Fid_str(2607); %><br>
+												</div>
+												</td>
+											</tr>
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='protected_mode'></a><font color="#0000ff"><b><% Fid_str(797); %></b></font><br>
+												<% Fid_str(798); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='Qos_mode'></a><font color="#0000ff"><b><% Fid_str(875); %></b></font><br>
+												<% Fid_str(876); %> 
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='guest_access'></a><font color="#0000ff"><b><% Fid_str(1613); %></b></font><br>											        
+											        <% Fid_str(2614); %>
+											        </div>
+												</td>
+											</tr>
+											
+												<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='wlan_mac'></a><font color="#0000ff"><b><% Fid_str(883); %></b></font><br>
+												<% Fid_str(884); %><% Fid_str(885); %><% Fid_str(886); %><% Fid_str(887); %><% Fid_str(888); %>
+												<% Fid_str(889); %><% Fid_str(890); %><% Fid_str(891); %><% Fid_str(892); %><% Fid_str(893); %>
+												<% Fid_str(894); %><% Fid_str(895); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3" <% Fid_str(282); %></font></a></td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='virtual_server'></a><font color="#0000ff"><b><% Fid_str(1022); %></b></font><br>
+												<% Fid_str(1023); %> <% Fid_str(1024); %> <% Fid_str(1025); %>
+												<% Fid_str(1026); %> <% Fid_str(1027); %> <% Fid_str(1028); %>
+												<% Fid_str(1029); %> <% Fid_str(1030); %> <% Fid_str(1031); %>
+												<% Fid_str(1032); %> <% Fid_str(1033); %> <% Fid_str(1034); %>
+												<% Fid_str(1035); %> <% Fid_str(1036); %> <% Fid_str(1037); %>
+												<% Fid_str(1038); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<!--
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='ip_filter'></a><font color="#0000ff"><b><% Fid_str(1039); %></b></font><br>
+												<% Fid_str(1040); %> <% Fid_str(1041); %> <% Fid_str(1042); %>
+												<% Fid_str(1043); %> <% Fid_str(1044); %> <% Fid_str(1045); %>
+												<% Fid_str(1046); %> <% Fid_str(1047); %> <% Fid_str(1048); %>
+												<% Fid_str(1049); %> 
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											-->
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='mac_filtering'></a><font color="#0000ff"><b><% Fid_str(1050); %></b></font><br>
+												<% Fid_str(1051); %> <% Fid_str(1052); %> <% Fid_str(1053); %>
+												<% Fid_str(1054); %> <% Fid_str(1055); %> <% Fid_str(1056); %>
+												<% Fid_str(1057); %> <% Fid_str(1058); %> <% Fid_str(1059); %>
+												<% Fid_str(1060); %> <% Fid_str(1061); %> <% Fid_str(1062); %>
+												<% Fid_str(1063); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='dmz'></a><font color="#0000ff"><b><% Fid_str(27); %></b></font><br>
+												<% Fid_str(1064); %> <% Fid_str(1065); %> <% Fid_str(1066); %>
+												<% Fid_str(1067); %> <% Fid_str(1068); %> <% Fid_str(1069); %>
+												<% Fid_str(1070); %> <% Fid_str(1071); %> <% Fid_str(1072); %>
+												<% Fid_str(1073); %> <% Fid_str(1074); %> <% Fid_str(1075); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='block_icmp_ping'></a><font color="#0000ff"><b><% Fid_str(1076); %></b></font><br>
+												<% Fid_str(1077); %> <% Fid_str(1078); %> <% Fid_str(1079); %>
+												<% Fid_str(1080); %> <% Fid_str(1081); %> <% Fid_str(1082); %>												
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='ddns'></a><font color="#0000ff"><b><% Fid_str(1186); %></b></font><br>
+												<% Fid_str(1187); %> <% Fid_str(1188); %> 
+												<% Fid_str(1190); %><% Fid_str(1191); %> <% Fid_str(1192); %>
+												<% Fid_str(1193); %> <% Fid_str(1194); %> <% Fid_str(1195); %>
+												<% Fid_str(1196); %> <% Fid_str(1197); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3"> <% Fid_str(282); %></font></a></td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='admin_password'></a><font color="#0000ff"><b><% Fid_str(1083); %></b></font><br>
+												<% Fid_str(1084); %> <% Fid_str(1085); %> <% Fid_str(1086); %>
+												<% Fid_str(1087); %> <% Fid_str(1088); %> <% Fid_str(1089); %>
+												<% Fid_str(1090); %> <% Fid_str(1091); %> <% Fid_str(1092); %>
+												<% Fid_str(1093); %> <% Fid_str(1094); %> <% Fid_str(1095); %>
+												<% Fid_str(1096); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='time_zone'></a><font color="#0000ff"><b><% Fid_str(1097); %></b></font><br>
+												<% Fid_str(1098); %> <% Fid_str(1099); %> <% Fid_str(1100); %>
+												<% Fid_str(1101); %> <% Fid_str(1102); %> <% Fid_str(1103); %>
+												<% Fid_str(1104); %> <% Fid_str(1105); %> </font>
+													</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='remote_mgmt'></a><font color="#0000ff"><b><% Fid_str(1106); %></b></font><br>
+												<% Fid_str(1107); %> <% Fid_str(1108); %> <% Fid_str(1109); %>
+												<% Fid_str(1110); %> <% Fid_str(1111); %> <% Fid_str(1112); %>
+												<% Fid_str(1113); %> <% Fid_str(1114); %> <% Fid_str(1115); %>
+												<% Fid_str(1116); %> <% Fid_str(1117); %> <% Fid_str(1118); %>
+												<% Fid_str(1119); %> <% Fid_str(1120); %>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<!--
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='nat'></a><font color="#0000ff"><b><% Fid_str(1121); %></b></font><br>
+												<% Fid_str(1122); %> <% Fid_str(1123); %> <% Fid_str(1124); %>
+												<% Fid_str(1125); %> <% Fid_str(1126); %> <% Fid_str(1127); %>
+												<% Fid_str(1128); %> <% Fid_str(1129); %> <% Fid_str(1130); %>												
+												</div>
+												</td>
+											</tr>
+											-->
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='upnp'></a><font color="#0000ff"><b>UPNP</b></font><br>
+												<% Fid_str(1131); %> <% Fid_str(1132); %> <% Fid_str(1133); %>
+												<% Fid_str(1134); %> <% Fid_str(1135); %> <% Fid_str(1136); %>
+												<% Fid_str(1137); %> 
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='autoupdate'></a><font color="#0000ff"><b><% Fid_str(1141); %></b></font><br>
+												<% Fid_str(1142); %> <% Fid_str(1143); %> <% Fid_str(1144); %>
+												<% Fid_str(1145); %> <% Fid_str(1146); %> <% Fid_str(1147); %>
+												</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3"> <% Fid_str(282); %></font></a></td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='encryption'></a><font color="#0000ff"><b><% Fid_str(1148); %></b></font><br>
+												<% Fid_str(1149); %> <% Fid_str(1150); %> <% Fid_str(1151); %>
+												<% Fid_str(1152); %> <% Fid_str(1153); %> <% Fid_str(1154); %>
+												<% Fid_str(1155); %> <% Fid_str(1156); %> <% Fid_str(1157); %>
+												<% Fid_str(1158); %> 
+												<% Fid_str(1164); %> 
+												<% Fid_str(1172); %>
+												<% Fid_str(1173); %> <% Fid_str(1174); %> <% Fid_str(1175); %>
+												<% Fid_str(1176); %> <% Fid_str(1177); %> <% Fid_str(1178); %>
+												<% Fid_str(1179); %> <% Fid_str(1180); %> <% Fid_str(1181); %>
+												</div>
+												</td>
+											</tr>
+											
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='eco_mode'></a><font color="#0000ff"><b><% Fid_str(2608); %></b></font><br>
+												<% Fid_str(2609); %>
+												<% Fid_str(2610); %>
+												</div>
+												</td>
+											</tr>
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" valign="top" width="548"><div align="left">
+												<a name='wps'></a><font color="#0000ff"><b><% Fid_str(1319); %> (WPS)</b></font><br>
+												<% Fid_str(1320); %>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td width="10" colspan ="z">&nbsp;</td>
+											</tr>
+											<tr>
+												<td width="10"><font size="1" face="Verdana" color="#000000">&nbsp;</font></td>
+												<td class="help" width="548"><a href="glossary.stm#TOP"> <font color="#6464c3"> <% Fid_str(282); %></font></a></td>
+											</tr>											
+			</TD></TR>
+		</table>
+		</TD></TR></TBODY></TABLE></TR></TBODY></TABLE>
+<BLOCKQUOTE>			
+			</td>    
+		</tr>             
+     </table>	
+	</body>
+</html>

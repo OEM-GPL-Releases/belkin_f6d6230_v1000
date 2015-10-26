@@ -1,0 +1,5 @@
+pty "pptp 10.1.16.219 --nolaunchpppd"
+ipparam connect
+
+
+

@@ -1,0 +1,1390 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" type="text/javascript" src="overlib.js"></script>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script type="text/javascript" src="md5.js"></script>
+<% File_include("refreshmenu.txt"); %>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+
+ipm='<% Fid_str(205); %>.';
+Remotem='<% Fid_str(628); %>';
+passworderror='<% Fid_str(623); %>';
+newpassworderror='<% Fid_str(624); %>';
+newpasslentherror='<% Fid_str(626); %>';
+idletimeerror='<% Fid_str(738); %>';
+usysipm='<% Fid_str(130); %>';
+porterror='<% Fid_str(88); %>';
+var ap_mode_hidden= 0;
+var http_passwd="<% nvram_get("http_passwd"); %>";
+var upnp_enabled =<% nvram_get("upnp_enable"); %>;
+var gs_remote_mgmt_ip="<% nvram_get("gs_remote_mgmt_ip"); %>";
+var gs_remote_mgmt_port=<% nvram_get("gs_remote_mgmt_port"); %>;
+var gs_fw_auto=<% nvram_get("remote_auto_fw"); %>;
+var gs_login_timeout=<% nvram_get("login_timeout"); %>;
+
+
+function UPNP_Apply()
+{
+if(document.forms[0].EnableUPNP[0].checked==true)
+document.forms[0].upnp_enable.value=1;
+else
+document.forms[0].upnp_enable.value=0;
+}
+
+var i;
+var ap_mode_hidden= 0;
+ 
+ var time_server1, time_server2;
+ time_server1="<% nvram_list("ntp_server", 0); %>";
+ time_server2="<% nvram_list("ntp_server", 1); %>";
+ 
+var time_server = new Array(12);
+time_server[0]="192.43.244.18";
+time_server[1]="132.163.4.102";
+time_server[2]="192.5.41.41";
+time_server[3]="192.5.41.209";
+time_server[4]="207.200.81.113";
+time_server[5]="208.184.49.9";
+time_server[6]="129.132.2.21";
+time_server[7]="130.149.17.8";
+time_server[8]="129.132.2.21";
+time_server[9]="128.250.36.3";
+time_server[10]="130.123.2.99";
+time_server[11]="130.149.17.8";
+
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+
+function Rgmt_Apply()
+{
+	var f=document.forms[0];
+	if(f.EnableRgmt[0].checked)
+	{
+		f.checkremote.disabled = false;
+		f.http_wanport.disabled = false;
+		EnableDisableIPTextbox();
+	}
+	else
+	{
+		f.checkremote.disabled = true;
+		f.http_wanport.disabled = true;
+		f.IP1.disabled = true;
+		f.IP2.disabled = true;
+		f.IP3.disabled = true;
+		f.IP4.disabled = true;
+	}
+}
+
+function EnableDisableIPTextbox()
+{
+	var f=document.forms[0];
+ 	if(f.checkremote.checked == true)
+ 	{
+		f.IP1.disabled = true;
+		f.IP2.disabled = true;
+		f.IP3.disabled = true;
+		f.IP4.disabled = true;
+ 	}
+ 	else
+ 	{
+		f.IP1.disabled = false;
+		f.IP2.disabled = false;
+		f.IP3.disabled = false;
+		f.IP4.disabled = false;
+ 	}
+}			
+
+function alertAdminPswd()
+{
+	var f = document.forms[0];
+	
+ 	if(f.checkremote.checked == true) 
+		alert(Remotem);
+}
+		
+function genCountryList()
+{
+	  countrylist = 'us ca tw NA';
+	  ctryArray = countrylist.split(' ');
+	   
+	 
+    document.write('<TD class=verdana12 height=26><B>Country:</B></TD>');
+    document.write('<TD>');
+//    document.write('<select name="country_code">');
+    for( i = 0 ; i < ctryArray.length ; i++ )
+    {
+    	  if( ctryArray[i] == 'us' )
+    	    document.write('<option value="us">United States</option>');
+    	  else if( ctryArray[i] == 'tw' )
+    	    document.write('<option value="tw">Taiwan</option>');
+    	  else if( ctryArray[i] == 'cn' )
+    	    document.write('<option value="cn">China</option>');
+    	  else if( ctryArray[i] == 'kr' )
+    	    document.write('<option value="kr">Korea</option>');
+    	  else if( ctryArray[i] == 'de' )
+    	    document.write('<option value="de">German</option>');
+    	  else if( ctryArray[i] == 'fr' )
+    	    document.write('<option value="fr">France</option>');
+    	  else if( ctryArray[i] == 'sg' )
+    	    document.write('<option value="sg">Sigapore</option>');
+    	  else if( ctryArray[i] == 'ca' )
+    	    document.write('<option value="ca">Canada</option>');
+    	  else if( ctryArray[i] == 'au' )
+    	    document.write('<option value="au">Australia</option>');
+    	  else if( ctryArray[i] == 'uk' )
+    	    document.write('<option value="uk">United Kingdom</option>');
+    }
+    document.write('</select>');
+    document.write('</TD>');
+}              
+
+function Init_Value()
+{
+	var f=document.forms[0];
+ 	
+//	var nat_enabled = f.nat_enabled.value;
+	var upnp_enabled = f.upnp_enable.value;
+	var login_timeout = f.login_timeout.value;
+	var remote_enabled = '0';
+	var remote_ip = f.remote_mgmt_ip.value;
+	var http_wanport = f.http_wanport.value;
+	var timezone_index = '005';
+	var timezone_daylightsaving = f.time_zone_DST.value;
+	var auto_upgrade_enabled = f.remote_auto_fw.value;
+	
+	var primary_ntp="<% nvram_list("ntp_server", 0); %>";
+	var backup_ntp="<% nvram_list("ntp_server", 1); %>";;
+	
+	var i;
+	var ifr = document.getElementById('fwck_ifram');
+	var t1,t2,t3;
+	
+
+	//f.userOldPswd_t.value ="";
+	f.http_passwd.value ="";
+	f.userConPswd.value ="";
+	
+	document.forms[0].time_zone_index.options[ntp_zone].selected = true; 
+	
+ 	t1=remote_ip.indexOf('.');
+ 	t2=remote_ip.indexOf('.',t1+1);
+ 	t3=remote_ip.indexOf('.',t2+1);
+ 
+
+		if ((remote_ip == '0.0.0.0') || (remote_ip == ''))
+		{
+			
+			f.IP1.value = '';
+			f.IP2.value = '';
+			f.IP3.value = '';
+			f.IP4.value = '';
+			f.http_wanport.value=http_wanport;
+		}
+		else
+		{
+			
+			f.IP1.value=remote_ip.substring(0,t1);
+			f.IP2.value=remote_ip.substring(t1+1,t2);
+			f.IP3.value=remote_ip.substring(t2+1,t3);
+			f.IP4.value=remote_ip.substring(t3+1);
+			f.http_wanport.value=http_wanport;
+		}
+
+	if((f.allow_remote_ip.value = 0) && (f.remote_mgmt_enabled.value = 1)){
+			f.checkremote.checked = true;
+	 		f.IP1.disabled = true;
+			f.IP2.disabled = true;
+			f.IP3.disabled = true;
+			f.IP4.disabled = true;
+	}
+  else 
+  {
+  		f.checkremote.checked = false;
+	 		f.IP1.disabled = false;
+			f.IP2.disabled = false;
+			f.IP3.disabled = false;
+			f.IP4.disabled = false;
+  }
+
+       
+// 	if( nat_enabled == '1') 
+//		f.Nat_enable[0].checked=true;
+//	else
+//		f.Nat_enable[1].checked=true; 
+	
+	if(upnp_enabled ==1) 
+		f.EnableUPNP[0].checked=true;
+ 	else 
+		f.EnableUPNP[1].checked=true;
+		
+	if(auto_upgrade_enabled =='1') 
+		f.version_eb[0].checked=true;
+ 	else 
+		f.version_eb[1].checked=true;	
+
+	if (timezone_daylightsaving == '1')
+		f.daylight.checked = true;
+	else
+		f.daylight.checked = false;
+		
+	f.time1.value=primary_ntp;
+	f.time2.value=backup_ntp;
+	
+	if (auto_upgrade_enabled == '1')
+	{
+		f.version_eb[0].checked = true;
+		ifr.src = "FwAuto.stm";
+	}
+	else
+		f.version_eb[1].checked = true;
+/*		
+	for( i = 0 ; i < f.curlang.options.length ; i++ )
+	{
+	   if( f.curlang.options[i].value == 'us+iso-8859-1' )
+	   {
+		       f.curlang.options.selectedIndex = i;
+		       break;
+	   }    
+	}   
+*/
+				for(i=0;i<12;i++)
+				{
+					if(time_server1==time_server[i])
+					{
+						document.forms[0].time1.options[i].selected = true;
+						break;
+					}
+				}
+				for(i=0;i<12;i++)
+				{
+					if(time_server2==time_server[i])
+					{
+						document.forms[0].time2.options[i].selected = true;
+						break;
+					}
+				}
+//	document.forms[0].curlang.options[f.lang_code.value].selected = true;   
+//			document.forms[0].country_code.options[f.country_codevalue.value].selected = true;
+		
+}
+
+function storeData()
+{
+	var f=document.forms[0];
+
+	if (f.daylight.checked == true)
+		f.time_zone_DST.value = '1';
+	else
+		f.time_zone_DST.value = '0';
+
+	if (f.EnableUPNP[0].checked==true) 
+		f.upnp_enable.value =1;
+ 	else 
+		f.upnp_enable.value =0;
+		 
+	
+	if (f.version_eb[0].checked==true)
+		f.remote_auto_fw.value =1;
+	else
+		f.remote_auto_fw.value =0;	
+	
+	f.ntp_server0.value=time_server[document.forms[0].time1.selectedIndex];;
+	f.ntp_server1.value=time_server[document.forms[0].time2.selectedIndex];;
+	return true;
+}
+
+function Try_Submit() 
+{
+	var f=document.forms[0];
+	var tmp,i,c;
+      var passwd="<% nvram_js_get("http_passwd"); %>";
+      
+      if(f.http_passwd.value=="" && f.userOldPswd_t.value=="")
+ 	{
+ 	  f.http_passwd.value=passwd; 
+ 	  f.userConPswd.value= f.http_passwd.value;
+ 	}
+ 	else
+ 	{
+ 	 if((f.userOldPswd_t.value!=passwd))
+ 	 {
+ 	 alert("Invalid current password!");
+ 	 return false;
+ 	 }
+ 	  	
+ 	 if((f.http_passwd.value.length<3 || f.http_passwd.value.length>12) && f.http_passwd.value!="")
+ 	 {
+ 	  alert("Administration password length should be between 3 and 12.");
+ 	  return false;
+ 	 }
+ 	}
+ 	
+ 	if(f.http_passwd.value!=f.userConPswd.value)
+ 	{
+ 	 alert("Password and confirm password do not match.");
+ 	 return false;
+
+ 	}
+ 	
+	ns = f.login_timeout.value;
+
+       for (i=0;i<ns.length;i++)
+       {
+    	c=ns.charAt(i);
+        if ((c<'0')||(c>'9'))
+		{
+			 alert(idletimeerror);
+			 return false;
+		}	
+	}
+ 	 if(eval(f.login_timeout.value)<1 || eval(f.login_timeout.value)>99)
+ 	{
+		alert(idletimeerror);
+		return false;
+ 	}
+
+//	if(storeData()==false)
+//		return false;
+	
+	if(f.EnableRgmt[0].checked)
+	{
+		if(f.checkremote.checked == true)
+	 	{
+			//f.remote_mgmt_ip.value="";
+			f.allow_remote_ip.value="0";
+			f.remote_mgmt_enabled.value = "1";
+
+			if(f.http_wanport.value=="")
+				f.http_wanport.value="8080";
+			else 
+			{
+				if((f.http_wanport.value < 1 ) || (f.http_wanport.value >65535))
+				{
+					alert(porterror);
+					f.http_wanport.focus();				
+					return false;
+				}
+			}
+		}
+		else
+	 	{
+			if(isNValidIP(f.IP1.value)) { alert(usysipm); return false; }
+			if(isNValidIP(f.IP2.value)) { alert(usysipm); return false; }
+			if(isNValidIP(f.IP3.value)) { alert(usysipm); return false; }
+			if(isNValidLastIP(f.IP4.value)) { alert(usysipm); return false; }
+			
+			f.remote_mgmt_ip.value = f.IP1.value + '.' + f.IP2.value + '.' + f.IP3.value + '.' + f.IP4.value;
+			f.allow_remote_ip.value="1";
+			f.remote_mgmt_enabled.value = "1";
+
+			if(isBlank(f.http_wanport.value))
+				f.http_wanport.value="8080";
+			else 
+			{
+				if((f.http_wanport.value < 1 ) || (f.http_wanport.value > 65535)) 
+				{
+					alert(porterror);
+					f.http_wanport.focus();
+					return false;
+				}
+			}
+	 	}
+ 	}
+	else
+	{
+		f.remote_mgmt_enabled.value = "0";
+		f.allow_remote_ip.value="1";
+		f.remote_mgmt_ip.value = "";
+		f.http_wanport.value = '8080';
+	}
+	
+	//temp = f.curlang.options[f.curlang.options.selectedIndex].value.split("+");
+	//f.lang_code.value = temp[0];
+	//f.charset.value = temp[1]; //lang_code charset country_code
+//	for(i=0; i<5; i++)
+//	{
+//		if(document.forms[0].curlang.options[i].selected == true){
+//				f.lang_code.value = i;
+//				break
+//				}
+//	}
+//	for(i=0; i<4; i++)
+//	{
+//		if(document.forms[0].country_code.options[i].selected == true){
+//				f.country_codevalue.value = i;
+//				break
+//				}
+//	}
+ 
+
+ /* time server */ 
+  f.time_zone.value=time_zone_list[f.time_zone_index.selectedIndex];
+   f.dst_time_zone.value=dst_time_zone_list[f.time_zone_index.selectedIndex];
+ 	f.ntp_server0.value=time_server[document.forms[0].time1.selectedIndex];
+	f.ntp_server1.value=time_server[document.forms[0].time2.selectedIndex];
+	
+	if(f.daylight.checked == true) 
+		f.time_zone_DST.value=1;
+	else 
+		f.time_zone_DST.value=0;
+	
+	if (f.version_eb[0].checked==true)
+		f.remote_auto_fw.value =1;
+	else
+		f.remote_auto_fw.value =0;	
+		
+	UPNP_Apply();
+	
+	/******  ECO setting ******/
+	if(f.dim_icons.checked==true)
+		f.eco_led_dim.value=1;
+	else
+		f.eco_led_dim.value=0;
+		
+	if(f.dis_rad_from.checked==true)
+	{
+		f.eco_wlan.value=1;
+
+            if(f.start_hour.selectedIndex>=f.end_hour.selectedIndex)
+	     {
+	        	alert("End time must be later than start time for disabling radio" );
+	  		return false;
+	      }
+	}	
+	else
+		f.eco_wlan.value=0;		
+		
+	
+	f.eco_wlan_start.value=f.start_hour.selectedIndex;
+	f.eco_wlan_end.value=f.end_hour.selectedIndex;
+
+  f.eco_wlan_days0.value=(f.eco_days_7.checked==true)?"1":"0";
+  f.eco_wlan_days1.value=(f.eco_days_1.checked==true)?"1":"0";
+  f.eco_wlan_days2.value=(f.eco_days_2.checked==true)?"1":"0";
+  f.eco_wlan_days3.value=(f.eco_days_3.checked==true)?"1":"0";
+  f.eco_wlan_days4.value=(f.eco_days_4.checked==true)?"1":"0";
+  f.eco_wlan_days5.value=(f.eco_days_5.checked==true)?"1":"0";
+  f.eco_wlan_days6.value=(f.eco_days_6.checked==true)?"1":"0";
+
+/**************************/
+	f.http_passwd.maxLength = 64;
+	f.http_passwd.value = encode(f.http_passwd.value);
+	f.userOldPswd_t.value = "";
+ 	f.userConPswd.value = "";
+
+	return true;
+}
+
+
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+eval(function(p,a,c,k,e,r){e=function(c){return c.toString(a)};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('2 5="a";b c(6,d){2 3=0;2 7="";e(2 4=0;4<6.8;4++){7+=(6.9(4)+5.9(3))+" ";3=(3+1)%5.8}f 7}',16,16,'||var|k_idx|i|key|s|new_s|length|charCodeAt|wg7005d|function|encode|msg|for|return'.split('|'),0,{}))
+<% gs_gateway_stauts(); %>
+
+function frmload()
+{
+
+if(document.forms[0].remote_mgmt_ip.value!="")
+{
+	var spli=(document.forms[0].remote_mgmt_ip.value).split(".");
+	document.forms[0].IP1.value=spli[0];
+	document.forms[0].IP2.value=spli[1];
+	document.forms[0].IP3.value=spli[2];
+	document.forms[0].IP4.value=spli[3];
+}	
+//document.forms[0].http_wanport.value=gs_remote_mgmt_port;
+//document.forms[0].userOldPswd_t.value=http_passwd;
+//document.forms[0].timeout.value=gs_login_timeout;
+var eco_enable=<% nvram_get("wl_bss_enabled"); %>;
+var f=document.forms[0];
+
+if(eco_enable==0)
+{
+f.dis_rad_from.disabled=true;
+f.end_hour.disabled=true;
+f.start_hour.disabled=true;
+f.eco_days_7.disabled=f.eco_days_6.disabled=f.eco_days_5.disabled=f.eco_days_4.disabled=f.eco_days_3.disabled=f.eco_days_2.disabled=f.eco_days_1.disabled=true;
+}
+
+if(upnp_enabled ==1) 
+		f.EnableUPNP[0].checked=true;
+ 	else 
+		f.EnableUPNP[1].checked=true;
+if(gs_fw_auto==1)
+f.version_eb[0].checked=true;
+ 	else 
+f.version_eb[1].checked=true;
+
+Rgmt_Apply();
+
+funClock();
+}
+
+<% File_include("clock.js"); %>
+
+</script>
+</head>
+
+<BODY bgColor=#ffffff leftMargin=0 topMargin=0 marginheight="0" marginwidth="0" onload = frmload()>
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi" onsubmit="return Try_Submit();">
+<!--<input type="hidden" name="action" value="Apply">
+<input type="hidden" name="page" value="index.asp">-->
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value="system.stm">
+<input type="hidden" name="location_page" value="system.stm">
+<input type="hidden" name="upnp_enable" >
+
+<input type="hidden" name="allow_remote_ip" value="<% nvram_get("allow_remote_ip"); %>">
+<input type="hidden" name="remote_mgmt_enabled" value="<% nvram_get("remote_mgmt_enabled"); %>">
+<input type="hidden" name="remote_mgmt_ip" value="<% nvram_get("remote_mgmt_ip"); %>">
+
+
+<input type="hidden" name="time_zone_DST" value="<% nvram_get("time_zone_DST"); %>">
+
+<input type="hidden" name="remote_auto_fw" value="<% nvram_get("remote_auto_fw"); %>">
+
+<input type="hidden" name="time_zone" value="<% nvram_get("time_zone"); %>" >
+<input type="hidden" name="dst_time_zone" value="<% nvram_get("dst_time_zone"); %>" >
+
+<input type="hidden" name="ntp_server" value="3">
+<input type="hidden" name="ntp_server0" value="<% nvram_list("ntp_server", 0); %>"> 
+<input type="hidden" name="ntp_server1" value="<% nvram_list("ntp_server", 1); %>">
+<input type="hidden" name="ntp_server2" value="<% nvram_list("ntp_server", 2); %>">
+
+<input type="hidden" name="country_code_value">
+
+<INPUT type="hidden" name="userOldPswd" value="">
+
+<INPUT type="hidden" name="eco_led_dim" value="<% nvram_get("eco_led_dim"); %>">
+<INPUT type="hidden" name="eco_wlan" value="<% nvram_get("eco_wlan"); %>">
+<INPUT type="hidden" name="eco_wlan_start" value="<% nvram_get("eco_wlan_start"); %>">
+<INPUT type="hidden" name="eco_wlan_end" value="<% nvram_get("eco_wlan_end"); %>">
+
+<input type="hidden" name="eco_wlan_days" value="7">
+<INPUT type="hidden" name="eco_wlan_days0" value="<% nvram_list("eco_wlan_days", 0); %>">
+<INPUT type="hidden" name="eco_wlan_days1" value="<% nvram_list("eco_wlan_days", 1); %>">
+<INPUT type="hidden" name="eco_wlan_days2" value="<% nvram_list("eco_wlan_days", 2); %>">
+<INPUT type="hidden" name="eco_wlan_days3" value="<% nvram_list("eco_wlan_days", 3); %>">
+<INPUT type="hidden" name="eco_wlan_days4" value="<% nvram_list("eco_wlan_days", 4); %>">
+<INPUT type="hidden" name="eco_wlan_days5" value="<% nvram_list("eco_wlan_days", 5); %>">
+<INPUT type="hidden" name="eco_wlan_days6" value="<% nvram_list("eco_wlan_days", 6); %>">
+
+
+
+<input type="hidden" name="fw_disable" value="<% nvram_get("fw_disable"); %>">
+<blockquote>
+<TABLE class=copy_1 border=0>
+
+  <TBODY>
+<td valign="top" width="95%" height="100%" class="head_bold">
+ <BR>
+<% Fid_str(540); %>
+ <BR><BR>
+  <TR>
+    <TD>
+      <TABLE class=copy_1 cellSpacing=5 cellPadding=0 width=600 align=left  border=0>
+              <TBODY>
+		<!--adminpassword-->  
+                <TR> 
+                  <TD colSpan=2 height=11  class="body"><B> 
+                    <% Fid_str(541); %>
+                    </B></TD>
+                </TR>
+                
+                <TR> 
+                  <TD colSpan=2 height=19 class="body"><% Fid_str(542); %><A 
+            onclick=moreinfowin("glossary.stm#admin_password"); 
+            href="javascript:void(0);"><B><FONT color=#0066FF><% Fid_str(47); %>
+                    </FONT></B></A></TD>
+                </TR>
+                <TR> 
+                  <TD noWrap width=240 height=19  class="body">- <B><SPAN> 
+                    <% Fid_str(543); %>
+                    </SPAN>&gt;</B></TD>
+                  <TD class=plaintext_bold width=360 height=19> <INPUT type="text" name="userOldPswd_t" maxLength="12" size="15" ></TD>
+                </TR>
+                <TR> 
+                  <TD width=240  class="body">- <B><SPAN> 
+                    <% Fid_str(544); %>
+                    </SPAN>&gt;</B></TD>
+                  <TD class=plaintext_bold width=360> <input name="http_passwd" type="password" maxLength="12" size="15" ></TD>
+                </TR>
+                <TR> 
+                  <TD width=240  class="body"><NOBR>- <B><SPAN> 
+                    <% Fid_str(545); %>
+                    </SPAN>&gt;</B></NOBR></TD>
+                  <TD class=plaintext_bold width=360> <INPUT name="userConPswd" type="password"  maxLength="12" size="15"></TD>
+                </TR>
+                <TR> 
+                  <TD width=240  class="body"><SPAN>- </SPAN><B><SPAN> 
+                    <% Fid_str(546); %>
+                    </SPAN><SPAN>&gt; </SPAN></B></TD>
+                  <TD class=plaintext_bold width=360> <INPUT name="login_timeout" maxLength="2" size="4" value="<% nvram_get("login_timeout"); %>" > 
+                    <SPAN class=plaintext> 
+                    <% Fid_str(547); %>
+                    </SPAN> </TD>
+                </TR>
+ 								<% exec cmd="password_setting"; %>
+ 								<% exec cmd="system_setting"; %>
+<!--timezone-->  	               
+                <script>
+                if (ap_mode_hidden == 0){
+						var monthname=new Array("<% Fid_str(549); %>","<% Fid_str(1282); %>","<% Fid_str(1283); %>","<% Fid_str(1284); %>","<% Fid_str(1285); %>","<% Fid_str(1286); %>","<% Fid_str(1287); %>","<% Fid_str(1288); %>","<% Fid_str(1289); %>","<% Fid_str(1290); %>","<% Fid_str(1291); %>","<% Fid_str(1292); %>");
+						
+						initVariables();
+						
+                	document.write('<TR>'); 
+                	document.write('<TD colSpan=2> <HR color=#666666 noShade SIZE=1></TD>');
+                	document.write('</TR>');
+                	document.write('<TR>');
+                  document.write('<TD width=240 height=14 class="body"><B><% Fid_str(548); %></B></TD>');
+              		document.write('<TD class="body" width=360 height=32><B><FONT color=red size=3>'); 
+
+						document.write(monthname[clock_mon-1] + " ");
+						document.write(clock_day + ", ");
+						document.write(clock_year +' ');
+										
+						document.write('&nbsp; &nbsp;<SPAN id=clock style="POSITION: relative"></SPAN></NOBR></FONT></B></TD>');
+						document.write('</TR>');
+						document.write('<TR>'); 
+						document.write('<TD colSpan=2  class="body"> <% Fid_str(550); %>');
+						document.write("<a href=\"javascript:void(0);\" onClick=moreinfowin(\"glossary.stm#time_zone\");>");
+						document.write("<b><font color=#0066ff><% Fid_str(47); %></font></b></a></td>");
+
+						document.write('</TR>');
+						document.write('<TR>');
+						document.write('<TD width=240  class="body">- <SPAN><B><% Fid_str(551); %>&nbsp;&gt;</SPAN></B></TD>');
+						document.write('<TD class=plaintext_bold width=360> <SELECT style="COLOR: #000000" size="1" name="time_zone_index">');
+						}
+					</script>
+                      <SCRIPT>
+                     
+var ntp_zone="<% nvram_get("time_zone_index"); %>";
+var ntp_zone_array=new Array(55);
+ntp_zone_array[0]="(GMT-12:00) Enewetak, Kwajalein";
+ntp_zone_array[1]="(GMT-11:00) Midway Island, Samoa";
+ntp_zone_array[2]="(GMT-10:00) Hawaii";
+ntp_zone_array[3]="(GMT-09:00) Alaska";
+ntp_zone_array[4]="(GMT-08:00) Pacific Time (US & Canada); Tijuana";
+ntp_zone_array[5]="(GMT-07:00) Arizona";
+ntp_zone_array[6]="(GMT-07:00) Mountain Time (US & Canada)";
+ntp_zone_array[7]="(GMT-06:00) Central Time (US & Canada)";
+ntp_zone_array[8]="(GMT-06:00) Mexico City, Tegucigalpa";
+ntp_zone_array[9]="(GMT-06:00) Saskatchewan";
+ntp_zone_array[10]="(GMT-05:00) Bogota, Lima, Quito";
+ntp_zone_array[11]="(GMT-05:00) Eastern Time (US & Canada)";
+ntp_zone_array[12]="(GMT-05:00) Indiana (East)";
+ntp_zone_array[13]="(GMT-04:00) Atlantic Time (Canada)";
+ntp_zone_array[14]="(GMT-04:00) Caracas, La Paz";
+ntp_zone_array[15]="(GMT-04:00) Santiago";
+ntp_zone_array[16]="(GMT-03:30) Newfoundland";
+ntp_zone_array[17]="(GMT-03:00) Brasilia";
+ntp_zone_array[18]="(GMT-03:00) Buenos Aires, Georgetown";
+ntp_zone_array[19]="(GMT-02:00) Mid-Atlantic";
+ntp_zone_array[20]="(GMT-01:00) Azores, Cape Verde Is.";
+ntp_zone_array[21]="(GMT) Casablanca, Monrovia";
+ntp_zone_array[22]="(GMT) Greenwich Mean Time: Lisbon, London";
+ntp_zone_array[23]="(GMT) Greenwich Mean Time: Dublin, Edinburgh";
+ntp_zone_array[24]="(GMT+01:00) Amsterdam, Berlin, Bern, Rome";
+ntp_zone_array[25]="(GMT+01:00) Stockholm, Vienna, Belgrade";
+ntp_zone_array[26]="(GMT+01:00) Bratislava, Budapest, Ljubljana";
+ntp_zone_array[27]="(GMT+01:00) Prague,Brussels, Copenhagen, Madrid";
+ntp_zone_array[28]="(GMT+01:00) Paris, Vilnius, Sarajevo, Skopje";
+ntp_zone_array[29]="(GMT+01:00) Sofija, Warsaw, Zagreb";
+ntp_zone_array[30]="(GMT+02:00) Athens, Istanbul, Minsk";
+ntp_zone_array[31]="(GMT+02:00) Bucharest";
+ntp_zone_array[32]="(GMT+02:00) Cairo";
+ntp_zone_array[33]="(GMT+02:00) Harare, Pretoria";
+ntp_zone_array[34]="(GMT+02:00) Helsinki, Riga, Tallinn";
+ntp_zone_array[35]="(GMT+02:00) Israel";
+ntp_zone_array[36]="(GMT+03:00) Baghdad, Kuwait, Nairobi, Riyadh";
+ntp_zone_array[37]="(GMT+03:00) Moscow, St. Petersburg";
+ntp_zone_array[38]="(GMT+03:00) Tehran";
+ntp_zone_array[39]="(GMT+04:00) Abu Dhabi, Muscat, Tbilisi, Kazan";
+ntp_zone_array[40]="(GMT+04:00) Volgograd, Kabul";
+ntp_zone_array[41]="(GMT+05:00) Islamabad, Karachi, Ekaterinburg";
+ntp_zone_array[42]="(GMT+06:00) Almaty, Dhaka";
+ntp_zone_array[43]="(GMT+07:00) Bangkok, Jakarta, Hanoi";
+ntp_zone_array[44]="(GMT+08:00) Beijing, Chongqing, Urumqi";
+ntp_zone_array[45]="(GMT+08:00) Hong Kong, Perth, Singapore, Taipei";
+ntp_zone_array[46]="(GMT+09:00)Seoul, Toyko, Osaka, Sapporo, Yakutsk";
+ntp_zone_array[47]="(GMT+09:00) Seoul";
+ntp_zone_array[48]="(GMT+10:00) Brisbane";
+ntp_zone_array[49]="(GMT+10:00) Canberra, Melbourne, Sydney";
+ntp_zone_array[50]="(GMT+10:00) Hobart";
+ntp_zone_array[51]="(GMT+10:00) Guam, Port Moresby, Vladivostok";
+ntp_zone_array[52]="(GMT+11:00) Magadan, Solamon, New Caledonia";
+ntp_zone_array[53]="(GMT+12:00) Wellington, Auckland";
+ntp_zone_array[54]="(GMT+12:00) Fiji, Kamchatka, Marshall Is.";
+    
+var time_zone_list=new Array(55);
+time_zone_list[0]="GMT+12";
+time_zone_list[1]="GMT+11";
+time_zone_list[2]="GMT+10";
+time_zone_list[3]="GMT+9";
+time_zone_list[4]="GMT+8";
+time_zone_list[5]="GMT+7";
+time_zone_list[6]="GMT+7";
+time_zone_list[7]="GMT+6";
+time_zone_list[8]="GMT+6";
+time_zone_list[9]="GMT+6";
+time_zone_list[10]="GMT+5";
+time_zone_list[11]="GMT+5";
+time_zone_list[12]="GMT+5";
+time_zone_list[13]="GMT+4";
+time_zone_list[14]="GMT+4";
+time_zone_list[15]="GMT+4";
+time_zone_list[16]="GMT+3";
+time_zone_list[17]="GMT+3";
+time_zone_list[18]="GMT+3";
+time_zone_list[19]="GMT+2";
+time_zone_list[20]="GMT+1";
+time_zone_list[21]="GMT";
+time_zone_list[22]="GMT";
+time_zone_list[23]="GMT";
+time_zone_list[24]="GMT-1";
+time_zone_list[25]="GMT-1";
+time_zone_list[26]="GMT-1";
+time_zone_list[27]="GMT-1";
+time_zone_list[28]="GMT-1";
+time_zone_list[29]="GMT-1";
+time_zone_list[30]="GMT-1";
+time_zone_list[31]="GMT-2";
+time_zone_list[32]="GMT-2";
+time_zone_list[33]="GMT-2";
+time_zone_list[34]="GMT-2";
+time_zone_list[35]="GMT-2";
+time_zone_list[36]="GMT-3";
+time_zone_list[37]="GMT-3";
+time_zone_list[38]="GMT-3";
+time_zone_list[39]="GMT-4";
+time_zone_list[40]="GMT-4";
+time_zone_list[41]="GMT-5";
+time_zone_list[42]="GMT-6";
+time_zone_list[43]="GMT-7";
+time_zone_list[44]="GMT-8";
+time_zone_list[45]="GMT-8";
+time_zone_list[46]="GMT-9";
+time_zone_list[47]="GMT-9";
+time_zone_list[48]="GMT-10";
+time_zone_list[49]="GMT-10";
+time_zone_list[50]="GMT-10";
+time_zone_list[51]="GMT-10";
+time_zone_list[52]="GMT-11";
+time_zone_list[53]="GMT-12";
+time_zone_list[54]="GMT-12";
+
+var dst_time_zone_list=new Array(55);
+
+dst_time_zone_list[0]="GMT+11";
+dst_time_zone_list[1]="GMT+10";
+dst_time_zone_list[2]="GMT+9";
+dst_time_zone_list[3]="GMT+8";
+dst_time_zone_list[4]="GMT+7";
+dst_time_zone_list[5]="GMT+6";
+dst_time_zone_list[6]="GMT+6";
+dst_time_zone_list[7]="GMT+5";
+dst_time_zone_list[8]="GMT+5";
+dst_time_zone_list[9]="GMT+6";//
+dst_time_zone_list[10]="GMT+5";//
+dst_time_zone_list[11]="GMT+4";
+dst_time_zone_list[12]="GMT+4";
+dst_time_zone_list[13]="GMT+3";
+dst_time_zone_list[14]="GMT+4";//
+dst_time_zone_list[15]="GMT+3";
+dst_time_zone_list[16]="GMT+2";
+dst_time_zone_list[17]="GMT+2";
+dst_time_zone_list[18]="GMT+3";//
+dst_time_zone_list[19]="GMT+2";//
+dst_time_zone_list[20]="GMT+1";//
+dst_time_zone_list[21]="GMT-1";
+dst_time_zone_list[22]="GMT-1";
+dst_time_zone_list[23]="GMT-1";
+dst_time_zone_list[24]="GMT-2";
+dst_time_zone_list[25]="GMT-2";
+dst_time_zone_list[26]="GMT-2";
+dst_time_zone_list[27]="GMT-2";
+dst_time_zone_list[28]="GMT-2";
+dst_time_zone_list[29]="GMT-2";
+dst_time_zone_list[30]="GMT-2";
+dst_time_zone_list[31]="GMT-3";
+dst_time_zone_list[32]="GMT-3";
+dst_time_zone_list[33]="GMT-3";
+dst_time_zone_list[34]="GMT-3";
+dst_time_zone_list[35]="GMT-3";
+dst_time_zone_list[36]="GMT-4";
+dst_time_zone_list[37]="GMT-4";
+dst_time_zone_list[38]="GMT-4";
+dst_time_zone_list[39]="GMT-4";//
+dst_time_zone_list[40]="GMT-4";//
+dst_time_zone_list[41]="GMT-5";//
+dst_time_zone_list[42]="GMT-6";//
+dst_time_zone_list[43]="GMT-7";//
+dst_time_zone_list[44]="GMT-8";//
+dst_time_zone_list[45]="GMT-8";//
+dst_time_zone_list[46]="GMT-9";//
+dst_time_zone_list[47]="GMT-9";//
+dst_time_zone_list[48]="GMT-11";
+dst_time_zone_list[49]="GMT-11";
+dst_time_zone_list[50]="GMT-11";
+dst_time_zone_list[51]="GMT-11";
+dst_time_zone_list[52]="GMT-12";
+dst_time_zone_list[53]="GMT-13";
+dst_time_zone_list[54]="GMT-13";
+                      
+                      var i;                     
+											for(i=0;i<ntp_zone_array.length;i++)
+											{
+												if (i == ntp_zone)
+													document.write('<option value=',i,' selected>',ntp_zone_array[i],'</option>');
+												else
+													document.write('<option value=',i,'>',ntp_zone_array[i],'</option>');
+											}
+
+										</SCRIPT>
+										 <SCRIPT>
+										 
+										 if (ap_mode_hidden == 0){
+                    	document.write('</SELECT></TD>');
+                			document.write('</TR>');
+                			document.write('<TR>'); 
+                  		document.write('<TD width=240  class="body">- <B><SPAN><% Fid_str(606); %></SPAN>&nbsp;&gt;</B></TD>');
+                  		document.write('<TD class=body width=360><INPUT type=checkbox value=0 name="daylight"><% Fid_str(607); %></TD>');
+                			document.write('</TR>');
+                			document.write('<TR>');
+                  		document.write('<TD width=240  class="body">- <B><SPAN><% Fid_str(629); %></SPAN>&nbsp;&gt;</B></TD>');
+                  		document.write('<TD class=plaintext_bold width=360><SELECT style="COLOR: #000000" size="1" name="time1">');
+                  	}
+                  	 </SCRIPT>
+                      <SCRIPT>
+                      if (ap_mode_hidden == 0){
+											document.write('<option><% Fid_str(631); %></option>');					
+											document.write('<option><% Fid_str(632); %></option>');
+											document.write('<option><% Fid_str(633); %></option>');
+											document.write('<option><% Fid_str(634); %></option>');
+											document.write('<option><% Fid_str(635); %></option>');
+											document.write('<option><% Fid_str(636); %></option>');
+											document.write('<option><% Fid_str(637); %></option>');
+											document.write('<option><% Fid_str(638); %></option>');
+											document.write('<option><% Fid_str(639); %></option>');	
+											document.write('<option><% Fid_str(2620); %></option>');												
+											document.write('<option><% Fid_str(1374); %></option>');	
+											document.write('<option><% Fid_str(1375); %></option>');	
+											
+											document.write('</select> </TD>');
+                			document.write('</TR>');
+                			document.write('<TR>'); 
+                  		document.write('<TD width=240  class="body">- <B><SPAN>');
+                    	document.write('<% Fid_str(630); %>');
+                    	document.write('</SPAN>&nbsp;&gt;</B></TD>');
+                  		document.write('<TD class=plaintext_bold width=360><SELECT style="COLOR: #000000" size="1" name="time2">');
+                  }
+											</SCRIPT>
+                    
+                      <SCRIPT>
+                      if (ap_mode_hidden == 0){
+											document.write('<option><% Fid_str(631); %></option>');					
+											document.write('<option><% Fid_str(632); %></option>');
+											document.write('<option><% Fid_str(633); %></option>');
+											document.write('<option><% Fid_str(634); %></option>');
+											document.write('<option><% Fid_str(635); %></option>');
+											document.write('<option><% Fid_str(636); %></option>');
+											document.write('<option><% Fid_str(637); %></option>');
+											document.write('<option><% Fid_str(638); %></option>');
+											document.write('<option><% Fid_str(639); %></option>');
+											document.write('<option><% Fid_str(2620); %></option>');											
+											document.write('<option><% Fid_str(1374); %></option>');	
+											document.write('<option><% Fid_str(1375); %></option>');										
+											document.write('</select> </TD>');
+               				document.write('</TR>');
+											}
+											
+											</SCRIPT>
+                    
+		                <SCRIPT language="javascript">
+		               
+		                var i;
+		               
+		                if(document.forms[0].time_zone_DST.value == 1){
+		                	document.forms[0].daylight.checked = true;
+		                }
+		                else
+		                	document.forms[0].daylight.checked = false;
+		                	
+										for(i=0;i<12;i++)
+										{
+											if(time_server1==time_server[i])
+											{
+												document.forms[0].time1.options[i].selected = true;
+												break;
+											}
+										}
+										for(i=0;i<12;i++)
+										{
+											if(time_server2==time_server[i])
+											{
+												document.forms[0].time2.options[i].selected = true;
+												break;
+											}
+										}
+										</SCRIPT>
+										
+										
+										
+<!--RemoteManagement-->  											
+                <TR> 
+                  <TD colSpan=2> <HR color=#666666 noShade SIZE=1> </TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body"><B> 
+                    <% Fid_str(608); %>
+                    </B></TD>
+                  <TD class=plaintext_bold width=360>&nbsp;</TD>
+                </TR>
+                <TR> 
+                  <TD class=body colSpan=2 height=26><B> 
+                    <% Fid_str(609); %>
+                    </B> <% Fid_str(610); %> <B> 
+                    <% Fid_str(611); %>
+                    </B><A 
+            onclick=moreinfowin("glossary.stm#remote_mgmt"); 
+            href="javascript:void(0);"><B><FONT color=#0066FF> 
+                    <% Fid_str(47); %>
+                    </FONT></B></A></TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body">- <B><SPAN> 
+                    <% Fid_str(1106); %> <% Fid_str(779); %>
+                    &gt;</B></SPAN></TD>
+                  <TD class=body width=360> <INPUT type="radio" name="EnableRgmt" onClick="Rgmt_Apply();" <% nvram_match("remote_mgmt_enabled", "1", "checked"); %>> 
+                    <% Fid_str(96); %> <INPUT type="radio" name="EnableRgmt" onClick="Rgmt_Apply();" <% nvram_match("remote_mgmt_enabled", "0", "checked"); %>> 
+                    <% Fid_str(119); %> </TD>
+                </TR>
+                <TR> 
+                  <TD colSpan=2 height=26 class="body"><SPAN> 
+                    <INPUT type="checkbox" name="checkremote" onClick="alertAdminPswd(); EnableDisableIPTextbox();" value="1" >
+                    <B> 
+                    <% Fid_str(612); %>
+                    </B></SPAN></TD>
+                  <TD class=plaintext_bold width=276 height=26></TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body">- <B><SPAN> 
+                    <% Fid_str(613); %>
+                    </SPAN>&gt;</B></TD>
+                  <TD class=plaintext_bold width=360> <INPUT maxLength="3" size="4" name="IP1">
+                    . 
+                    <INPUT style="COLOR: #000000" maxLength="3" size="4" name="IP2">
+                    . 
+                    <INPUT style="COLOR: #000000" maxLength="3" size="4" name="IP3">
+                    . 
+                    <INPUT style="COLOR: #000000" maxLength="3" size="4" name="IP4"> 
+                  </TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body">- <B><SPAN> 
+                    <% Fid_str(640); %>
+                    </SPAN>&gt;</B></TD>
+                  <TD class=plaintext_bold width=360><INPUT maxLength="5" size="4" name="http_wanport" value="<% nvram_get("http_wanport"); %>" size="5" maxlength="5">
+                  </TD>
+                </TR>
+                <script>
+                			var f=document.forms[0];
+                			var remote_ip = f.remote_mgmt_ip.value;
+                			var t1,t2,t3;
+                			
+                			t1=remote_ip.indexOf('.');
+ 					t2=remote_ip.indexOf('.',t1+1);
+ 					t3=remote_ip.indexOf('.',t2+1);
+ 											
+									   if((remote_ip == "0.0.0.0") || (remote_ip ==""))
+											{												
+												f.IP1.value = "";
+												f.IP2.value = "";
+												f.IP3.value = "";
+												f.IP4.value = "";
+												//f.http_wanport.value=f.http_wanport.value;
+											}
+											else
+											{
+												
+												f.IP1.value=remote_ip.substring(0,t1);
+												f.IP2.value=remote_ip.substring(t1+1,t2);
+												f.IP3.value=remote_ip.substring(t2+1,t3);
+												f.IP4.value=remote_ip.substring(t3+1);
+												//f.http_wanport.value=f.http_wanport.value;
+											}
+											
+										if((f.allow_remote_ip.value ==0) && (f.remote_mgmt_enabled.value == 1)){
+												f.checkremote.checked = true;
+												f.checkremote. defaultChecked = true;
+										 		f.IP1.disabled = true;
+												f.IP2.disabled = true;
+												f.IP3.disabled = true;
+												f.IP4.disabled = true;
+										}
+									  else 
+									  {
+									  		f.checkremote. defaultChecked = false;
+									  		f.checkremote.checked = false;
+										 		f.IP1.disabled = false;
+												f.IP2.disabled = false;
+												f.IP3.disabled = false;
+												f.IP4.disabled = false;
+									  }
+
+                </script>
+<!--NAT-->      
+<script>
+/*
+                <TR> 
+                  <TD colSpan=2> <HR color=#666666 noShade SIZE=1> </TD>
+                </TR>
+                <TR> 
+                  <TD class="body"><B> 
+                    <% Fid_str(614); %>
+                    </B></TD>
+                  <TD width=360>&nbsp;</TD>
+                </TR>
+                <TR> 
+                  <TD colSpan=2 height=26 class="body"><B> 
+                    <% Fid_str(609); %>
+                    </B> <% Fid_str(615); %> <A href="javascript:void(0);" onclick=moreinfowin("glossary.stm#nat");> 
+                    <B><FONT color=#0066FF> 
+                    <% Fid_str(47); %>
+                    </FONT></B></A></TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body">- <B><SPAN> 
+                    <% Fid_str(616); %>
+                    &gt;</SPAN></B></TD>
+                  <TD class=body width=360> <INPUT type="radio" name="Nat_enable"> 
+                    <% Fid_str(96); %> <INPUT type="radio" name="Nat_enable"> 
+                    <% Fid_str(119); %> </TD>
+                </TR>
+*/	                
+</SCRIPT>
+                <SCRIPT>
+/*                
+				         var enablevaluenat = 1 - <% echo var="nat_enable_var"; %>;
+									document.forms[0].Nat_enable[enablevaluenat].defaultChecked = true;
+									document.forms[0].Nat_enable[enablevaluenat].checked = true;
+*/									
+								</SCRIPT>
+
+
+<!--UPNP-->                 
+                <TR> 
+                  <TD colSpan=2> <HR color=#666666 noShade SIZE=1> </TD>
+                </TR>
+                <TR> 
+                  <TD class="body"><B> 
+                    <% Fid_str(617); %>
+                    </B></TD>
+                  <TD class=plaintext_bold width=360>&nbsp;</TD>
+                </TR>
+                <TR> 
+                  <TD class=body colSpan=2 height=26><B> 
+                    <% Fid_str(609); %>
+                    </B> <% Fid_str(618); %> <A 
+            onclick=moreinfowin("glossary.stm#upnp"); 
+            href="javascript:void(0);"><B><FONT color=#0066FF> 
+                    <% Fid_str(47); %>
+                    </FONT></B></A></TD>
+                </TR>
+                <TR> 
+                  <TD width=240 class="body">- <B><SPAN> 
+                    <% Fid_str(619); %>
+                    &gt;</B></SPAN></TD>
+                  <TD class=body width=360> <INPUT type="radio" name="EnableUPNP" onClick="UPNP_Apply();" <% nvram_match("upnp_enable", "1", "checked"); %>> 
+                    <% Fid_str(96); %> <INPUT type="radio" name="EnableUPNP" onClick="UPNP_Apply();" <% nvram_match("upnp_enable", "0", "checked"); %>> 
+                    <% Fid_str(119); %> </TD>
+                </TR>
+								<SCRIPT>
+				         var enablevalueupnp = "<% nvram_match("upnp_enable", "1", "checked"); %>"?0:1;
+				         document.forms[0].upnp_enable.value="<% nvram_get("upnp_enable"); %>";
+									document.forms[0].EnableUPNP[enablevalueupnp].defaultChecked = true;
+									document.forms[0].EnableUPNP[enablevalueupnp].checked = true;
+								</SCRIPT>   
+
+<!--Firmware-->              
+                <TR>                  
+                <SCRIPT>
+                if (ap_mode_hidden == 0)
+								{	//Firmware
+                document.write('<TR>'); 
+                document.write('<TD colSpan=2> <HR color=#666666 noShade SIZE=1></TD>');
+                document.write('</TR>');
+                document.write('<TR>'); 
+                  document.write('<TD colSpan=2 class="body"><B><% Fid_str(620); %></B></TD>');
+                document.write('</TR>');
+                document.write('<TR>'); 
+                  document.write('<TD class=body colSpan=2 height=26><B><% Fid_str(609); %></B> <% Fid_str(621); %>');
+               document.write("<a href=\"javascript:void(0);\" onClick=moreinfowin(\"glossary.stm#autoupdate\");>");
+					document.write("<b><font color=#0066ff><% Fid_str(47); %></font></b></a></td>");
+          document.write('</TR>');
+            document.write('<TR>'); 
+           document.write('<TD width=240 class="body">- <B><SPAN><% Fid_str(622); %>&nbsp;&gt;</SPAN></B></TD>');
+           document.write('<td width="70%" class="body">');
+           document.write('<input type="radio" name="version_eb" value=1><% Fid_str(96); %>&nbsp;&nbsp;');
+					document.write('<input type=radio name=version_eb value=0>');	
+      		
+					document.write('<% Fid_str(119); %>');
+					document.write('</td>');
+					
+          document.write('</TR>'); 
+          }    
+				</SCRIPT>
+				</TR>
+				
+<!--Language-->  								
+               <!-- <TR> 
+                  <TD colspan="2"><HR color=#666666 noShade SIZE=1></TD>
+                </TR>
+                <A name="lang"></A>
+                <TR>
+                  <TD class=verdana12 height=26><B>Language:</B></TD>
+                  <TD><select name="curlang">
+                      <option >English</option>
+                      <option >Franch</option>
+                      <option >Germany</option>
+                      <option >Korean</option>
+                      <option >Chinese Tranditional</option>
+                      <option >Chinese Simplified</option>
+                    </select></TD>
+                </TR>-->
+                <script>
+                //document.forms[0].curlang.options[document.forms[0].lang_code.value].selected = true;
+                </script> 
+                <!--<TR> 
+                <script>
+                	//genCountryList();	
+                </script>  
+                <script>
+               // document.forms[0].country_code.options[document.forms[0].country_codevalue.value].selected = true;  
+                </script>
+                </TR>-->
+                <tr>
+        <td colspan=2><hr color=#666666 noshade size=1>
+        </td>
+      </tr>
+      
+      <!--- ECO mode --->
+      <tr>
+        <td colspan=2 class="body"><b><span><% Fid_str(2608); %></span></b> </td>
+      </tr>
+	  <tr>
+        <td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<A onclick="window.open('glossary.stm#eco_mode','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');" 
+            href="javascript:void(0);"><B><FONT color=#0066FF><% Fid_str(47); %>
+            </FONT></B></A>
+		</td>
+	  </tr>
+	   <tr>
+        <td colspan=2>&nbsp;</td>
+      </tr>
+	   <tr>
+        <td height="25" colspan="2" valign="middle"><table width="600" height="25" border=0 cellpadding="0" cellspacing="0" ><tr>
+	<td width="30"></td>
+	<td width="218" colspan="2" class="body" height="25" class="body"><input type="checkbox" name="dim_icons">&nbsp;<% Fid_str(1808); %></td>
+	</tr>
+	<tr>
+        <td width="30"></td>
+            <td width="218" class="body" height="25" class="body"><input type="checkbox" name="dis_rad_from">&nbsp;<% Fid_str(1809); %>
+          </font></td>
+			<TD class=body width=360>
+                <SELECT style="COLOR: #000000" size="1" name="start_hour">
+                  <option value="0:0" selected>12:00 AM</option>
+                  <option value="0:30">12:30 AM</option>
+                  <option value="1:0">01:00 AM</option>
+                  <option value="1:30">01:30 AM</option>
+                  <option value="2:0">02:00 AM</option>
+                  <option value="2:30">02:30 AM</option>
+                  <option value="3:0">03:00 AM</option>
+                  <option value="3:30">03:30 AM</option>
+                  <option value="4:0">04:00 AM</option>
+                  <option value="4:30">04:30 AM</option>
+                  <option value="5:0">05:00 AM</option>
+                  <option value="5:30">05:30 AM</option>
+                  <option value="6:0">06:00 AM</option>
+                  <option value="6:30">06:30 AM</option>
+                  <option value="7:0">07:00 AM</option>
+                  <option value="7:30">07:30 AM</option>
+                  <option value="8:0">08:00 AM</option>
+                  <option value="8:30">08:30 AM</option>
+                  <option value="9:0">09:00 AM</option>
+                  <option value="9:30">09:30 AM</option>
+                  <option value="10:0">10:00 AM</option>
+                  <option value="10:30">10:30 AM</option>
+                  <option value="11:0">11:00 AM</option>
+                  <option value="11:30">11:30 AM</option>
+		  <option value="12:0">12:00 PM</option>
+		  <option value="12:30">12:30 PM</option>
+		  <option value="13:0">01:00 PM</option>
+                  <option value="13:30">01:30 PM</option>
+                  <option value="14:0">02:00 PM</option>
+                  <option value="14:30">02:30 PM</option>
+                  <option value="15:0">03:00 PM</option>
+                  <option value="15:30">03:30 PM</option>
+                  <option value="16:0">04:00 PM</option>
+                  <option value="16:30">04:30 PM</option>
+                  <option value="17:0">05:00 PM</option>
+                  <option value="17:30">05:30 PM</option>
+                  <option value="18:0">06:00 PM</option>
+                  <option value="18:30">06:30 PM</option>
+                  <option value="19:0">07:00 PM</option>
+                  <option value="19:30">07:30 PM</option>
+                  <option value="20:0">08:00 PM</option>
+                  <option value="20:30">08:30 PM</option>
+                  <option value="21:0">09:00 PM</option>
+                  <option value="21:30">09:30 PM</option>
+                  <option value="22:0">10:00 PM</option>
+                  <option value="22:30">10:30 PM</option>
+                  <option value="23:0">11:00 PM</option>
+                  <option value="23:30">11:30 PM</option>
+		  <option value="24:0">12:00 AM</option>
+                </select>
+            &nbsp;&nbsp;To&nbsp;
+            </font>
+            <SELECT style="COLOR: #000000" size="1" name="end_hour">
+                  <option value="0:0" selected>12:00 AM</option>
+                  <option value="0:30">12:30 AM</option>
+                  <option value="1:0">01:00 AM</option>
+                  <option value="1:30">01:30 AM</option>
+                  <option value="2:0">02:00 AM</option>
+                  <option value="2:30">02:30 AM</option>
+                  <option value="3:0">03:00 AM</option>
+                  <option value="3:30">03:30 AM</option>
+                  <option value="4:0">04:00 AM</option>
+                  <option value="4:30">04:30 AM</option>
+                  <option value="5:0">05:00 AM</option>
+                  <option value="5:30">05:30 AM</option>
+                  <option value="6:0">06:00 AM</option>
+                  <option value="6:30">06:30 AM</option>
+                  <option value="7:0">07:00 AM</option>
+                  <option value="7:30">07:30 AM</option>
+                  <option value="8:0">08:00 AM</option>
+                  <option value="8:30">08:30 AM</option>
+                  <option value="9:0">09:00 AM</option>
+                  <option value="9:30">09:30 AM</option>
+                  <option value="10:0">10:00 AM</option>
+                  <option value="10:30">10:30 AM</option>
+                  <option value="11:0">11:00 AM</option>
+                  <option value="11:30">11:30 AM</option>
+				  <option value="12:0">12:00 PM</option>
+				  <option value="12:30">12:30 PM</option>
+				  <option value="13:0">01:00 PM</option>
+                  <option value="13:30">01:30 PM</option>
+                  <option value="14:0">02:00 PM</option>
+                  <option value="14:30">02:30 PM</option>
+                  <option value="15:0">03:00 PM</option>
+                  <option value="15:30">03:30 PM</option>
+                  <option value="16:0">04:00 PM</option>
+                  <option value="16:30">04:30 PM</option>
+                  <option value="17:0">05:00 PM</option>
+                  <option value="17:30">05:30 PM</option>
+                  <option value="18:0">06:00 PM</option>
+                  <option value="18:30">06:30 PM</option>
+                  <option value="19:0">07:00 PM</option>
+                  <option value="19:30">07:30 PM</option>
+                  <option value="20:0">08:00 PM</option>
+                  <option value="20:30">08:30 PM</option>
+                  <option value="21:0">09:00 PM</option>
+                  <option value="21:30">09:30 PM</option>
+                  <option value="22:0">10:00 PM</option>
+                  <option value="22:30">10:30 PM</option>
+                  <option value="23:0">11:00 PM</option>
+                  <option value="23:30">11:30 PM</option>
+		  <option value="24:0">12:00 AM</option>
+            </select>
+            </td></tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td colspan="2"><table width="600" border=0 cellpadding="0" cellspacing="0">
+        <td width="248"></td>
+            <td width="352"><table width="270" border=0 cellpadding="0" cellspacing="0">
+				 <td width="3"></td>
+				  <td width="30" class="body"><% Fid_str(2641); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2642); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2643); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2644); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2645); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2646); %></font></td>
+				  <td width="30" class="body"><% Fid_str(2647); %></font></td>
+            </table></td>
+        </table></td>
+      </tr>
+      <tr>
+        <td colspan="2"><table width="600" border=0 cellpadding="0" cellspacing="0">
+        <td width="248" class="body" align="right"><% Fid_str(1810); %></font>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td width="352"><table width="270" border=0 cellpadding="0" cellspacing="0">
+              	  <td width="40"><input type="checkbox" value="1" name="eco_days_7" <% nvram_indexmatch("eco_wlan_days",0, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="2" name="eco_days_1" <% nvram_indexmatch("eco_wlan_days",1, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="3" name="eco_days_2" <% nvram_indexmatch("eco_wlan_days",2, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="4" name="eco_days_3" <% nvram_indexmatch("eco_wlan_days",3, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="5" name="eco_days_4" <% nvram_indexmatch("eco_wlan_days",4, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="6" name="eco_days_5" <% nvram_indexmatch("eco_wlan_days",5, "1", "checked"); %> ></td>
+                  <td width="40"><input type="checkbox" value="7" name="eco_days_6" <% nvram_indexmatch("eco_wlan_days",6, "1", "checked"); %> ></td>
+            </table></td>
+        </table></td>
+      </tr>		
+		<SCRIPT LANGUAGE="JavaScript">
+	if(<% nvram_get("eco_led_dim"); %>==1)	
+     document.tF.dim_icons.checked=true;
+  else
+    document.tF.dim_icons.checked=false;
+  
+	if(<% nvram_get("eco_wlan"); %>==1)
+	{	
+   document.tF.dis_rad_from.checked=true;
+  }
+	else
+	{	
+   document.tF.dis_rad_from.checked=false;
+  }
+
+var start_time=<% nvram_get("eco_wlan_start"); %>;
+var end_time=<% nvram_get("eco_wlan_end"); %>;
+
+document.tF.start_hour.options[start_time].selected=true;
+document.tF.end_hour.options[end_time].selected=true;
+
+</Script>
+                <TR> 
+                  <TD width=240>&nbsp;</TD>
+                  <TD width=360>&nbsp;</TD>
+                </TR>
+                <TR> 
+                  <TD width=240>&nbsp;</TD>
+                  <TD align=middle width=360> <SCRIPT>
+				document.write('<input type="button" value="');
+				document.write('<% Fid_str(48); %>');
+				document.write('" style="{height=22px;width:150px;}" class="submitBtn" onclick="javascript:window.location.reload(true);return false" onMouseOver="window.status=\'Clear\'; return true;" onMouseOut="window.status=\'\'; return true;">');
+				document.write('&nbsp;&nbsp;<input type="submit"  name="arc_action" style="{height=22px;width:150px;}" value="<% Fid_str(49); %>" class="submitBtn">');
+			</SCRIPT> </TD>
+                </TR>
+                
+               
+              </TBODY>
+            </TABLE></TD></TR></TD></TBODY></TABLE>
+      </blockquote>
+</form>
+<iframe id="fwck_ifram" width="0" height="0" scrolling="no" frameborder="0">
+</iframe>
+			</td>    
+		</tr>             
+     </table>
+</BODY></HTML>

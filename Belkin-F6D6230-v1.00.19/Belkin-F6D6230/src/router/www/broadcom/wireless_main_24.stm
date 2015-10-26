@@ -1,0 +1,64 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<!--#include file="refreshmenu.txt" -->
+<% File_include("hyper.txt"); %>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode=1;// '<!--#exec cmd="device_mode_script" -->';
+
+
+function evaltF()
+{
+	return true;
+}
+<!--#exec cmd="gateway_status" -->
+//<!--#exec cmd="Gateway_IsWanConnected" -->
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF" action="/cgi-bin/wireless_eb.exe" method="post">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">		
+			<br><b><% Fid_str(1607); %></b>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width="600" border="0" cellspacing="0" cellpadding="0" align="left" class="copy_1">
+							<tr>
+								<td class="body">
+									<% Fid_str(824); %>
+									<ul>
+									<li><a href="wireless_id.stm"><b><% Fid_str(825); %></b></a></li><br>
+									<% Fid_str(826); %><br>&nbsp;
+									<li><a href="wireless_e.stm"><b><% Fid_str(827); %></b></a></li><br>
+									<% Fid_str(828); %><br>&nbsp;
+							    <li><a href="wireless_WPS.stm"><b><% Fid_str(1319); %></b></a></li><br>
+									<% Fid_str(1320); %><br>&nbsp;
+									</ul>
+
+								</td>
+							</tr>	
+							
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

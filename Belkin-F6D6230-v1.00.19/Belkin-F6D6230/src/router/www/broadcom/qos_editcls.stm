@@ -1,0 +1,504 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="/main_router.css" type="text/css">
+<style type="text/css">
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; color: #003366; text-decoration: none}
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.section {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 15px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #003399; text-decoration: none}
+a {  text-decoration: none; color: #003366}
+a:hover {  text-decoration: underline; color: #000066}
+.copy_1 {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; line-height: 14px; color: #003366}
+/*.submitBtn {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px;border-color: #3399CC; background-color: #006699; color: #ffffff}*/
+</style>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<!--#exec cmd="my_function" -->
+<% login_timeout(); %>
+
+var CUSTOM_TRFC_VPN=11;
+var CUSTOM_TRFC_TCP=20;
+var CUSTOM_TRFC_UDP=21;
+
+var ap_num;
+var max_ap_num = 20;
+var ap_pool=new Array(max_ap_num);
+var i;
+function AP_ENTRY()
+{
+	this.name = "";
+	this.val = "";
+}
+for(i = 0; i < max_ap_num; i++)
+{
+	ap_pool[i] = new AP_ENTRY();
+}
+
+var dscp_num;
+var max_dscp_num = 56;  //64 - 8 for AFx2, AFx3
+var dscp_pool=new Array(max_dscp_num);
+var i;
+function DSCP_ENTRY()
+{
+	this.name = "";
+	this.val = "";
+}
+for(i = 0; i < max_dscp_num; i++)
+{
+	dscp_pool[i] = new DSCP_ENTRY();
+}
+<!--#exec cmd="ClsRuleIdx_script"-->
+
+macm='<!--#Fid_str(115)-->';
+ipm="<!--#Fid_str(641)-->";
+portm="<!--#Fid_str(1513)-->\n <!--#Fid_str(1805)-->\n <!--#Fid_str(1514)-->";
+inportm='<!--#Fid_str(1515)-->';
+matchdscpm="<!--#Fid_str(1516)-->\n <!--#Fid_str(1517)-->";
+
+function open_help(url) {
+	newwindow=window.open(url,"","toolbar=0,location=0,directories=0,status=0,menubar=0,width=450,height=400,scrollbars=1");
+}
+
+function showmatchDSCP(F)
+{
+	var str;
+
+	str='';
+	if(user_dscp==1){
+	    str = '&nbsp;&nbsp;:0x<input type=text name=matchdscp size=1 maxlength=2 value="" ';
+	if(getElementsByFieldName(document.tF, "matchdscp")!=-1)
+	    str += document.tF.matchdscp.value;
+	str += '">';
+    }
+
+	document.getElementById('specialtos').innerHTML=str;
+}
+function evaltF() {
+var i, j, fieldid;
+var eidx, input1, input2;
+
+    if(document.tF.tmp_submit.value==1){
+        return  true;
+    }
+
+	if (isSpecialChar(document.tF.rule_name.value,"<!--#Fid_str(1802)-->")) 
+	{ 
+		document.tF.rule_name.value='';
+		return false; 
+	}
+
+    if(src_addr_type==MAC_ADDR){ //MAC type
+        for(i=0; i<5; i++){
+            for(j=0; j<6; j++){
+                fieldid="smac"+i+j;
+                eidx=getElementsByFieldName(document.tF, fieldid);
+                if(!isBlank(document.tF.elements[eidx].value)) break;
+            }
+            if(j==6) break;
+            for(j=0; j<6; j++){
+                fieldid="smac"+i+j;
+                eidx=getElementsByFieldName(document.tF, fieldid);
+                if(!isNValids(document.tF.elements[eidx].value)) {alert(macm); return false;}
+            }
+        }
+	}
+	else if(src_addr_type==IP_ADDR){  //ip type
+	    for(i=0; i<5; i++){
+	        fieldid="srcip"+i;
+	        eidx=getElementsByFieldName(document.tF, fieldid);
+	        input1=document.tF.elements[eidx].value;
+	        if(isNValidIP(input1))
+	    		{alert(ipm); return false;}
+	        if(i==3)    input2=input1;
+		}
+	    if(eval(input1)<eval(input2))
+	        {alert(ipm); return false;}
+    }
+    else if(src_addr_type==IN_PORT){  //incoming ports
+        for(i=0; i<4; i++){
+	        fieldid="inport_"+i;
+	        eidx=getElementsByFieldName(document.tF, fieldid);
+	        if(document.tF.elements[eidx].checked==true)
+	            break;
+        }
+        if(i==4)
+	        {alert(inportm); return false;}
+    }
+
+    if(dst_addr_type==IP_ADDR){  //ip type
+	    for(i=0; i<5; i++){
+	        fieldid="dstip"+i;
+	        eidx=getElementsByFieldName(document.tF, fieldid);
+	        input1=document.tF.elements[eidx].value;
+	        if(isNValidIP(input1))
+	    		{alert(ipm); return false;}
+	        if(i==3)    input2=input1;
+		}
+	    if(eval(input1)<eval(input2))
+	        {alert(ipm); return false;}
+    }
+
+    if(traffic_type>=CUSTOM_TRFC_TCP){
+        if(protocol_type==6 || protocol_type==17){
+        for(i=0; i<6; i++){
+            fieldid="sprange_"+i;
+            eidx=getElementsByFieldName(document.tF, fieldid);
+            if(i%2==0)
+                input1=document.tF.elements[eidx].value;
+            else{
+                input2=document.tF.elements[eidx].value;
+
+		        if(!(isBlank_Zero(input1)) || !(isBlank_Zero(input2))){
+	    	        if (isNValidPort(input1) || isNValidPort(input2) || eval(input1)>eval(input2))
+	    		        {alert(portm); return false;}
+		        }
+		    }
+		}
+        for(i=0; i<6; i++){
+            fieldid="dprange_"+i;
+            eidx=getElementsByFieldName(document.tF, fieldid);
+            if(i%2==0)
+                input1=document.tF.elements[eidx].value;
+            else{
+                input2=document.tF.elements[eidx].value;
+
+		        if(!(isBlank_Zero(input1)) || !(isBlank_Zero(input2))){
+	    	        if (isNValidPort(input1) || isNValidPort(input2) || eval(input1)>eval(input2))
+	    		        {alert(portm); return false;}
+		        }
+		    }
+		}
+    }
+        if(document.tF.dscp.value=='FE'){
+            if(isBlank(document.tF.matchdscp.value) || !isHex(document.tF.matchdscp.value))
+                {alert(matchdscpm); return false;}
+        }
+    }
+
+	return true;
+}
+
+function selectChange(item)
+{
+    if (isSpecialChar(document.tF.rule_name.value,"<!--#Fid_str(1802)-->")) 
+    { 
+    		window.location.reload();  
+    		return true;
+    	} 
+    if(item==0){ //src addr type change
+        if(src_addr_type>=THIS_DEVICE){
+            if(document.tF.src_addr.value>=THIS_DEVICE){
+                src_addr_type=document.tF.src_addr.value;
+                return true;
+            }
+        }
+    }
+
+    if(item==2){ //traffic type change
+        if(traffic_type<CUSTOM_TRFC_TCP){
+            if(document.tF.tfc_type.value<CUSTOM_TRFC_TCP){
+                traffic_type=document.tF.tfc_type.value;
+                if(my_qos==2){
+                    if(traffic_type==CUSTOM_TRFC_VPN){
+                        document.tF.out_vc.selectedIndex=0;
+                        document.tF.out_vc.disabled=true;
+                    }
+                    else
+                        document.tF.out_vc.disabled=false;
+                }
+                return true;
+            }
+        }
+        if(traffic_type>=CUSTOM_TRFC_TCP){
+            if((traffic_type==CUSTOM_TRFC_TCP && document.tF.tfc_type.value==CUSTOM_TRFC_UDP) ||
+               (traffic_type==CUSTOM_TRFC_UDP && document.tF.tfc_type.value==CUSTOM_TRFC_TCP)){
+                traffic_type=document.tF.tfc_type.value;
+                return true;
+            }
+        }
+    }
+
+    if(item==3){
+        adv_cfg=1;
+    }
+
+    if(item==4){    //DSCP or TOS
+        if(document.tF.dscp.value=='FE')
+            user_dscp=1;
+        else
+            user_dscp=0;
+        showmatchDSCP(document.tF);
+        return true;
+    }
+
+    if(item==5){    //map to PHB
+        if(document.tF.remarkdscp.value!="FF"){
+            document.tF.remarkdscp.selectedIndex=document.tF.fwd_phb.selectedIndex+1;
+        }
+        return true;
+    }
+
+    document.tF.adv_cfg.value=adv_cfg;
+    document.tF.tmp_submit.value=1;  
+    document.forms[0].submit();
+}
+
+function clear1() {
+	window.status="";
+}
+</script>
+</head>
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1()">
+<!--#include file="menu.stm" -->
+<FORM NAME=tF METHOD=POST ACTION="/cgi-bin/qos_submit_cls.exe">
+<input type="hidden" name="tmp_submit" value="0">
+<input type="hidden" name="rule_id">
+<input type="hidden" name="adv_cfg">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;<!--#Fid_str(1488)-->&gt; <!--#Fid_str(1518)--><br>
+		<table border=0 class="copy_1">
+			<tr>
+				<td width="5" colspan="2">&nbsp;</td>
+			</tr>
+			<tr>
+				<td width="10" height="25" >&nbsp;</td>
+				<td width="700" colspan="2" height="25">
+					<table border="0" class="copy_1">
+						<tr>
+							<td>
+										<!--#Fid_str(1800)-->
+							</td>
+						</tr>						
+						<tr>
+							<td>
+										<!--#Fid_str(1519)-->&nbsp;
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td width="10" height="25">&nbsp;</td>
+			</tr>
+		</table>												
+	
+<table border=0 cellspacing=1 cellpadding=5 width="80%" height=36 align="center" class="copy_1">
+  		<tr>
+	   	    <td width="22%" >
+	   	        <b><!--#Fid_str(1802)--> &gt;</b>
+	   	    </td>
+	        <td width="63%" >
+	            <input type="text" name="rule_name" size="16" maxlength="15">
+	        </td>
+	    </tr>
+
+	    <script language="javascript">
+	    var i, j;
+	    if(adv_cfg==0){
+		document.write('<input type="hidden" name="src_addr" value="',ANY,'">');
+	    document.write('<input type="hidden" name="dst_addr" value="',ANY,'">');
+        }
+        else{
+		    document.write('<tr><td width="22%" ><b><!--#Fid_str(1520)--> &gt;</b></td>');
+	        document.write('<td width="63%" >');
+	        document.write('<select name="src_addr" onchange="selectChange(0);">');
+		    document.write('<option value="',MAC_ADDR,'"><!--#Fid_str(1521)--></option>');
+		    document.write('<option value="',IP_ADDR,'"><!--#Fid_str(1522)--></option>');
+		    if(show_laninport==1)
+		        document.write('<option value="',IN_PORT,'"><!--#Fid_str(1523)--></option>');
+		    document.write('<option value="',THIS_DEVICE,'"><!--#Fid_str(1524)-->r</option>');
+		    document.write("<option value=',ANY,' selected><!--#Fid_str(1492)--></option>");
+	        document.write('</select></td></tr>');
+
+            if(src_addr_type==MAC_ADDR){
+                for(i=0;i<5;i++){
+	                document.write('<tr>');
+	                if(i==0) document.write('<td width="22%"  rowspan=5>&nbsp;</td>');
+		            document.write('<td width="63%">');
+	                for(j=0;j<6;j++){
+		                document.write('<input type="text" name="smac',i,j,'" size="1" maxlength="2">');
+		                if(j<5) document.write('<b>&nbsp;:&nbsp;</b>');
+		            }
+		            if(i<4) document.write('&nbsp;or');
+		            document.write('</td></tr>');
+		        }
+		    }
+		    else if(src_addr_type==IP_ADDR){
+		        document.write('<tr><td width="22%" >&nbsp;</td>');
+		        document.write('<td width="63%" >');
+		        for(i=0; i<5; i++){
+		    	    document.write('<input type="text" name="srcip',i,'" size="3" maxlength="3" value="">');
+		    	    if(i<3)         document.write('<b>&nbsp;.&nbsp;</b>');
+		    	    else if(i==3)   document.write('<b>&nbsp;&nbsp;~&nbsp;&nbsp;</b>');
+		    	}
+		    }
+            else if(src_addr_type==IN_PORT){
+		        document.write('<tr><td width="22%">&nbsp;</td>');
+		        document.write('<td width="63%" >');
+                for(i=0; i<4; i++){
+                    document.write('<input type="checkbox" name="inport_', i, '" value="1">LAN', i+1, '&nbsp;&nbsp;');
+                }
+            }
+
+	        document.write('<tr><td width="22%" ><b><!--#Fid_str(1525)--> &gt;</b></td>');
+	        document.write('<td width="63%" >');
+	        document.write('<select name="dst_addr" onchange="selectChange(1);">');
+		    document.write('<option value="',IP_ADDR,'"><!--#Fid_str(1522)--></option>');
+		    document.write("<option value=',ANY,' selected><!--#Fid_str(1492)--></option>");
+	        document.write('</select></td></tr>');
+
+            if(dst_addr_type==IP_ADDR){
+		        document.write('<tr><td width="22%" >&nbsp;</td>');
+		        document.write('<td width="63%" >');
+		        for(i=0; i<5; i++){
+		    	    document.write('<input type="text" name="dstip',i,'" size="3" maxlength="3" value="">');
+		    	    if(i<3)         document.write('<b>&nbsp;.&nbsp;</b>');
+		    	    else if(i==3)   document.write('<b>&nbsp;&nbsp;~&nbsp;&nbsp;</b>');
+		    	}
+		    }
+		}
+        </script>
+
+	    <tr>
+	        <td width="22%">
+	            <b><!--#Fid_str(1526)--> &gt;</b>
+	        </td>
+	        <td width="63%">
+	            <select name="tfc_type" onchange="selectChange(2);">
+	                <script language="javascript">
+	                    for(i=0; i<ap_num; i++){
+	                        document.write('<option value=', ap_pool[i].val, '>', ap_pool[i].name, '</option>');
+	                    }
+	                </script>
+	             </select>
+                 <script language="javascript">
+                    if(adv_cfg==0)
+                        document.write('&nbsp;&nbsp;<input type="button" value="<!--#Fid_str(1527)-->" style="width:240px; font-size: 8pt;" onclick="selectChange(3);">&nbsp;');
+                 </script>
+	        </td>
+	    </tr>
+			
+        <script language="javascript">
+        if(traffic_type>=CUSTOM_TRFC_TCP){    //customized service type
+			if(protocol_type==6 || protocol_type==17){
+                var i;
+                document.write('<tr><td width="22%"><b><!--#Fid_str(1528)--> &gt;</b>&nbsp;&nbsp;&nbsp;</td>');
+		        document.write('<td width="63%">');
+		        for(i=0; i<6; ){
+		            document.write('<input type="text" name="sprange_', i, '" size="1" maxlength="5" value=""><b>~</b>');
+		            document.write('<input type="text" name="sprange_', i+1, '" size="1" maxlength="5" value="">');
+		            if(i<4) document.write('<b>,&nbsp;</b>');
+		            i=i+2;
+		        }
+		        document.write('</td></tr>');
+
+		        document.write('<tr><td width="22%"><b><!--#Fid_str(1529)--> &gt;</b></td>');
+		        document.write('<td width="63%">');
+		        for(i=0; i<6; ){
+		            document.write('<input type="text" name="dprange_', i, '" size="1" maxlength="5" value=""><b>~</b>');
+		            document.write('<input type="text" name="dprange_', i+1, '" size="1" maxlength="5" value="">');
+		            if(i<4) document.write('<b>,&nbsp;</b>');
+		            i=i+2;
+		        }
+		        document.write('</td></tr>');
+			}
+
+            document.write('<tr><td width="22%">');
+            document.write('<b><!--#Fid_str(1530)--> &gt;</b>');
+            document.write('</td>');
+		    document.write('<td width="63%">');
+		    document.write('<select name="dscp" onchange="selectChange(4);">');
+		    document.write("<option value=FF><!--#Fid_str(1492)--></option>");
+		    document.write('<option value="0">BE</option>');
+			document.write('<option value="28">AF1x</option>');
+			document.write('<option value="48">AF2x</option>');
+			document.write('<option value="68">AF3x</option>');
+			document.write('<option value="88">AF4x</option>');
+		    document.write('<option value="B8">EF</option>');
+		    document.write('<option value="FE"><!--#Fid_str(1531)--></option></select>');
+			document.write('<span id=specialtos></span>');
+	        showmatchDSCP(document.tF);
+			document.write('</td></tr>');
+		}
+        </script>
+
+
+		    <tr>
+		        <td width="22%">
+		            <b><!--#Fid_str(1532)--> &gt;</b>
+		        </td>
+		        <td width="63%">
+		            <select name="fwd_phb" onchange="selectChange(5);">
+		            	<option value="0">BE</option>
+		                <option value="1">AF1x</option>
+		                <option value="2">AF2x</option>
+		                <option value="3">AF3x</option>
+		                <option value="4">AF4x</option>
+		                <option value="5">EF</option>
+		            </select>
+				</td>	
+			</tr>	
+
+			<tr>
+		        <td width="22%" >				            
+		            <b><!--#Fid_str(1533)--> &gt;</b>&nbsp;
+		         </td>
+		         <td width="63%" >
+		            <select name="remarkdscp">
+			            <option value="FF"><!--#Fid_str(1534)--></option>
+			            <script language="javascript">
+	                        for(i=0; i<dscp_num; i++){
+		                        document.write('<option value=', dscp_pool[i].val, '>', dscp_pool[i].name, '</option>');
+		                    }
+		                </script>
+		            </select>
+		            (<!--#Fid_str(1535)-->)
+	            </td>
+	        </tr>
+
+		   <script language="javascript">
+            if(my_qos==2){
+	            document.write('<tr><td width="22%">');
+	            document.write('<b><!--#Fid_str(1536)--> &gt;</b>');
+	            document.write('</td>');
+	            document.write('<td width="63%">');
+	            document.write('<select name="out_vc">');
+	            document.write('<option value="0"><!--#Fid_str(1537)--></option>');
+	            for(i=1; i<=1; i++)
+	                document.write('<option value="',i,'">VC',i,'</option>');
+	            document.write('</select>');
+                document.write('</td></tr>');
+            }
+            else{
+                document.write('<input type=hidden name="out_vc" value=0>');
+            }
+        </script>
+</table>
+<!--#exec cmd="ClsRuleShow_script"-->
+
+<table border=0 class="copy_1">
+	<tr>
+			<td width="5" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="100">&nbsp;</td>
+		<td colspan="2" align=center>
+			<input type="button" value="<!--#Fid_str(48)-->" style="{width:240px;}" class="submitBtn" onClick="javascript:history.go(-1)">
+			&nbsp;&nbsp;
+			<input type="submit" name="arc_action" value="<!--#Fid_str(49)-->" style="{width:240px;}" class="submitBtn" onClick="return evaltF();">
+		</td>
+	</tr>							
+</table>
+
+</td>
+</tr>
+</table>
+</FORM>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

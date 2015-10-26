@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>Guest Access Setting</title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script type="text/javascript" src="routine_data.js"></script>
+<script>
+var wl_ssid="<% nvram_js_get("wl0.1_ssid"); %>";
+var wl_wpa_psk="<% nvram_js_get("wl0.1_wpa_psk"); %>";
+var wl_guestPSK="<% nvram_js_get("wl_guest_passwd"); %>";
+var wl_guestWEP="<% nvram_js_get("wl0.1_key1"); %>";
+var guest_mode=<% nvram_get("wl_guest_mode"); %>;
+var wl_passwd,wl_security;
+
+
+if(guest_mode==0)
+{ 
+  wl_passwd=wl_guestPSK;
+  wl_security="Cafe-Style";
+ }
+else if(guest_mode==1)
+{ 
+ wl_passwd=wl_wpa_psk;
+ wl_security="WPA/WPA2";
+ }
+else if(guest_mode==2)
+{ 
+ wl_passwd=wl_guestWEP;
+ wl_security="WEP";
+ }
+else
+{ 
+wl_passwd="Open Mode";
+wl_security="Open Mode";
+}
+
+function print_page()
+{
+window.print();
+}
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="print_page();">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td width="36">&nbsp;</td>
+<td valign="top" width="95%" height="100%" class="head_bold">
+	<table border=0 style="background-color: #cccccc" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF">
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">									
+		<tr>
+		<td width="160" class="body"><b>BELKIN&nbsp;</b></td>
+		<td width="335" id="guest_ssid" class="body">
+		<% Fid_str(1613); %>
+		</td>
+		</tr>
+		</table>
+	</td>
+	</tr>
+	</table>
+	<table border=0 style="background-color: #ECFEFE" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" >
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">									
+		<!--ssid-->
+		<tr>
+		<td width="160" class="body"><b>Network Name&nbsp;</b></td>
+		<td width="335" id="guest_ssid" class="body">
+		<script>
+		document.write(wl_ssid);
+		</script>
+		</td>
+		</tr>
+		</table>
+	</td>
+	</tr>
+	
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+		<!--passwd-->
+		<tr>
+			<td width="160" class="body"><b><% Fid_str(409); %>&nbsp;</b></td>
+			<td width="335" class="body">
+			<script>
+			document.write(wl_passwd);
+			</script>
+			</td>
+		</tr>
+		<tr id="passwd_desc">
+			<td width="160" class="body">&nbsp;</b></td>
+			<td width="335" class="body">
+			<b>Each guest that connects to your wireless network will need this password.</b>
+			</td>
+		</tr>
+		</table>
+	</td>
+	</tr>	
+	</table>
+		
+	<div id="security" >
+	<table border=0 style="background-color: #ECFEFE" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" >
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+		<!--security-->
+		<tr>
+			<td width="160" class="body"><b><% Fid_str(1715); %>&nbsp;</b></td>
+			<td width="335" class="body">
+			<script>
+			document.write(wl_security);
+			</script>
+			</td>
+		</tr>
+		</table>
+	</td>
+	</tr>						
+	</table>
+	</div>	
+	<script>
+	if(guest_mode==0)
+	  document.getElementById("security").style.display="none";
+ 	else if(guest_mode==1)
+	 document.getElementById("security").style.display="";
+        else if(guest_mode==2)
+	 document.getElementById("security").style.display=""; 
+        else
+         {
+         document.getElementById("security").style.display="none";
+         document.getElementById("passwd_desc").style.display="none";
+         }
+	</script>
+	<br>	
+	
+	<table border=0 class="copy_1">
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+		<!--user guide-->
+		<tr>
+			<td width="400" class="body"><b>To connect to the wireless network:</b></td>
+			<td width="100" class="body">
+		</tr>
+		</table>
+	</td>
+	</tr>
+	<tr>
+	<td>	
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+		<tr>	
+			<td width="160" class="body" valign="top"><b>Windows&nbsp;</b></td>
+			<td width="335" class="body">
+			 1. Right-click the wireless network icon in your Windows system tray and select View Available Wireless Networks from the pop-up menu.<br>
+			 2. Double click on the <b><script>document.write(wl_ssid);</script></b> network.<br>
+			 3. A window will popup asking for the network key. Enter the password above and click OK.<br>
+			</td>
+		</tr>
+		<tr>
+			<td width="160" class="body" valign="top"><b>MAC OS X&nbsp;</b></td>
+			<td width="335" class="body">
+			1. Click the wireless network icon in your menu bar (top right) and select the <b><script>document.write(wl_ssid);</script></b> network.<br>
+			2. A window will popup asking for the network key. Enter the password above and click OK.
+			</td>
+		</tr>
+		</table>
+	</td>
+	</tr>							
+	</table>								
+			
+</td>
+</tr>
+</table>
+
+</body>
+</html>

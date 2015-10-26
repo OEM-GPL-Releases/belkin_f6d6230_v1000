@@ -1,0 +1,11 @@
+var my_dialup=0;
+var my_printer=0;
+var my_upnp = 1;
+var upnp_enable = 1;
+var wireless_func = 1;
+var wireless_enable = 1;
+var my_pptp = 1; // for VPN PPTP
+var my_tiny = 1;// backup log and config
+var PM = "154DSL"; // product model
+var BACKUP_LOG_NAME = PM + "_log.log";
+var BACKUP_CONFIG_NAME = PM + "_backup.bin";

@@ -1,0 +1,45 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="javascript">
+function send_event(id)
+{
+	var f = document.tF;
+	f.id.value = id;
+	f.submit();
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body>
+	<table>
+	<form name="tF" action="apply.cgi" method="post">
+		<tr>
+			<td>
+				<input type="hidden" name="id" value="0">
+				<input type="hidden" name="location_page" value="event_page.stm">
+				<input type="hidden" name="arc_action" value="send_event">
+				<input type="button" onclick="send_event(0)" value="Event 1">
+				<input type="button" onclick="send_event(1)" value="Event 2">
+				<input type="button" onclick="send_event(2)" value="Event 3">
+				<input type="button" onclick="send_event(3)" value="Event 4">
+				<input type="button" onclick="send_event(4)" value="Event 5">
+				<input type="button" onclick="send_event(5)" value="Event 6">
+				<input type="button" onclick="send_event(6)" value="Event 7">
+				<input type="button" onclick="send_event(7)" value="Event 8">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				X1 <input type="text" name="x1">
+				X2 <input type="text" name="x2">
+				X3 <input type="text" name="x3">
+				X4 <input type="text" name="x4">
+			</td>
+		</tr>
+	</form>
+	</table>
+</body>
+</html>

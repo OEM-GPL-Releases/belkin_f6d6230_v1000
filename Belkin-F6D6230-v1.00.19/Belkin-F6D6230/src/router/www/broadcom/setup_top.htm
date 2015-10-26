@@ -1,0 +1,157 @@
+<HTML>
+<HEAD>
+<% char_set(); %>
+<script language="JavaScript" src="/prototype.js"></script>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style type="text/css">
+.head_bold1 {  font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 19px; font-weight: bold; color: #00000; text-decoration: none}
+a { FONT: bold 9pt Arial,Helvetica, sans-serif; text-decoration: none; color: #000000}
+ a:link {
+     color: #00000;
+     font-size: 7pt;
+     font-family: Arial;
+     text-decoration: none;
+    }
+    a:visited {
+     color: #00000;
+     font-size: 7pt;
+     font-family: Arial;
+     text-decoration: none;
+    }
+    a:active {
+     color: #000000;
+     font-size: 7pt;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+ </style>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+function MM_swapImgRestore() { //v3.0
+	if(top.topFrame.document.tf.swapImg.value != "0") return;
+	var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+
+function MM_swapImage() { //v3.0
+	if(top.topFrame.document.tf.swapImg.value != "0") return;
+	var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+	if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+function MM_findObj(n, d) { //v4.0 ??
+	var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+	d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+	if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+	for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+	if(!x && document.getElementById) x=document.getElementById(n); return x;
+}  	
+//jimmy++ 20071030
+function showConnectTest(reqObj) {
+
+var my_text;
+var req_text = reqObj.responseText;
+if(req_text.indexOf("wan is connected") >= 0)
+{
+	$("connect_state").innerHTML ='<font face="arial" color="#0000ff">'+'<% Fid_str(6); %>'+'</font>';
+}
+else
+{
+	$("connect_state").innerHTML ='<font face="arial" color="#FF0000">'+'<% Fid_str(7); %>'+'</font>';
+}
+
+if(reqObj.responseText.indexOf("WPS") >=0)
+{
+window.open('wps_showInit.stm','WPS','toolbar=0,status=0,menubar=0,scrollbars=0,resizable=0,width=300,height=200,left=150,top=150,resizable=0,depended=1, location=0');
+	
+}
+//	Element.update("connect_state",reqObj.responseText);
+
+}
+
+function doConnectTest() {
+	var url = "wancon.cgi";
+	var ajax = new Ajax.Request( url,
+		{
+			method: 'post',
+			parameters:'arc_action=wan_con',
+			onComplete:showConnectTest
+		}
+		);
+}
+var speed=5000;
+setInterval("doConnectTest()",speed);
+
+//jimmy-- 20071030
+var bWanConnected=<% is_wan_connected(); %>;	
+</SCRIPT>
+</HEAD>
+<BODY leftMargin=0 topMargin=0 marginheight="0" marginwidth="0" >
+ <form METHOD="post" ACTION="apply.cgi" NAME="tf" target="mainFrame">
+  <INPUT TYPE="hidden" NAME="page" VALUE="logout">
+  <INPUT TYPE="hidden" NAME="swapImg" VALUE="0">
+  <TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+			<table bgcolor="#cccccc" width="100%" border="0" cellspacing="1" cellpadding="0">
+				<tr>
+					<td rowspan="3" width="20" valign="middle">
+							<a href="http://www.belkin.com" target="_blank">
+								<img src="../images/head_logo.gif" border="0">
+							</a>
+					</td>
+					<td rowspan="3" width="300" valign="middle" class="head_bold1">
+						&nbsp;&nbsp;&nbsp;<% Fid_str(1602); %>
+					</td>					
+					<td colspan="4" height="21" align="right" nowrap>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="4" height="18">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="150" height="28"><img src="../images/shim.gif" width="1" height="28"></td>
+					<td height="28"></td>
+					<td height="28" align="right" nowrap class="top_nav">
+						<nobr>
+						<span class="top_nav"><a href="setup.htm" target="_top"><font class="top"><% Fid_str(1); %></font></a></span> <font color="#000000">|</font>
+						<span class="top_nav"><a href="setup_help.htm" target="_top"><font class="top"><% Fid_str(2); %></font></a></span> <font color="#000000">|</font>
+						<script language="javascript">
+						<% LoginStatus(); %>
+						if(ht_isLogined == 1)
+						{
+							document.write('<span class="top_nav"><a href="#" target="_top" onclick="document.tf.submit();return false;"><font class="top"><% Fid_str(4); %></font></a></span>&nbsp; &nbsp;');
+							document.write('<input type="hidden" name="arc_action" value="logout">');
+						}
+						else
+						{
+							document.write('<span class="top_nav"><a href="login.htm" target="mainFrame"><font class="top"><% Fid_str(3); %></font></a></span>&nbsp; &nbsp;');
+						}
+						</script>
+						
+						<script language="javascript">
+						<% exec cmd="Gateway_IsWanConnected"; %>
+						var ap_mode= '<% nvram_get("gs_apMode"); %>';
+						if (ap_mode == 0)
+						{
+							document.write('<span class="top_nav"><font color="#000000" ><% Fid_str(5); %>:&nbsp;</font>');
+							
+								if(bWanConnected==1)
+									document.write('<b><font face="arial" color="#0000ff"><div id="connect_state" style="display:inline"><% Fid_str(6); %></div></font></b></span>');
+								else
+									document.write('<b><font face="arial" color="#FF0000"><div id="connect_state" style="display:inline"><% Fid_str(7); %></div></font></b></span>');
+						}
+						</script>
+						
+						</nobr>
+					</td>
+					<td height="28" align="right"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+ </TABLE>
+</form>
+</BODY>
+</HTML>

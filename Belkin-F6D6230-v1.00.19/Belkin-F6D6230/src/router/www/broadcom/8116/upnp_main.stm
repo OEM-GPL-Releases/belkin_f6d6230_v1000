@@ -1,0 +1,53 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="javascript">
+<% login_timeout(); %>
+function evaltF()
+{
+    return true;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" align="center">
+<FORM name="tF" action="/cgi-bin/upnp_eb.exe" method="post">
+    <tr>
+        <td>
+            <p><b class=subtitle><% Fid_str(692); %></b></p>
+            <p class=normalText>
+			<% Fid_str(693); %>
+			</p>
+            <p class=normalText>
+           <% Fid_str(694); %>&nbsp;&nbsp;
+            <input type="radio" name="upnp_enable" value=1><% Fid_str(27); %>&nbsp;&nbsp;
+            <input type="radio" name="upnp_enable" value=0>
+			<SCRIPT LANGUAGE="JavaScript">
+			var iDOD = 1 - <% echo var="upnp_enable_var"; %>;
+			document.tF.upnp_enable[iDOD].defaultChecked = true;
+			document.tF.upnp_enable[iDOD].checked = true;
+			</SCRIPT>
+            Disable</p>
+        </td>
+    </tr>
+	<tr>
+		<td class="mainmsgR">
+			<input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('/help.stm#upnp','help','scrollbars=yes,width=600,height=500')">
+			<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+			<script language="javascript">
+			    if(navigator.appName != "Netscape")
+			        document.write('<input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">');
+			    else
+			        document.write('<a href="/upnp.stm"><input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>"></a>');
+			</script>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>

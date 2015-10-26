@@ -1,0 +1,84 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+
+function evaltF()
+{
+
+	if ((document.tF.userConPswd.value)!=(document.tF.userNewPswd.value)) {
+		alert(pwd_match);
+		return false;
+	}
+
+	if (isNValidNum(document.tF.timeout.value)|| (document.tF.timeout.value<0)) {
+		alert(time_out_err);
+		return false;
+	}
+
+	if (eval(document.tF.timeout.value) < 0) {
+		alert(time_out_err);
+		return false;
+	}
+
+	return true;
+}
+
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<form ACTION="/cgi-bin/setup_pass.exe" method="post" name="tF">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="0">
+<input type="hidden" name="restart_page" value='document.location.href="system_remote_mgmt.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+    <tr>
+	    <td>
+            <p class=subtitle><% Fid_str(611); %></p>
+            <p class=normalText>
+            <% Fid_str(612); %>
+            </p>
+		</td>
+	</tr>
+	<tr>
+		<td><ul>
+            <p class=normalText>
+            	<li class=txt1><% Fid_str(613); %><input type="password" size="15" maxlength="12" name="userOldPswd" value=""></li>
+            </p>
+            <p class=normalText>
+            	<li class=txt1><% Fid_str(614); %><input type="password" size="12" maxlength="12" name="userNewPswd" value=""></li>
+            </p>
+            <p class=normalText>
+            	<li class=txt1><% Fid_str(615); %><input type="password" size="12" maxlength="12" name="userConPswd" value=""></li>
+            </p>
+            <p class=normalText>
+            	<li class=txt1><% Fid_str(616); %><input type="text" class="textbox" name="timeout" size="3" maxlength="3"><% Fid_str(617); %></li>
+            </p>
+         </ul></td>
+	</tr>
+    <% exec cmd="password_setting"; %>
+	<tr>
+		<td class="mainmsgR">
+         <input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('/help.stm#password','help','scrollbars=yes,width=600,height=500')">
+			<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+			<script language="javascript">
+			    if(navigator.appName != "Netscape")
+			        document.write('<input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">');
+			    else
+			        document.write('<a href="/system_p.stm"><input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>"></a>');
+			</script>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>
+
+

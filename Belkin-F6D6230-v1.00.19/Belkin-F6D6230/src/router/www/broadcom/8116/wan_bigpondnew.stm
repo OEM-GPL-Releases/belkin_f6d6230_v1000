@@ -1,0 +1,146 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<title></title>
+<script language="Javascript" src="/br_ver.js"></script>
+
+<% char_set(); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+<% File_include("routine.txt"); %>
+
+
+
+
+function evaltF() 
+{
+	/*var loginServer = document.tF0.bigpond_sname.value.split(".");
+	if(isBlank(document.tF0.bigpond_user_name.value))
+	{ 
+		alert('<% Fid_str(742); %>'); 
+		return false; 
+	}
+	if(isBlank(document.tF0.bigpond_passwd.value))
+	{ 
+		alert('<% Fid_str(757); %>');
+		return false; 
+	}
+	if(isBlank(document.tF0.bigpond_passwdV.value))
+	{ 
+		alert('<% Fid_str(756); %>');
+		return false; 
+	}
+	if(document.tF0.bigpond_passwd.value!=document.tF0.bigpond_passwdV.value) 
+	{ 
+		alert('<% Fid_str(624); %>'); 
+		return false; 
+	}
+	if(document.tF0.bpa_manual_enable_display.checked == true){	
+		if(loginServer.length != 4) 
+		{ 
+			alert('<% Fid_str(1379); %>'); 
+			return false; 
+		}
+		if(isNValidLastIP(loginServer[0])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidIP(loginServer[1])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidIP(loginServer[2])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidLastIP(loginServer[3])) { alert('<% Fid_str(1379); %>'); return false; }
+	}*/
+	return true;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+<!--#exec cmd="gateway_status" -->
+<!--#exec cmd="Gateway_IsWanConnected" -->
+</script>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="apply.cgi">
+<input type="hidden" name="page" value="wan_main.stm">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="wan_bigpondnew.stm";'>
+<input type="hidden" name="location_page" value="wan_bigpondnew.stm">
+<input type="hidden" name="wan_pptp_enable" value="0">
+<input type="hidden" name="wan_proto" value="dhcp">
+<input type="hidden" name="wan_unit" value="0" >
+<input type="hidden" name="wan_ifnames" value="<% nvram_get("wan0_ifnames"); %>">
+<input type="hidden" name="wan_bigpond_enable" value="1">
+<input type="hidden" name="wan_hostname" value="">
+<input type="hidden" name="wan_primary" value="1">
+<input type="hidden" name="wan_hwaddr" value="<% nvram_get("wan0_hwaddr"); %>">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>		
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(770); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="15" colspan="5">&nbsp;</td></tr>
+				<tr>					
+					<td>
+						<table width=800 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							
+							<tr>
+							<td class="body"><% Fid_str(1681); %><br><br></td>
+								
+							</tr>
+							<tr>
+							<td class="body"><font color="red"><% Fid_str(1682); %>:</font></td>
+								
+							</tr>
+							<tr>								
+								<td class="body"><font color="red"><% Fid_str(1683); %>:</font><br><br></td>
+								
+							</tr>
+							<tr>
+								
+								<td class="body"><font color="red"><% Fid_str(1684); %></font></td>
+								
+							</tr>
+							<tr>
+								
+								<td class="body"><font color="red"><% Fid_str(1685); %>&nbsp;</font></td>
+								
+							</tr>
+							<tr>
+								
+								<td class="body"><font color="red"><% Fid_str(1686); %>&nbsp;</font></td>
+								
+							</tr>
+							
+							<tr>
+								
+								<td class="body"><br><font color="red"><% Fid_str(1687); %></font></td>
+								
+							</tr>
+							
+									
+							<tr>
+								<td align="center" colspan=2>
+									<br><br>
+									<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn"></a>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

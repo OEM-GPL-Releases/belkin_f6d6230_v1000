@@ -1,0 +1,280 @@
+<html>
+<head>
+
+<% char_set(); %>
+<title>Advanced Configuration - Hardware Options</title>
+<script language="JavaScript">
+HW_OPT='<% echo var="HW_OPT"; %>';
+HW_OPT1='<% echo var="HW_OPT1"; %>';
+HW_OPT2='<% echo var="HW_OPT2"; %>';
+HW_OPT3='<% echo var="HW_OPT3"; %>';
+HW_OPT4='<% echo var="HW_OPT4"; %>';
+<% include file="routine.txt"; %>
+<% exec cmd="ForBootParam"; %>
+var isNew='<% exec cmd="isNew"; %>';
+function evaltF()
+{
+	if (isBlank(document.forms[1].HW_OPT0.value)) document.forms[1].HW_OPT0.value='0';
+	if (isBlank(document.forms[1].HW_OPT1.value)) document.forms[1].HW_OPT1.value='0';
+	if (isBlank(document.forms[1].HW_OPT2.value)) document.forms[1].HW_OPT2.value='0';
+	if (isBlank(document.forms[1].HW_OPT3.value)) document.forms[1].HW_OPT3.value='0';
+	if (isBlank(document.forms[1].HW_OPT4.value)) document.forms[1].HW_OPT4.value='0';
+	return true;
+}</script>
+</head>
+
+<body  bgcolor="#99cccc" text="#330099">
+<table width="98%" border="0" cellspacing="0" cellpadding="5">
+<tr> <td>
+<form method="POST" action="/cgi-bin/production.exe">
+<table width="49%" border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td>
+	<p><font face="Arial" size="4" color="#330099">
+	<b><% Fid_str(472); %></b>
+	</font></p>
+</td>
+</tr>
+<tr>
+<td>
+	<font face="Arial" color="#330099" size="2">
+        <p><% Fid_str(473); %> <b><i><% Fid_str(490); %></i></b><% Fid_str(491); %></p>
+	</font>
+
+	<table border=1 cellspacing="0" cellpadding="10" height="90%" align=center>
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(475); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<input TYPE="text" maxLength="40" name="ssid" size="10" value="<% echo var="ssid"; %>">
+	</td></tr>
+	
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(476); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+<script language="JavaScript">
+var operation_func = <% echo var="operation_func"; %>;
+if (operation_func==6) {
+	document.write('<select size="1" name="wchan">');
+	document.write('<% exec cmd="w11a_chan"; %>');
+	document.write('</select>');
+}
+else {
+	document.write('<select size="1" name="wchan">');
+	document.write('<% exec cmd="wchan"; %>');
+	document.write('</select>');
+}									
+</script>
+	</td></tr>
+
+	<tr><td nowrap bgcolor="#330099">
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(477); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE=checkbox value="1" name="RstDefault">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(478); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="2" name="MACaddr0" size="2">-
+	<input TYPE="text" maxLength="2" name="MACaddr1" size="2">-
+	<input TYPE="text" maxLength="2" name="MACaddr2" size="2">-
+	<input TYPE="text" maxLength="2" name="MACaddr3" size="2">-
+	<input TYPE="text" maxLength="2" name="MACaddr4" size="2">-
+	<input TYPE="text" maxLength="2" name="MACaddr5" size="2">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(479); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="32" name="serial_number" size="12">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(480); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="8" name="board_version" size="9">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(481); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="10" name="ProdKey" size="10">
+	</font>
+	</td></tr>
+
+	</table>
+</td>
+</tr>
+<tr>
+<td>
+	<br>
+	<div align="center">
+<script language="JavaScript">
+if (isNew!='500') 
+	document.write('<INPUT onclick="return true;" type=submit value="  <% Fid_str(490); %> " name="OK.x" href="javascript:document.forms[0].submit()">');
+</script>
+	</div>
+</td>
+</tr>
+</table>
+</form>
+</td>
+
+<td>
+<form method="POST" action="/cgi-bin/hw_opt.cgi" name=hwoption>
+<table width="49%" border="0" cellspacing="0" cellpadding="5">
+<tr>
+<td>
+	<p><font face="Arial" size="4" color="#330099">
+	<b><% Fid_str(340); %></b>
+	</font></p>
+</td>
+</tr>
+<tr>
+<td>
+	<font face="Arial" color="#330099" size="2">
+        <p><% Fid_str(341); %> <b><i><% Fid_str(19); %></i></b> <% Fid_str(491); %></p>
+	</font>
+
+	<table border=1 cellspacing="0" cellpadding="10" height="90%" align=center>
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>A/B</b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<input TYPE="text" maxLength="1" name="HW_OPT0" size="1" value="<% echo var="HW_OPT"; %>">
+	</td></tr>
+	
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C1 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<input TYPE="text" maxLength="1" name="HW_OPT1" size="1" value="<% echo var="HW_OPT1"; %>">
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C2 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT2" size="1" value="<% echo var="HW_OPT2"; %>">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C3 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT3" size="1" value="<% echo var="HW_OPT3"; %>">
+	</font>
+	</td></tr>
+
+	<tr> 
+	<td nowrap bgcolor="#330099"> 
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b>C4 <% Fid_str(346); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="1" name="HW_OPT4" size="1" value="<% echo var="HW_OPT4"; %>">
+	</font>
+	</td></tr>
+
+	<tr>
+	<td nowrap bgcolor="#330099">
+	<font color="#FFFFCC" face="Arial" size="2">
+	<b><% Fid_str(481); %></b>
+	</font>
+	</td>
+	<td nowrap bgcolor="#FFFFE6">
+	<font color="#330099" face="Arial" size="2">
+	<input TYPE="text" maxLength="10" name="key" size="10">
+	</font>
+	</td></tr>
+	
+<script language="JavaScript">
+	document.forms[0].MACaddr0.value=MACaddr0;
+	document.forms[0].MACaddr1.value=MACaddr1;
+	document.forms[0].MACaddr2.value=MACaddr2;
+	document.forms[0].MACaddr3.value=MACaddr3;
+	document.forms[0].MACaddr4.value=MACaddr4;
+	document.forms[0].MACaddr5.value=MACaddr5;
+	document.forms[0].serial_number.value=serial_number;
+	document.forms[0].board_version.value=board_version;
+</script>
+	</table>
+</td>
+</tr>
+
+<tr>
+<td>
+	<br>
+	<div align="center">
+<script language="JavaScript">
+if (isNew!='500') {
+	document.write('<INPUT onclick="return evaltF();" type=submit value=" <% Fid_str(19); %> " name="OK.x" href="javascript:document.forms[1].submit()">');
+	document.write('<br><INPUT onclick="return true;" type=submit value="  <% Fid_str(1250); %> " name="LED.x" href="javascript:document.forms[1].submit()">');
+}
+</script>
+	</div>
+</td>
+</tr>
+
+</table>
+</form>
+</td> </tr>
+</table>
+<INPUT onClick="javascript:history.go(-1);" type="button" value="   <% Fid_str(521); %>  " name=Cancel>
+<INPUT onClick="javascript:window.location.reload(true);return false;" type="button" value="  Reload  " name=Cancel>
+</body>
+</html>
+

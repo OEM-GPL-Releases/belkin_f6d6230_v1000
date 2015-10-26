@@ -1,0 +1,27 @@
+<html>
+<head>
+
+<% char_set(); %>
+<script language="JavaScript">
+<!--
+var operation_func = <% echo var="operation_func"; %>;
+var weprequired = <% echo var="wireless_weprequired"; %>;
+var WEPmode = <% echo var="wireless_WEPmode"; %>;
+//-->
+</script>
+<title></title>
+
+<script language="JavaScript">
+if(operation_func == 1) 
+{
+ if(weprequired == 0)
+  document.location.href="wireless_e.stm";
+ else {
+  if(WEPmode == 0)
+   document.location.href="wireless40sec.stm";
+  else
+   (document.location.href ="wireless128sec.stm");
+ }
+}
+</script>
+</head>

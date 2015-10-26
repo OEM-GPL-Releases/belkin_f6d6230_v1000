@@ -1,0 +1,2 @@
+var feature_func = 3;//<% echo var="feature_func"; %>;
+var operation_func = <% echo var="operation_func"; %>;

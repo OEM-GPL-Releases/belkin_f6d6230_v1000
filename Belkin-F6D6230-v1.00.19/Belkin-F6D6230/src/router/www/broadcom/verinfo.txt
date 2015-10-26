@@ -1,0 +1,2 @@
+pVer='ADSLUI 0.1'
+pDate='Thu Jul 08 15:45:05 2004'

@@ -1,0 +1,84 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" type="text/javascript" src="overlib.js"></script>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% File_include("routine.txt"); %>
+
+function evaltF()
+{
+if(doConfirm())
+{
+return true;
+}
+else
+return false;
+}
+
+function doConfirm(){
+	if(confirm('<% Fid_str(426); %>')) {
+		alert('<% Fid_str(427); %>');
+		return true;
+	} else {
+	alert(('<% Fid_str(428); %>\n'));
+	 return false;
+	}
+}
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name ="tF" method="post" action="apply.cgi"  onSubmit="return evaltF();">
+<input type="hidden" name="page" value="status.stm">
+<input type="hidden" name="location_page" value="status.stm">
+<input type="hidden" name="logout">
+<input type="hidden" name="action" value="Restore Defaults">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+	<td width="36" height="100%">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>
+			&nbsp;<% Fid_str(415); %><% Fid_str(424); %><br>
+				<table border=0 class="copy_1">
+					<tr>
+						<td width="5" colspan="2">&nbsp;</td></tr>
+					<tr>
+					<td>
+						<table width="600" border="0" cellspacing="3" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<td class="body">
+									<% Fid_str(425); %>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div align="center"><br><br>
+									<input type="submit" name="Restore" value="<% Fid_str(429); %>" class="submitBtn"></div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

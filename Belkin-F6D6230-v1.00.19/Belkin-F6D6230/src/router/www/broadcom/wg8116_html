@@ -1,0 +1,226 @@
+PAGES += ./8116/ddns.stm \
+	./8116/dns_proxy.stm \
+	./8116/doConnectTest.stm \
+	./8116/doFirewallAC.stm \
+	./8116/engineer.stm \
+	./8116/err_gen.stm \
+	./8116/firewall_ac.stm \
+	./8116/firewall_a.stm \
+	./8116/firewall_d.stm \
+	./8116/firewall_mac.stm \
+	./8116/firewall_main_0.stm \
+	./8116/firewall_main.stm \
+	./8116/firewall_ping.stm \
+	./8116/firewall_rule_a.stm \
+	./8116/firewall_rule.stm \
+	./8116/firewall.stm \
+	./8116/firewall_u.stm \
+	./8116/firmware_conn1.stm \
+	./8116/firmware_conn.stm \
+	./8116/function.stm \
+	./8116/fwauto_ok.stm \
+	./8116/FwAuto.stm \
+	./8116/fw_url.stm \
+	./8116/glossary.stm \
+	./8116/help.stm \
+	./8116/hwoption.stm \
+	./8116/index_pincode.stm \
+	./8116/isp.stm \
+	./8116/lan_dhcp.stm \
+	./8116/lan_main_0.stm \
+	./8116/lan_main.stm \
+	./8116/lan.stm \
+	./8116/loginduperr.stm \
+	./8116/loginerr.stm \
+	./8116/loginpserr.stm \
+	./8116/login.stm \
+	./8116/log.stm \
+	./8116/menu2.stm \
+	./8116/menu_cgi.stm \
+	./8116/menu.stm \
+	./8116/menu_wiz.stm \
+	./8116/multiPPPOE_Routing_table.stm \
+	./8116/nat_m.stm \
+	./8116/nat.stm \
+	./8116/natst.stm \
+	./8116/nattemp.stm \
+	./8116/nat_v.stm \
+	./8116/pppoeint.stm \
+	./8116/production.stm \
+	./8116/qos_clsmap.stm \
+	./8116/qos_editcls.stm \
+	./8116/qos_main_0.stm \
+	./8116/qos_main2.stm \
+	./8116/qos_main.stm \
+	./8116/qos_stats.stm \
+	./8116/qstatus_main.stm \
+	./8116/qwireless_id.stm \
+	./8116/scacccntr.stm \
+	./8116/setupa_brief.stm \
+	./8116/setupa_main.stm \
+	./8116/setupa.stm \
+	./8116/setupa_top.stm \
+	./8116/setup_dns.stm \
+	./8116/setupq6_main.stm \
+	./8116/setup_q6.stm \
+	./8116/sku_set.stm \
+	./8116/status.stm \
+	./8116/sysetupnp.stm \
+	./8116/system_c.stm \
+	./8116/system_f.stm \
+	./8116/system_i.stm \
+	./8116/system_main.stm \
+	./8116/system_p.stm \
+	./8116/system_remote_mgmt.stm \
+	./8116/system_r.stm \
+	./8116/system.stm \
+	./8116/system_t.stm \
+	./8116/tl_main_0.stm \
+	./8116/tl_main.stm \
+	./8116/tl.stm \
+	./8116/tools_backup.stm \
+	./8116/tools_restore.stm \
+	./8116/upgrade.stm \
+	./8116/upnp_main.stm \
+	./8116/upnp.stm \
+	./8116/waitp.stm \
+	./8116/wait.stm \
+	./8116/wan_bigpondnew.stm \
+	./8116/wan_dhpc_mac.stm \
+	./8116/wan_dhpc.stm \
+	./8116/wan_dyndns.stm \
+	./8116/wan_l2tp.stm \
+	./8116/wan_main_0.stm \
+	./8116/wan_main.stm \
+	./8116/wan_multipppoe.stm \
+	./8116/wan_pppoe.stm \
+	./8116/wan_pptp.stm \
+	./8116/wan_static_route.stm \
+	./8116/wan_static.stm \
+	./8116/wan.stm \
+	./8116/wireless_128bitwep_5.stm \
+	./8116/wireless_128bitwep.stm \
+	./8116/wireless_1x.stm \
+	./8116/wireless_64bitwep_5.stm \
+	./8116/wireless_64bitwep.stm \
+	./8116/wireless_apt.stm \
+	./8116/wireless_e1.stm \
+	./8116/wireless_e_5.stm \
+	./8116/wireless_e.stm \
+	./8116/wireless_guest.stm \
+	./8116/wireless_guest2.stm \
+	./8116/wireless_guest2_print.stm \
+	./8116/wireless_hid.stm \
+	./8116/wireless_id_5.stm \
+	./8116/wireless_id.stm \
+	./8116/wireless_mac.stm \
+	./8116/wireless_main_0.stm \
+	./8116/wireless_main_24.stm \
+	./8116/wireless_main_5.stm \
+	./8116/wireless_main.stm \
+	./8116/wireless_no_encryption_5.stm \
+	./8116/wireless_no_encryption.stm \
+	./8116/wireless_PSK_5.stm \
+	./8116/wireless_PSK.stm \
+	./8116/wireless.stm \
+	./8116/wirelessst.stm \
+	./8116/wirelesstemp.stm \
+	./8116/wireless_wds.stm \
+	./8116/wireless_wifi.stm \
+	./8116/wireless_WPA_5.stm \
+	./8116/wireless_WPS.stm \
+	./8116/wireless_WPS_5.stm \
+	./8116/wizard_check_value.stm \
+	./8116/wizard_wan_main.stm \
+	./8116/wiz_main.stm \
+	./8116/wps_showInit.stm \
+	./8116/wps_showProcess.stm \
+	./8116/WPS_stautsShow.stm \
+	./8116/_xcon_en_hid.stm \
+	./8116/data.js \
+	./8116/excanvas.js \
+	./8116/firewall_ac.js \
+	./8116/jquery_flot.js \
+	./8116/jquery.js \
+	./8116/md5.js \
+	./8116/mootabs.js \
+	./8116/mootools.js \
+	./8116/msg.js \
+	./8116/prototype.js \
+	./8116/routine_data.js \
+	./8116/tree.js \
+	./8116/wizard.js \
+	./8116/clock.js \
+	./8116/country_css.css \
+	./8116/main_router.css \
+	./8116/mootabs.css \
+	./8116/my_function3.css \
+	./8116/styles.css \
+	./8116/firewall.txt \
+	./8116/hyper.txt \
+	./8116/lan.txt \
+	./8116/log.txt \
+	./8116/menu_style.txt \
+	./8116/my_function.txt \
+	./8116/no_link.txt \
+	./8116/refreshmenu.txt \
+	./8116/routine.txt \
+	./8116/top_description.txt \
+	./8116/top_logout.txt \
+	./8116/top_menu.txt \
+	./8116/utilities.txt \
+	./8116/verinfo.txt \
+	./8116/wan.txt \
+	./8116/wireless.txt \
+	./8116/blocked.htm \
+	./8116/home.htm \
+	./8116/index.htm \
+	./8116/login_error.htm \
+	./8116/login.htm \
+	./8116/qos_stats2.htm \
+	./8116/save_ok.htm \
+	./8116/setup_help.htm \
+	./8116/setup.htm \
+	./8116/setup_top.htm \
+	./8116/wireless_wifi.htm \
+	./8116/storage_disk.html \
+	./8116/storage_disk.stm \
+	./8116/login_guest.htm \
+	./8116/login_guest.stm \
+	./8116/login_guest_pserr.stm \
+	./8116/login_guest_success.stm \
+	./8116/setup_top_guest.htm \
+	./8116/media_dlna.stm \
+	./8116/bt.stm \
+	./8116/bt_menu.stm \
+	./8116/bt_main_0.stm \
+	./8116/bt_main.stm \
+	./8116/bt_get_config.stm \
+	./8116/cgi.stm \
+	./8116/health_main.stm	\
+	./8116/bt.html \
+	./8116/bt_check.stm \
+	./8116/bt_main_check.stm \
+	./8116/event_page.stm\
+	./8116/wireless_wifi.html\
+	./8116/wl_main.html\
+	./8116/wan_main.html\
+	./8116/fw_virtual.html\
+	./8116/wan_pptp.html\
+	./8116/wan_dynamic.html\
+	./8116/wan_mac.html\
+	./8116/wan_type.html\
+	./8116/wl_ap.html\
+	./8116/wl_channel.html\
+	./8116/index.html\
+	./8116/wl_mac_control.html\
+	./8116/wan_static.html\
+	./8116/wl_security.html\
+	./8116/fw_access.html\
+	./8116/fw_main.html\
+	./8116/fw_ddns.html\
+	./8116/wan_l2tp.html\
+	./8116/wl_guest.html\
+	./8116/wan_dns.html\
+	./8116/wan_telstra.html\
+	./8116/wan_pppoe.html

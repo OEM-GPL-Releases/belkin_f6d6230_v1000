@@ -1,0 +1,140 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="my_function"; %>
+
+var lan_ip = "<%  echo var='lan_ip' -->";
+var lan_mask = "<%  echo var='lan_mask' -->";
+var ulLan_ip = IpToLong(lan_ip);
+var ulLan_mask = IpToLong(lan_mask);
+
+function evaltF()
+{
+var i, keyid, eidx, bw;
+    for(i=1; i<=4; i++)
+    {
+        keyid="IP"+i;
+        eidx=getElementsByFieldName(document.tF, keyid);
+	    bw=document.tF.elements[eidx].value;
+		if(!isBlank_Zero(bw) && isNValidIP(bw))
+		{
+			alert(ipm);
+			return false;
+		}
+    }
+
+	var remote_ip = document.tF.IP1.value + "." + document.tF.IP2.value + "." + document.tF.IP3.value + "." + document.tF.IP4.value;
+
+	var ulIP, ulLan_ID, ulMaskedIP;
+
+	if (remote_ip.length != 0 && remote_ip != "0.0.0.0")
+    {
+		if (isValidIP(remote_ip) == false)  { alert(err_ipm); return false; }
+
+		ulIP = IpToLong(remote_ip);
+		ulLan_ID = ulLan_ip & ulLan_mask;
+		if (ulLan_ID < 0) ulLan_ID += 0x100000000;
+
+		ulMaskedIP = ulIP & ulLan_mask;
+		if (ulMaskedIP < 0) ulMaskedIP += 0x100000000;
+		if (ulMaskedIP == ulLan_ID)  { alert(err_ipm); return false; }
+	}
+
+	return true;
+}
+
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()">
+<form name="tF" method="post" action="/cgi-bin/setup_remote_mgmt.exe">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="0">
+<input type="hidden" name="restart_page" value='document.location.href="setup_dns.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+    <tr>
+	    <td>
+            <p class=subtitle><% Fid_str(337); %></p>
+            <p class=normalText>
+          <% Fid_str(612); %>
+            </p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="10">
+               <tr>
+                    <td>
+						<script language="JavaScript">
+						if(vendor_code == 4)
+						{
+							document.write('<table cellpadding="5" cellspacing="1" border="0" align="center" width=70%>');
+							document.write('<tr>');
+              document.write('<td class=tdTitler><% Fid_str(27); %></td>');
+              document.write('<td class=tdText><input type="checkbox" name="check" value="1"></td>');
+              document.write('</tr>');				
+							document.write('<tr><td class=tdTitlec>Host Address</td>');
+							document.write('<td class=tdText>');
+                			document.write('<input type="text" class="textbox" name="IP1" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP2" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP3" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP4" size="3" maxlength="3" value="0"></td></tr>');
+							document.write('<tr><td class=tdTitlec>Subnet Mask</td>');
+							document.write('<td class=tdText>');
+                			document.write('<input type="text" class="textbox" name="netmask1" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="netmask2" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="netmask3" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="netmask4" size="3" maxlength="3" value="0"></td></tr>');
+                		}
+                		else
+                		{
+							document.write('<table cellpadding="5" cellspacing="1" border="0" align="center" width=50%>');
+                			document.write('<tr>');
+                			document.write('<td class=tdTitler><% Fid_str(27); %></td>');
+                			document.write('<td class=tdText><input type="checkbox" name="check" value="1"></td>');
+                			document.write('</tr>');
+                			document.write('<tr>');
+                			document.write('<td class=tdTitler>Host Address</td>');
+                			document.write('<td class=tdText>');
+                			document.write('<input type="text" class="textbox" name="IP1" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP2" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP3" size="3" maxlength="3" value="0">.');
+                			document.write('<input type="text" class="textbox" name="IP4" size="3" maxlength="3" value="0"></td>');
+                			document.write('</tr>');
+							document.write('<tr><td class=tdTitler>Port Number</td>');
+							document.write('<td class=tdText>');
+                			document.write('<input name="r_mgnt_port" size="5" maxlength="5" value="0"></td>');
+                			document.write('</tr>');
+                		}
+                		</script>
+                		</table>
+                        <% exec cmd="Misc"; %>
+                    </td>
+                </tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="mainmsgR">
+         <input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('/help.stm#rmgmt','help','scrollbars=yes,width=600,height=500')">
+			<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+			<script language="javascript">
+			    if(navigator.appName != "Netscape")
+			        document.write('<input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">');
+			    else
+			        document.write('<a href="/system_remote_mgmt.stm"><input type="button" class="formsbutton" name="cancel" value="<% Fid_str(20); %>"></a>');
+			</script>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>
+

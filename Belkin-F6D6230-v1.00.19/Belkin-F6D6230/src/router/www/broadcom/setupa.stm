@@ -1,0 +1,15 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+</head>
+
+<frameset rows="76,*" frameborder="0" border="0" framespacing="0">
+    <frame name="topFrame" scrolling="no" noresize src="setupa_top.stm" >
+  <frame name="main1" src="setupa_brief.stm">
+</frameset>
+<noframes><body bgcolor="#FFFFFF" text="#000000">
+
+</body></noframes>
+</html>

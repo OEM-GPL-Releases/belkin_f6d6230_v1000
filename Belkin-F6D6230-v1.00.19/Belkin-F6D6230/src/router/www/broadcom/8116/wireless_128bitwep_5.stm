@@ -1,0 +1,545 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% include file="routine.txt"; %>
+<% exec cmd="my_function"; %>
+<% get5GWirelessSecurity(); %>
+</script>
+</head>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+var hexcase = 0;
+var b64pad = "";
+var chrsz = 8;
+
+var passphrase = "<% Fid_str(812); %>";
+var keyerror =  "<% Fid_str(115); %>";
+var completekeyerror = "<% Fid_str(813); %>";
+<% getWirelessSecurity(); %>
+
+//var wirelesserror = "<% Fid_str(1190); %>";
+//var wirelessenable = <% echo var="getWirelessStatus"; %>;
+//var passphrase = "<% Fid_str(812); %>";
+function is2Hex(s) {
+	var j,x = 0;
+	for(var i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		j = parseInt(c,16);
+		if ((j == 0) || (j == 1)|| (j == 2)|| (j == 3)|| (j == 4)|| (j == 5)|| (j == 6)
+			|| (j == 7)|| (j == 8)|| (j == 9)|| (j == 10)|| (j == 11)|| (j == 12)|| (j == 13)|| (j == 14)|| (j == 15)) {
+			if(x==1)	return false;
+			x=1;
+		}
+	}
+	return true;
+}
+function selectedchange(){
+	if(document.tF.security_type.selectedIndex == 0){
+		location.href = "wireless_no_encryption_5.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 1){
+		location.href = "wireless_64bitwep_5.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 2){
+		location.href = "wireless_128bitwep_5.stm";
+	}
+//	else if(document.tF.security_type.selectedIndex == 3){
+//		location.href = "wireless_WPA_5.stm";
+//	}
+	else{
+		location.href = "wireless_PSK_5.stm";
+	}
+	return true;
+}
+
+function safe_add(x,y){
+	var lsw =(x&0xffff)+(y&0xffff);
+	var msw = (x>>16)+(y>>16)+(lsw>>16);
+	return ((msw<<16)|(lsw&0xffff));
+}
+
+function bit_rol(num, cnt)
+{
+	return (num << cnt) | (num >>> (32 - cnt));
+}
+
+function str2binl(str)
+{
+	var bin = Array();
+	var mask = (1 << chrsz) - 1;
+	for(var i = 0; i < str.length * chrsz; i += chrsz)
+	bin[i>>5] |= (str.charCodeAt(i / chrsz) & mask) << (i%32);
+	return bin;
+}
+
+function md5_cmn(q, a, b, x, s, t)
+{
+	return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s),b);
+}
+
+function md5_ff(a, b, c, d, x, s, t)
+{
+	return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t);
+}
+function md5_gg(a, b, c, d, x, s, t)
+{
+	return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t);
+}
+function md5_hh(a, b, c, d, x, s, t)
+{
+	return md5_cmn(b ^ c ^ d, a, b, x, s, t);
+}
+function md5_ii(a, b, c, d, x, s, t)
+{
+	return md5_cmn(c ^ (b | (~d)), a, b, x, s, t);
+}
+
+function core_md5(x, len)
+{
+	x[len >> 5] |= 0x80 << ((len) % 32);
+	x[(((len + 64) >>> 9) << 4) + 14] = len;
+
+	var a = 1732584193;
+	var b = -271733879;
+	var c = -1732584194;
+	var d = 271733878;
+
+	for(var i = 0; i < x.length; i += 16)
+	{
+	var olda = a;
+	var oldb = b;
+	var oldc = c;
+	var oldd = d;
+
+	a = md5_ff(a, b, c, d, x[i+ 0], 7 , -680876936);
+	d = md5_ff(d, a, b, c, x[i+ 1], 12, -389564586);
+	c = md5_ff(c, d, a, b, x[i+ 2], 17, 606105819);
+	b = md5_ff(b, c, d, a, x[i+ 3], 22, -1044525330);
+	a = md5_ff(a, b, c, d, x[i+ 4], 7 , -176418897);
+	d = md5_ff(d, a, b, c, x[i+ 5], 12, 1200080426);
+	c = md5_ff(c, d, a, b, x[i+ 6], 17, -1473231341);
+	b = md5_ff(b, c, d, a, x[i+ 7], 22, -45705983);
+	a = md5_ff(a, b, c, d, x[i+ 8], 7 , 1770035416);
+	d = md5_ff(d, a, b, c, x[i+ 9], 12, -1958414417);
+	c = md5_ff(c, d, a, b, x[i+10], 17, -42063);
+	b = md5_ff(b, c, d, a, x[i+11], 22, -1990404162);
+	a = md5_ff(a, b, c, d, x[i+12], 7 , 1804603682);
+	d = md5_ff(d, a, b, c, x[i+13], 12, -40341101);
+	c = md5_ff(c, d, a, b, x[i+14], 17, -1502002290);
+	b = md5_ff(b, c, d, a, x[i+15], 22, 1236535329);
+
+	a = md5_gg(a, b, c, d, x[i+ 1], 5 , -165796510);
+	d = md5_gg(d, a, b, c, x[i+ 6], 9 , -1069501632);
+	c = md5_gg(c, d, a, b, x[i+11], 14, 643717713);
+	b = md5_gg(b, c, d, a, x[i+ 0], 20, -373897302);
+	a = md5_gg(a, b, c, d, x[i+ 5], 5 , -701558691);
+	d = md5_gg(d, a, b, c, x[i+10], 9 , 38016083);
+	c = md5_gg(c, d, a, b, x[i+15], 14, -660478335);
+	b = md5_gg(b, c, d, a, x[i+ 4], 20, -405537848);
+	a = md5_gg(a, b, c, d, x[i+ 9], 5 , 568446438);
+	d = md5_gg(d, a, b, c, x[i+14], 9 , -1019803690);
+	c = md5_gg(c, d, a, b, x[i+ 3], 14, -187363961);
+	b = md5_gg(b, c, d, a, x[i+ 8], 20, 1163531501);
+	a = md5_gg(a, b, c, d, x[i+13], 5 , -1444681467);
+	d = md5_gg(d, a, b, c, x[i+ 2], 9 , -51403784);
+	c = md5_gg(c, d, a, b, x[i+ 7], 14, 1735328473);
+	b = md5_gg(b, c, d, a, x[i+12], 20, -1926607734);
+
+	a = md5_hh(a, b, c, d, x[i+ 5], 4 , -378558);
+	d = md5_hh(d, a, b, c, x[i+ 8], 11, -2022574463);
+	c = md5_hh(c, d, a, b, x[i+11], 16, 1839030562);
+	b = md5_hh(b, c, d, a, x[i+14], 23, -35309556);
+	a = md5_hh(a, b, c, d, x[i+ 1], 4 , -1530992060);
+	d = md5_hh(d, a, b, c, x[i+ 4], 11, 1272893353);
+	c = md5_hh(c, d, a, b, x[i+ 7], 16, -155497632);
+	b = md5_hh(b, c, d, a, x[i+10], 23, -1094730640);
+	a = md5_hh(a, b, c, d, x[i+13], 4 , 681279174);
+	d = md5_hh(d, a, b, c, x[i+ 0], 11, -358537222);
+	c = md5_hh(c, d, a, b, x[i+ 3], 16, -722521979);
+	b = md5_hh(b, c, d, a, x[i+ 6], 23, 76029189);
+	a = md5_hh(a, b, c, d, x[i+ 9], 4 , -640364487);
+	d = md5_hh(d, a, b, c, x[i+12], 11, -421815835);
+	c = md5_hh(c, d, a, b, x[i+15], 16, 530742520);
+	b = md5_hh(b, c, d, a, x[i+ 2], 23, -995338651);
+
+	a = md5_ii(a, b, c, d, x[i+ 0], 6 , -198630844);
+	d = md5_ii(d, a, b, c, x[i+ 7], 10, 1126891415);
+	c = md5_ii(c, d, a, b, x[i+14], 15, -1416354905);
+	b = md5_ii(b, c, d, a, x[i+ 5], 21, -57434055);
+	a = md5_ii(a, b, c, d, x[i+12], 6 , 1700485571);
+	d = md5_ii(d, a, b, c, x[i+ 3], 10, -1894986606);
+	c = md5_ii(c, d, a, b, x[i+10], 15, -1051523);
+	b = md5_ii(b, c, d, a, x[i+ 1], 21, -2054922799);
+	a = md5_ii(a, b, c, d, x[i+ 8], 6 , 1873313359);
+	d = md5_ii(d, a, b, c, x[i+15], 10, -30611744);
+	c = md5_ii(c, d, a, b, x[i+ 6], 15, -1560198380);
+	b = md5_ii(b, c, d, a, x[i+13], 21, 1309151649);
+	a = md5_ii(a, b, c, d, x[i+ 4], 6 , -145523070);
+	d = md5_ii(d, a, b, c, x[i+11], 10, -1120210379);
+	c = md5_ii(c, d, a, b, x[i+ 2], 15, 718787259);
+	b = md5_ii(b, c, d, a, x[i+ 9], 21, -343485551);
+
+	a = safe_add(a, olda);
+	b = safe_add(b, oldb);
+	c = safe_add(c, oldc);
+	d = safe_add(d, oldd);
+	}
+	return Array(a, b, c, d);
+}
+
+function binl2str(bin)
+{
+	var str = "";
+	var mask = (1 << chrsz) - 1;
+	for(var i = 0; i < bin.length * 32; i += chrsz)
+	str += String.fromCharCode((bin[i>>5] >>> (i % 32)) & mask);
+	return str;
+}
+function FillKeysCell(aKey, index)
+{
+	var result=aKey.length;
+	var i=2;
+	var j=0;
+	var x=index;
+
+	do {
+		var n=aKey.substring(j,i);
+		document.tF.keys[x].value=n;
+		x++;i+=2;j+=2;
+	} while(i<=result)
+}
+
+function frmload()
+{
+	var wl_key1="<% nvram_get("wl1_key1"); %>";
+	if(wl_key1.length>=26)	
+	FillKeysCell(wl_key1, 0);
+		
+	var WSC_Mode = "<% nvram_get("wl1_wps_mode"); %>";	
+	if(WSC_Mode == "enabled" )
+	alert("<% Fid_str(1339); %>");
+}
+
+function pass_check()
+{
+if(document.tF.enable_phrase.checked==true)
+document.tF.passphrase.disabled=false;
+else
+document.tF.passphrase.disabled=true;
+}
+
+function binl2hex(binarray)
+{
+	var hex_tab = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
+	var str = "";
+	for(var i = 0; i < binarray.length * 4; i++)
+	{
+	str += hex_tab.charAt((binarray[i>>2] >> ((i%4)*8+4)) & 0xF) +
+	hex_tab.charAt((binarray[i>>2] >> ((i%4)*8 )) & 0xF);
+	}
+	return str;
+}
+function hex_md5(s){ 
+	return binl2hex(core_md5(str2binl(s), s.length * chrsz));
+}
+function Get128bitkey(input, k, ks)
+{
+	var str = input;
+	var i,j,len;
+	var key = "";
+	var t = "";
+	var md5key ="";
+
+	len = input.length;
+	
+	if (len <= 0)
+	{
+		alert(passphrase);
+		return;
+	}
+	
+	for(i=0;i<64;i++)
+	{
+		  j  = i % len;
+		  t  = str.charAt(j);
+		  key  = key.concat(t);
+	}
+	md5key = hex_md5(key);
+	k.value = md5key.substring(0,26);
+	var l;
+	var buf = '';
+	var digpairs = '';
+
+	digpairs = k.value;
+
+	for ( i = 0; i< 13; i++){
+	   l = i*2;
+	   buf = '';
+	   buf = digpairs.charAt(l);
+	   buf = buf.concat(digpairs.charAt(l+1));
+	   ks[i].value = buf.toUpperCase();
+
+	}
+ }
+function evaltF(){
+	var i,j,str;
+
+	for(i =0; i<13;i++){
+		var str = document.tF.keys[i].value;
+		var j = str.length;
+		if(j < 2){
+			if(j == 1)
+				document.tF.keys[i].value = '0'+document.tF.keys[i].value;
+			else if(str!="00"){
+				alert(completekeyerror);
+				return false;
+			}
+		}	
+		else{
+			if(is2Hex(document.tF.keys[i].value)){
+				alert(keyerror);
+				return false;
+			}
+		}
+	}
+
+	document.tF.wl_key1.value = document.tF.keys[0].value +document.tF.keys[1].value +document.tF.keys[2].value +document.tF.keys[3].value +document.tF.keys[4].value
+						+document.tF.keys[5].value +document.tF.keys[6].value +document.tF.keys[7].value +document.tF.keys[8].value +document.tF.keys[9].value
+						+document.tF.keys[10].value+document.tF.keys[11].value+document.tF.keys[12].value;
+//	alert(document.tF.wl_key1.value);
+	return true;
+}
+
+
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+</SCRIPT>
+	<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload= frmload()>
+<% File_include("menu.stm"); %>
+	<form name="tF" action="apply.cgi" method="post">
+	<input type="hidden" name="location_page" value="wireless_128bitwep_5.stm">
+	<!--<input type=hidden name=weptype value=0>
+	<input type=hidden name=wepmode value=1>
+	<input type=hidden name=wepprov value=0>
+	<input type="hidden" name="Dot1X_enable" value="0">
+	<input type=hidden name=Generate value=0>-->
+	
+	<input type="hidden" name="wl_bssid", value="0">
+	<input type="hidden" name="wl_unit", value="1">
+
+	  <input type="hidden" name="wl_action" value="1">	
+<!--	<input type="hidden" name="wl_ssid" value="<% nvram_get("wl1_ssid"); %>">
+	<input type="hidden" name="wl_bss_enabled" value="<% nvram_get("wl1_bss_enabled"); %>">-->
+
+	<input type="hidden" name="wl_wep", value="enabled">
+	<input type="hidden" name="wl_key1"> 
+	<input type="hidden" name="wl_key2"> 
+	<input type="hidden" name="wl_key3"> 
+	<input type="hidden" name="wl_key4">
+	<input type="hidden" name="wl_key" value="1">
+	<input type="hidden" name="wl_akm" value="">
+	<input type="hidden" name="wl_akm_wpa" value="disabled"><!--wpa enable/disable-->
+	<input type="hidden" name="wl_akm_psk" value="disabled"><!--wpa psk enable/disable-->
+	<input type="hidden" name="wl_akm_wpa2" value="disabled"><!--wpa2 enable/disable-->
+	<input type="hidden" name="wl_akm_psk2" value="disabled"><!--wpa2 psk enable/disable-->
+	<input type="hidden" name="wl_wps_config_state" value="enabled">
+        <input type="hidden" name="wl_auth" value="0"><!-- 0-open/1-shared -->
+        <input type="hidden" name="wl_auth_mode" value="none"><!-- radius/none -->
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+		<tr>
+			<td width="36"  colspan="2">&nbsp;</td>
+			<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(800); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<!--<tr align=left>
+								<td colspan=3 align=left class="body">
+                                                       <% Fid_str(296); %>
+                                                       <a href="javascript:void(0);" onClick="window.open('glossary.stm#encryption','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<b><font color=#0066FF><% Fid_str(298); %></font></b></a>
+								<br><br></td>
+							</tr>-->
+							<tr>
+								<td width="205" class="body"><b><% Fid_str(801); %> &gt;</b><br><br></td>
+								<td width="335">
+								<select size="1" name="security_type" class=selectList  onchange= selectedchange()>;
+									<option value = 0 ><% Fid_str(318); %></option>
+									<option value = 1><% Fid_str(804); %></option>
+									<option value = 2 selected><% Fid_str(803); %></option>
+									<!--<option value = 3><% Fid_str(1297); %></option>-->
+									<option value = 4><% Fid_str(1296); %></option>									
+								</select><a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#encryption");>
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>									
+								<br><br></td>
+							</tr>
+							<SCRIPT LANGUAGE="JavaScript">
+								/*if(enableOS)
+									document.tF.security_type.selectedIndex = 0;
+								else if(enableWEP){
+									if(WEPKEYTYPE)
+										document.tF.security_type.selectedIndex=2;
+									else
+										document.tF.security_type.selectedIndex=1;
+								}
+								else {
+									if(enableSSNPSK) document.tF.security_type.selectedIndex=4;
+									else    document.tF.security_type.selectedIndex=3;
+								}*/
+							</SCRIPT>	
+							<tr>
+								<td width=113 height=16>									
+									<font color=#004263 size=1>
+									<b>&nbsp;</b></font>
+							       </td>
+								<td width=624 height=16>
+									      <input maxLength=2 size=5 name=keys>
+									      <input  maxLength=2 size=5 name=keys>
+									      <input maxLength=2 size=5 name=keys>
+									      <input  maxLength=2 size=5 name=keys>
+									      <input maxLength=2 size=5 name=keys>
+								</td>
+      							</tr>
+
+      
+    							<tr>
+							      <td width=113 height=16></td>
+							      <td width=624 height=16>
+								      <input maxLength=2 size=5 name=keys>
+								      <input  maxLength=2 size=5 name=keys>
+								      <input maxLength=2 size=5 name=keys>
+								      <input  maxLength=2 size=5 name=keys>
+								      <input maxLength=2 size=5 name=keys>
+								</td>
+      							</tr>
+    							<tr>
+      								<td width=113 height=16></td>
+							      	<td width=624 height=16 class="body">
+							      		<input maxLength=2 size=5 name=keys>
+								      	<input maxLength=2 size=5 name=keys>
+								      	<input maxLength=2 size=5 name=keys>
+								      	<font color=#000000><b><% Fid_str(807); %></b></font>
+								      	<input type=hidden name=wlkey>
+								</td>
+							</tr>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+								//document.write('<input type=hidden  name=dkey  value="1+<% echo var="dkey"; %>">');
+								document.write('<input type=hidden  name=dkey value=1>');
+							</SCRIPT>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+								var i;
+								for(i=1;i<14;i++)
+								{
+									if(i<10)
+										document.write('<input type="hidden" name="m1',i,'" size="2" maxlength="2" value="">');
+									else
+										document.write('<input type="hidden" name="m1',i,'" size="2" maxlength="2" value="">');
+									
+								}
+							</SCRIPT>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+								var i;
+								for(i=1;i<14;i++)
+								{
+									if(i<10)
+										document.write('<input type="hidden" name="m2',i,'" size="2" maxlength="2" value="">');
+									else
+										document.write('<input type="hidden" name="m2',i,'" size="2" maxlength="2" value="">');
+									
+								}
+							</SCRIPT>
+							<SCRIPT LANGUAGE="JavaScript">
+								var i;
+								for(i=1;i<14;i++)
+								{
+									if(i<10)
+										document.write('<input type="hidden" name="m3',i,'" size="2" maxlength="2" value="">');
+									else
+										document.write('<input type="hidden" name="m3',i,'" size="2" maxlength="2" value="">');
+									
+								}
+							</SCRIPT>
+							<SCRIPT LANGUAGE="JavaScript">
+								var i;
+								for(i=1;i<14;i++)
+								{
+									if(i<10)
+										document.write('<input type="hidden" name="m4',i,'" size="2" maxlength="2" value="">');
+									else
+										document.write('<input type="hidden" name="m4',i,'" size="2" maxlength="2" value="">');
+									
+								}
+							</SCRIPT>
+							
+							<SCRIPT LANGUAGE="JavaScript">							    
+							    <% exec cmd="wirelessWEP_128bit_show"; %>
+							</SCRIPT>
+    							<tr>
+							      <td colSpan=2 height=16 class="body">
+							      <font color=#004263><% Fid_str(808); %><% Fid_str(809); %></font>
+							      </td>
+							 </tr>
+							 <tr>
+							      <td width=113 height=16></td>
+							      <td width=624 height=16></td></tr>
+							  <tr>
+							      <td width=113 height=16 class="body"><input type=checkbox name="enable_phrase" onClick="pass_check();"><font color=#004263><b>Enable</b></font></td>
+							      <td width=624 height=16></td>							  
+							  </tr>							      
+							 <tr>
+							      <td width=113 height=16 class="body">
+							      <font color=#004263><b><% Fid_str(810); %> &gt;</b></font></td>
+							      <td width=624 height=16><input maxLength=30 size=32 name=passphrase disabled>
+							      <input class=submitBtn style="{;}"  type=button value=<% Fid_str(811); %> name=generate_btn onclick="Get128bitkey(passphrase.value, wlkey, keys)"> 
+							      </td>
+							 </tr>							
+						</table>
+					</td>
+				</tr>
+			</table>						
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+							<td width="36">&nbsp;</td>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+              							<input type="submit"  name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}"  onClick="return evaltF();" class="submitBtn">
+							</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>		
+

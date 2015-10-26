@@ -1,0 +1,472 @@
+<!--#exec cmd="NdcUpdate" -->
+<html>
+<head>
+<title></title>
+
+<!--#exec cmd="char_set" -->
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style type="text/css">
+ a:link {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:visited {
+     color:#6464c3;
+     text-decoration: none;
+    }
+    a:active {
+      color:#6464c3;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+ </style>
+
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<!--#include file="routine.txt" -->
+var ap_mode= '<!--#exec cmd="device_mode_script" -->';
+
+<!--#exec cmd="Lan_IP_Address" --> // get LAN_IP_ADDR[], LAN_NETMASK[], LAN_SUBNET[]
+<!--#exec cmd="Wan_IP_Subnet" --> // get WAN_IP_ADDR[], WAN_NETMASK[], WAN_SUBNET[]
+
+var ipm='<!--#Fid_str(641)-->';
+var ipm1='<!--#Fid_str(675)-->';
+var Gm='<!--#Fid_str(395)-->';
+var Gm1='<!--#Fid_str(675)-->';
+var sm='<!--#Fid_str(766)-->';
+var wanm='<!--#Fid_str(1281)-->';
+var ipmUcast ='<!--#Fid_str(678)-->';
+var lastIpError ='<!--#Fid_str(1360)-->';
+
+var LAN_interface = new Interface_T();
+var WAN_interface = new Interface_T();
+<!--#exec cmd="LAN_Interface" -->
+var ch;
+function specialshar(s){
+	var i;
+	var token;
+	for(i=0;i<s.length;i++){
+		token = s.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='@' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' || token=='.' || token==',' ){ 
+			ch = token;
+			return true;
+		}
+	}
+	return false;
+}
+
+function evaltF() 
+{
+	var lanIP = document.tF0.wan_ip1.value + "." + document.tF0.wan_ip2.value + "." + document.tF0.wan_ip3.value + "." + document.tF0.wan_ip4.value;
+	var lanGW = document.tF0.default_gw1.value + "." + document.tF0.default_gw2.value + "." + document.tF0.default_gw3.value + "." + document.tF0.default_gw4.value;	
+	var errMsg;
+
+	WAN_interface.ip[0] = document.tF0.wan_ip1.value; WAN_interface.ip[1] = document.tF0.wan_ip2.value; WAN_interface.ip[2] = document.tF0.wan_ip3.value; WAN_interface.ip[3] = document.tF0.wan_ip4.value;
+	WAN_interface.mask[0] = LAN_interface.mask[0]; WAN_interface.mask[1] = LAN_interface.mask[1]; WAN_interface.mask[2] = LAN_interface.mask[2]; WAN_interface.mask[3] = LAN_interface.mask[3];
+	WAN_interface.gateway[0] = document.tF0.default_gw1.value; WAN_interface.gateway[1] = document.tF0.default_gw2.value; WAN_interface.gateway[2] = document.tF0.default_gw3.value; WAN_interface.gateway[3] = document.tF0.default_gw4.value;
+
+	if(isBlank(document.tF0.UN.value)){
+		alert('<!--#Fid_str(742)-->'); 
+		return false;
+	}
+//	if(isIncludeDQuote(document.tF0.UN.value)||isIncludeBSlash(document.tF0.UN.value)||isNvaliduser(document.tF0.UN.value))
+	{ 
+		if( specialshar(document.tF0.UN.value)){
+			alert('<!--#Fid_str(648)-->'+":"+ch);
+			return false; 
+		}
+	}
+	if(isBlank(document.tF0.PW.value))
+	{ 	
+		alert('<!--#Fid_str(757)-->');  
+		return false; 
+	}
+	/*if(specialshar(document.tF0.connectionID.value)){
+		alert('<!--#Fid_str(648)-->'+":"+ch);
+		return false; 
+	}
+	if(specialshar(document.tF0.hostname.value)){
+		alert('<!--#Fid_str(648)-->'+":"+ch);
+		return false; 
+	}*/		
+//	if(isIncludeDQuote(document.tF0.PW.value)||isIncludeBSlash(document.tF0.PW.value)||isNvaliduser(document.tF0.PW.value))
+	{ 
+		if(specialshar(document.tF0.PW.value)){
+			alert('<!--#Fid_str(648)-->'+":"+ch);
+			return false; 
+		}
+	}	
+	//if(isBlank(document.tF0.p_passwdV.value)){ alert('<!--#Fid_str(904)-->'); return false; }
+	if(document.tF0.PWV.value!=document.tF0.PW.value)
+	{ 
+		alert('<!--#Fid_str(624)-->'); 
+		return false; 
+	}
+	
+       if((document.tF0.gateway1.value=="0")&&(document.tF0.gateway2.value=="0")&&(document.tF0.gateway3.value=="0")&&(document.tF0.gateway4.value=="0")){
+		alert('Please enter L2TP Server IP Address or Domain Name!');
+		return false;		
+	}
+	if((document.tF0.gateway1.value==LAN_interface.ip[0] )&& (document.tF0.gateway2.value==LAN_interface.ip[1])
+	&&(document.tF0.gateway3.value==LAN_interface.ip[2])&&(document.tF0.gateway4.value==LAN_interface.ip[3])){
+		alert('L2TP Server IP Address can not be the same as Gateway IP Address!');
+		return false;	
+	}
+	
+	if ( document.tF0.p_auto_reconnect.checked==true ){
+	       if(isNValidNum(document.tF0.idle.value) || (document.tF0.idle.value<1) || (document.tF0.idle.value>99))
+		{
+			alert('<!--#Fid_str(738)--> '); 
+			return false;
+		}
+	}
+
+	if(!(isBlank_Zero(document.tF0.gateway1.value))||!(isBlank_Zero(document.tF0.gateway2.value))||!(isBlank_Zero(document.tF0.gateway3.value))||!(isBlank_Zero(document.tF0.gateway4.value))){
+		if(isNValidLastIP(document.tF0.gateway1.value)) { alert(lastIpError); return false; }
+		if(isNValidIP(document.tF0.gateway2.value)) { alert(ipm); return false; }
+		if(isNValidIP(document.tF0.gateway3.value)) { alert(ipm); return false; }
+		if(isNValidLastIP(document.tF0.gateway4.value)) { alert(lastIpError); return false; }
+	}
+	else
+	{
+		alert(ipm);
+		return false;
+	}
+
+	if(document.tF0.dhcp_clt.checked==false)
+	{
+	
+		if(!(isBlank_Zero(document.tF0.wan_ip1.value))||!(isBlank_Zero(document.tF0.wan_ip2.value))||!(isBlank_Zero(document.tF0.wan_ip3.value))||!(isBlank_Zero(document.tF0.wan_ip4.value))){
+			if(isNValidLastIP(document.tF0.wan_ip1.value)) { alert(lastIpError); return false; }
+			if(isNValidIP(document.tF0.wan_ip2.value)) { alert(ipm); return false; }
+			if(isNValidIP(document.tF0.wan_ip3.value)) { alert(ipm); return false; }
+			if(isNValidLastIP(document.tF0.wan_ip4.value)) { alert(lastIpError); return false; }
+		}
+		else
+		{
+			alert(ipm);
+			return false;
+		}
+		if(isNValidSubnetMask( document.tF0.wan_mask1.value, document.tF0.wan_mask2.value, document.tF0.wan_mask3.value, document.tF0.wan_mask4.value )){
+			alert(sm);
+			return false;
+		}
+		if(!(isBlank_Zero(document.tF0.default_gw1.value))||!(isBlank_Zero(document.tF0.default_gw2.value))||!(isBlank_Zero(document.tF0.default_gw3.value))||!(isBlank_Zero(document.tF0.default_gw4.value))){
+			if(isNValidLastIP(document.tF0.default_gw1.value)) { alert(lastIpError); return false; }
+			if(isNValidIP(document.tF0.default_gw2.value)) { alert(Gm); return false; }
+			if(isNValidIP(document.tF0.default_gw3.value)) { alert(Gm); return false; }
+			if(isNValidLastIP(document.tF0.default_gw4.value)) { alert(lastIpError); return false; }
+		}
+		else
+		{
+			alert(Gm);
+			return false;
+		}
+		
+		if( ((document.tF0.wan_ip1.value & LAN_NETMASK[0]) == LAN_SUBNET[0]) &&
+		((document.tF0.wan_ip2.value & LAN_NETMASK[1]) == LAN_SUBNET[1]) &&
+		((document.tF0.wan_ip3.value & LAN_NETMASK[2]) == LAN_SUBNET[2]) &&
+		((document.tF0.wan_ip4.value & LAN_NETMASK[3]) == LAN_SUBNET[3]) )
+		{
+			alert(wanm);
+			return false;
+		}		
+		
+		if( (document.tF0.wan_ip1.value == 127 ) && (document.tF0.wan_ip2.value == 0 ) && (document.tF0.wan_ip3.value == 0 ) && (document.tF0.wan_ip4.value == 1 ) ) { 
+			errMsg = '<!--#Fid_str(1241)-->'; 
+			alert(errMsg); return false;
+		}
+		if( (document.tF0.default_gw1.value == 127 ) && (document.tF0.default_gw2.value == 0 ) && (document.tF0.default_gw3.value== 0 ) && (document.tF0.default_gw4.value == 1 ) ) { 
+			errMsg = '<!--#Fid_str(1243)-->'; 
+			alert(errMsg); return false;
+		}
+		if( (document.tF0.wan_ip1.value == document.tF0.default_gw1.value ) && (document.tF0.wan_ip2.value == document.tF0.default_gw2.value) && 
+			(document.tF0.wan_ip3.value == document.tF0.default_gw3.value) && (document.tF0.wan_ip4.value == document.tF0.default_gw4.value) ) { 
+			errMsg ='<!--#Fid_str(1243)-->'; 
+			alert(errMsg); return false;
+		}
+	}
+	
+	/*if(!(isBlank_Zero(document.tF0.wan_ip1.value))||!(isBlank_Zero(document.tF0.wan_ip2.value))||!(isBlank_Zero(document.tF0.wan_ip3.value))||!(isBlank_Zero(document.tF0.wan_ip4.value))){
+		if(isNValidLastIP(document.tF0.wan_ip1.value)) { alert(lastIpError); return false; }
+		if(isNValidIP(document.tF0.wan_ip2.value)) { alert(ipm); return false; }
+		if(isNValidIP(document.tF0.wan_ip3.value)) { alert(ipm); return false; }
+		if(isNValidLastIP(document.tF0.wan_ip4.value)) { alert(lastIpError); return false; }
+	}
+	else
+	{
+		alert(ipm);
+		return false;
+	}
+	if(!(isBlank_Zero(document.tF0.wan_mask1.value))||!(isBlank_Zero(document.tF0.wan_mask2.value))||!(isBlank_Zero(document.tF0.wan_mask3.value))||!(isBlank_Zero(document.tF0.wan_mask4.value))){
+		if(isNValidIP(document.tF0.wan_mask1.value)) { alert(sm); return false; }
+		if(isNValidIP(document.tF0.wan_mask2.value)) { alert(sm); return false; }
+		if(isNValidIP(document.tF0.wan_mask3.value)) { alert(sm); return false; }
+		if(isNValidLastMask(document.tF0.wan_mask4.value)) { alert(sm); return false; }
+	}
+	else
+	{
+		alert(sm);
+		return false;
+	}
+		
+	if( ((document.tF0.wan_ip1.value & LAN_NETMASK[0]) == LAN_SUBNET[0]) &&
+	((document.tF0.wan_ip2.value & LAN_NETMASK[1]) == LAN_SUBNET[1]) &&
+	((document.tF0.wan_ip3.value & LAN_NETMASK[2]) == LAN_SUBNET[2]) &&
+	((document.tF0.wan_ip4.value & LAN_NETMASK[3]) == LAN_SUBNET[3]) )
+	{
+		alert(wanm);
+		return false;
+	}		
+		
+	if( (document.tF0.wan_ip1.value == 127 ) && (document.tF0.wan_ip2.value == 0 ) && (document.tF0.wan_ip3.value == 0 ) && (document.tF0.wan_ip4.value == 1 ) ) { 
+		errMsg = '<!--#Fid_str(1241)-->'; 
+		alert(errMsg); return false;
+	}
+	*/
+	
+	/*if( (document.tF0.wan_ip1.value == document.tF0.gateway1.value ) && (document.tF0.wan_ip2.value == document.tF0.gateway3.value) && 
+		(document.tF0.wan_ip3.value == document.tF0.gateway3.value) && (document.tF0.wan_ip4.value == document.tF0.gateway4.value) ) { 
+		errMsg ='<!--#Fid_str(116)-->' + " " + '<!--#Fid_str(62)-->'  + " " + '<!--#Fid_str(1273)-->'; 
+		alert(errMsg); return false;
+	}*/
+	return true;
+}
+
+
+ function ckeck_box()
+{
+	if(document.tF0.p_auto_reconnect.checked==false)
+		document.tF0.idle.disabled=true;
+	else
+		document.tF0.idle.disabled=false;
+	
+}
+
+function check_clt()
+{
+	
+ 	if(document.tF0.dhcp_clt.checked==false)
+    	{
+	    	document.getElementById("tr_ip_address").style.display="";
+	    	document.getElementById("tr_subnet_address").style.display="";
+	    	document.getElementById("tr_gw_address").style.display="";
+    	
+    	}
+    	else
+    	{
+	    	document.getElementById("tr_ip_address").style.display="none";
+	    	document.getElementById("tr_subnet_address").style.display="none";
+	    	document.getElementById("tr_gw_address").style.display="none";
+    	
+    	}
+ }
+
+function frmload(){
+	ckeck_box();
+	check_clt();
+
+}
+
+
+function tempPage()
+{
+	document.location.href="/setup_dns.stm";
+	return false;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+<!--#exec cmd="gateway_status" -->
+<!--#exec cmd="Gateway_IsWanConnected" -->
+</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="frmload()">
+<!--#include file="menu.stm" -->
+<form name="tF0" method="post" action="/cgi-bin/setup_wan_l2tp.exe">
+<input type="hidden" name="page" value="wan_main.stm">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="wan_pppoe.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<input type="hidden" name="wan_pptp_enable" value="0">
+<input type="hidden" name="wan_ifnames" value="<% nvram_get("wan0_ifnames"); %>">
+<input type="hidden" name="wan_hwaddr" value="<% nvram_get("wan0_hwaddr"); %>">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>L2TP<br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;
+					</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+						
+							<!--<tr align=left>
+								<td colspan=2 align=left class="body"><!--#Fid_str(170)-->
+									<a href="javascript:void(0);" onClick="window.open('glossary.stm#l2tp','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');"><b><font color=6464c3><!--#Fid_str(188)--></font></b></a><br><br>
+								</td>
+							</tr>-->
+							
+							<tr align=left>
+								<td colspan=2 align=left class="body"><a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#l2tp");><b><font color=0066ff><!--#Fid_str(47)--></font></b></a><br><br>
+								</td>
+							</tr>
+							
+							<tr>	
+            			        		<td width="250" class="body" height="30"><b>L2TP Account&gt;</b></td>
+								<td width="220">
+            			            			<input type=text name=UN size=25 maxlength=63 VALUE="<!--#echo var="pptp_username" -->"> 
+								</td>
+							</tr>
+							
+							<tr>								
+            			        		<td width="250" class="body" height="30"><b><!--#Fid_str(745)--> &gt;</b></td>
+								<td width="220">
+            			            			<input type=password name=PW size=25 maxlength=63 VALUE="<!--#echo var="pptp_password" -->">
+							</tr>
+							
+							<tr>								
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(746)--> &gt;</b></td>
+								<td width="220">
+            			            			<input type=password name=PWV size=25 maxlength=63 VALUE="<!--#echo var="pptp_password" -->">
+            			            			</td>
+							</tr>
+							<!--
+							<tr>								
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(747)--> &gt;</b></td>
+								<td width="220">
+            			            			<input type=text  name=hostname  size=25 maxlength=39 VALUE="<!--#echo var="pptp_hostname" -->">
+            			            			</td>
+							</tr>
+							-->
+							<tr>
+								<td width="250" class="body" height="30"><b><!--#Fid_str(1362)-->&nbsp;&gt;</b></td>
+								<td width="220">
+									<input type="checkbox" name="dhcp_clt" value=1 onClick="check_clt()">
+									<br>
+								</td>
+							</tr>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+							var iDOD = <!--#echo var="dhcp_enable_var" -->;
+							if (iDOD)		
+								document.tF0.dhcp_clt.checked=true;
+							else
+								document.tF0.dhcp_clt.checked=false;
+							</script>
+							
+							<tr>	
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(748)--> &gt;</b></td>
+								<td width="260">
+            			            			<input type="text" name="gateway1" size="3" maxlength=3>.
+            			            			<input type="text" name="gateway2" size="3" maxlength=3>.
+            			            			<input type="text" name="gateway3" size="3" maxlength=3>.
+            			            			<input type="text" name="gateway4" size="3" maxlength=3>
+								</td>
+							</tr>
+
+							<tr id="tr_ip_address" style="display: none;">	
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(749)--> &gt;</b></td>
+								<td width="260">
+								<input type="text" name="wan_ip1" size=3 maxlength=3>.
+								<input type="text" name="wan_ip2" size=3 maxlength=3>.
+								<input type="text" name="wan_ip3" size=3 maxlength=3>.
+								<input type="text" name="wan_ip4" size=3 maxlength=3>
+								</td>
+							</tr>
+							
+							<tr id="tr_subnet_address" style="display: none;">	
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(750)--> &gt;</b></td>
+								<td width="260">
+            			            			<input type="text" name="wan_mask1" size=3 maxlength=3>.
+								<input type="text" name="wan_mask2" size=3 maxlength=3>.
+								<input type="text" name="wan_mask3" size=3 maxlength=3>.
+								<input type="text" name="wan_mask4" size=3 maxlength=3>
+								</td>
+							</tr>
+
+							<tr id="tr_gw_address" style="display: none;">
+	                            			
+	            			        		<td width="250" class="body" height="30"><b><!--#Fid_str(338)--> &gt;</b></td>
+								<td width="260">
+	                                					<input type="text" name="default_gw1" size=3 maxlength=3>.
+										<input type="text" name="default_gw2" size=3 maxlength=3>.
+										<input type="text" name="default_gw3" size=3 maxlength=3>.
+										<input type="text" name="default_gw4" size=3 maxlength=3>
+	            			        		</td>
+	                            		</tr>
+	                            		
+							<!--<tr>								
+            			        			<td width="250" class="body" height="30"><b><!--#Fid_str(751)--> &gt;</b></td>
+								<td width="220">
+            			            			<input type=text name=connectionID size=25 maxlength=63 VALUE="<!--#echo var="pptp_connectionID" -->">
+            			            			</td>
+							</tr>-->							
+							
+							<tr>									
+								<td colspan=2 nowrap class="body">
+									<input type="checkbox" name="p_auto_reconnect" value=1 onClick="ckeck_box()">
+									<!--#Fid_str(736)--><input type="text" name="idle" size="3" maxlength="5" value=""><!--#Fid_str(737)-->
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#disconnect");><b><font color=0066ff><!--#Fid_str(47)--></font></b></a><br>
+            			        			</td>
+                            			</tr>
+                            			
+                            			<SCRIPT LANGUAGE="JavaScript">
+								var iDOD=<!--#echo var="p_pptp_auto_reconnect" -->;
+								if(iDOD == 1){
+									document.tF0.p_auto_reconnect.defaultChecked=true;
+									document.tF0.p_auto_reconnect.checked=true;
+								}	
+								//ckeck_box();
+							</SCRIPT>
+							
+							<tr>								
+								<td colspan=2 noWrap><br><a href="javascript:void(0);" onClick="return tempPage();"><b><!--#Fid_str(754)--></b></a>
+								</td>
+							</tr>
+	            <!--"L2TP_WAN_Tunnel_Info" -->				
+	            <!--#exec cmd="L2TP_WAN_Tunnel_Info" -->											
+                            			<tr>
+            			        			<td colspan="2"><!--#Fid_str(1433)--></td>
+                            			</tr>
+							
+							<tr>
+								<!--<td width="125">&nbsp;</td>-->
+								<td colspan=2 align="center">
+								<br><br>
+									<input type="button" value="<!--#Fid_str(48)-->" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+									<input type="submit" name="arc_action" value="<!--#Fid_str(49)-->" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();"></td>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

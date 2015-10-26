@@ -1,0 +1,334 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% include file="routine.txt"; %>
+<% exec cmd="my_function"; %>
+<% get5GWirelessSecurity(); %>
+</script>
+</head>
+
+<SCRIPT LANGUAGE="JavaScript">
+var prekeyerror="<% Fid_str(852); %>";
+var hexprekeyerror="<% Fid_str(1187); %>";
+var leastprekeyerror="<% Fid_str(1186); %>";
+var obscurepsk=1;//<% echo var="obscurePSK"; %>; //wenfang 20070111 add for belkin QA bug 102784
+function isHex(s) {
+	var j, x = 0;
+	for (var i = 0 ; i < s.length; i++) {
+		var c = s.charAt(i);
+		j = parseInt(c, 16);
+		if (!(j>=0 && j<=15)) {
+			x = 1;
+		}
+		if (x == 1) return false;
+	}
+	return true;
+}
+
+var wl_wpa_psk="<% wl_wpa_psk("1"); %>";
+var wirelesserror = "Wireless radio is disabled. To configure wireless security,please enable wireless radio.";
+var wirelessenable =<% nvram_get("wl1_radio"); %>;
+
+function selectedchange(){
+	if(document.tF.security_type.selectedIndex == 0){
+		parent.wireless_5G_sec.location.href = "wireless_no_encryption_5.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 1){
+		parent.wireless_5G_sec.location.href = "wireless_64bitwep_5.stm";
+	}
+	else if(document.tF.security_type.selectedIndex == 2){
+		parent.wireless_5G_sec.location.href = "wireless_128bitwep_5.stm";
+	}
+//	else if(document.tF.security_type.selectedIndex == 3){
+//		location.href = "wireless_WPA_5.stm";
+//	}
+	else{
+		parent.wireless_5G_sec.location.href = "wireless_PSK_5.stm";
+	}
+	return true;
+}
+
+
+function evaltF(){	
+
+	var value;	
+	var len;
+	var maxSize = 64;
+	var minSize = 8;
+  
+  if(!wirelessenable){
+		alert(wirelesserror);
+		return false;
+	}
+	
+	if(document.tF.obscure_psk.checked == false)
+		value = document.tF.wpa_key_text.value;
+	else
+		value = document.tF.wpa_key_pass.value;
+
+	len = value.length;
+	if( len < minSize || len >= maxSize )
+	{
+		if(len==maxSize)
+		{
+			if (!isHex(value))
+	    {
+	 	   	alert(prekeyerror);
+	 		  return false;
+	    } 
+		}
+		else
+		{
+		  alert(prekeyerror);
+		  return false;
+		}
+	}
+	onApply();
+	return true;
+}
+
+//wenfang 20070111 add for belkin QA bug 102784
+function click_obscure_psk(){
+	if(document.tF.obscure_psk.checked == true) {
+		document.tF.wpa_key_pass.value = document.tF.wpa_key_text.value;	
+		document.getElementById("pskid").style.display="none";	
+		document.getElementById("pskid1").style.display="";	
+	}
+	else{
+		document.tF.wpa_key_text.value = document.tF.wpa_key_pass.value;
+		document.getElementById("pskid1").style.display="none";	
+		document.getElementById("pskid").style.display="";	
+	}
+	document.tF.obscure_psk.value=document.tF.obscure_psk.checked?1:0;
+}
+
+function onApply()
+{
+	var index;
+	if(nmode_enable_5G==0)
+		index = document.tF.authentication.selectedIndex;
+	else
+		index = document.tF.authentication.selectedIndex + 1;	//tkip has been hidden.
+	document.tF.wl_auth_mode.value="none";
+	document.tF.wl_akm_psk.value="disabled";
+	document.tF.wl_akm_psk2.value="disabled";
+	document.tF.wl_akm_wpa.value="disabled";
+	document.tF.wl_akm_wpa2.value="disabled";
+
+	switch(index) {
+		case 0:
+			document.tF.wl_akm_psk.value="enabled";
+			break;
+		case 1:
+			document.tF.wl_akm_psk2.value="enabled";
+			break;
+		case 2:
+			document.tF.wl_akm_psk.value="enabled";
+			document.tF.wl_akm_psk2.value="enabled";
+			break;
+	}
+
+	if(document.tF.obscure_psk.checked == false)
+		document.tF.wl_wpa_psk.value = document.tF.wpa_key_text.value;
+	else
+		document.tF.wl_wpa_psk.value = document.tF.wpa_key_pass.value;	
+}
+
+function init()
+{
+	document.tF.wpa_key_pass.value=wl_wpa_psk;
+	document.tF.wpa_key_text.value=wl_wpa_psk;
+}
+
+function loaded(){
+init();
+authselectedchange();
+}
+//wenfang add end
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function authselectedchange(){
+	var index;
+	if(nmode_enable_5G==0)
+		index = document.tF.authentication.selectedIndex;
+	else
+		index = document.tF.authentication.selectedIndex + 1;	//tkip has been hidden.
+	if(index == 1){
+		document.tF.wl_crypto.selectedIndex = 1;
+		document.getElementById("sEncryption").innerHTML="AES";
+	}else if(index == 0){
+		document.tF.wl_crypto.selectedIndex  = 0;
+		document.getElementById("sEncryption").innerHTML="TKIP";
+	}else{
+		document.tF.wl_crypto.selectedIndex  = 2;
+		if(nmode_enable_5G==1)
+			document.getElementById("sEncryption").innerHTML="AES";
+		else
+			document.getElementById("sEncryption").innerHTML="TKIP+AES";
+	}
+}
+
+</SCRIPT>
+
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="loaded()">
+	<form name="tF" action="apply.cgi" method="post">
+	<input type="hidden" name="location_page" value="wireless_PSK_5.stm">	
+	<input type="hidden" name="wl_unit", value="1">
+	<input type="hidden" name="wl_bssid", value="0">
+	<input type="hidden" name="wl_action" value="1">	
+
+	<input type="hidden" name="wl_wep", value="disabled">
+	<input type="hidden" name="wl_wpa_psk">
+	<input type="hidden" name="wl_auth" value="0">	
+	<input type="hidden" name="wl_auth_mode" value="none">
+	<input type="hidden" name="wl_akm">
+	<input type="hidden" name="wl_akm_psk">
+	<input type="hidden" name="wl_akm_psk2">
+	<input type="hidden" name="wl_akm_wpa">
+	<input type="hidden" name="wl_akm_wpa2">
+	 <input type="hidden" name="wl_wps_config_state" value="enabled">
+	<input type="hidden" name="arc_action" value="<% Fid_str(49); %>"> 
+
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+		<tr>
+			<td width="36"  colspan="2">&nbsp;</td>
+			<td valign="top" width="95%" height="100%" class="head_bold">
+			<!--<br><% Fid_str(800); %><br>-->
+			<table border=0 class="copy_1">
+				<tr>
+					<td>
+						<table width=280 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<!--<td width="205" class="body"><b><% Fid_str(801); %> &gt;</b><br><br></td>-->
+								<td width="280">
+								<select size="1" name="security_type" class=selectList  onchange= selectedchange()>;
+									<option value = 0 ><% Fid_str(318); %></option>
+									<option value = 1><% Fid_str(804); %></option>
+									<option value = 2><% Fid_str(803); %></option>
+									<!--<option value = 3 ><% Fid_str(1297); %></option>-->
+									<option value = 4 selected><% Fid_str(1296); %></option>									
+								</select>									
+								<br><br></td>
+							</tr>							
+							<SCRIPT LANGUAGE="JavaScript">
+								document.write('<tr>');
+								//document.write('<td width="205" class="body"><b><% Fid_str(842); %> &gt;</b><br><br></td>');
+								document.write('<td width="280">');
+								document.write('<select size="1" name="authentication" class=selectList  onchange= authselectedchange()>');
+								document.write('<% authWPAPSK("main", 2); %>');
+								document.write('</select>');
+								document.write('<br><br></td>');
+			          				document.write('</tr>');
+							</SCRIPT>
+
+							<SCRIPT LANGUAGE="JavaScript">
+								document.write('<tr>');
+								//document.write('<td width="205" class="body"><b><% Fid_str(845); %> &gt;</b><br><br></td>');
+								document.write('<td width="280" class="body">');
+								document.write('<span id="sEncryption"></span>');
+								//document.write('<select size="1" name="encryption" class=selectList  >');
+								document.write('<select size="1" name="wl_crypto" class=selectList  style="display:none" >');
+								//if(nmode_enable==0)
+                                document.write('<option value="tkip" <% nvram_match("wl1_crypto", "tkip", "selected"); %>>TKIP</option>');
+
+								document.write('<option value="aes" <% nvram_match("wl1_crypto", "aes", "selected"); %>>AES</option>');
+	  							document.write('<option value="tkip+aes" <% nvram_match("wl1_crypto", "tkip+aes", "selected"); %>>TKIP+AES</option>');
+								//document.write('<% exec cmd="cryptoWPA"; %>');
+								document.write('</select>');
+								//document.write('<font color=#004263><% Fid_str(853); %></font><br><br></td>');
+								document.write('<br><br></td>');								
+			          				document.write('</tr>');
+							</SCRIPT>	
+							<tr>
+      							<!--<td width=154 class="body"><b><font color=#004263><% Fid_str(854); %></font> &gt;</b></td>-->
+								<script>
+								//heyu_20070113 +++ for obscurpsk
+								var obscurepsk=1;
+								if(obscurepsk == 1)
+								{
+      								document.write('<td id="pskid" style="display:none" width=280 class="body"><font color=#004263>');
+      								document.write('<input type=text maxLength=64  size=50  name=wpa_key_text  ></font>');
+      								document.write('</td>');
+	      							document.write('<td  id="pskid1" style="display:" width=280 class="body"><font color=#004263>');
+	      							document.write('<input type=password maxLength=64 size=50 name=wpa_key_pass  ></font>');
+	      							document.write('</td>');
+      							}
+      							else
+      							{    							
+      								document.write('<td id="pskid" style="display:" width=280 class="body"><font color=#004263 >');
+      								document.write('<input type=text maxLength=64  size=50  name=wpa_key_text ></font>');
+      								document.write('</td>');
+	      							document.write('<td  id="pskid1" style="display:none" width=280 class="body"><font color=#004263>');
+	      							document.write('<input type=password maxLength=64 size=50 name=wpa_key_pass ></font>');
+	      							document.write('</td>');
+      							}
+								</script>
+      						       </tr>					       
+
+							<tr>
+								<!--<td></td>-->
+								<td width=280 class="body"> 
+								<input type="checkbox" name="obscure_psk" value="1" onClick="click_obscure_psk()" >
+								<b><% Fid_str(857); %></b><br>
+								</td>
+							</tr>
+							<SCRIPT LANGUAGE="JavaScript">
+								<% exec cmd="wirelessWPA_show"; %>   
+								document.tF.obscure_psk.checked=(<% nvram_get("obscurePSK_5G"); %>)?true:false;
+								click_obscure_psk();
+							</SCRIPT>
+							<!--
+							<tr>
+								<td></td>
+								<td width=280 class="body"><br><font color=#004263><b><% Fid_str(855); %>: </b><% Fid_str(856); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#encryption");>
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+									<br><br>
+								</td>
+							</tr>
+							-->
+						</table>
+					</td>
+				</tr>
+			</table>
+			<!--
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+							<td width="36">&nbsp;</td>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+              					<input type="submit" name="arc_action" value="<% Fid_str(49); %>" onClick="return evaltF();" style="{height=22px;width:150px;}" class="submitBtn">
+							</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			-->
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>		
+

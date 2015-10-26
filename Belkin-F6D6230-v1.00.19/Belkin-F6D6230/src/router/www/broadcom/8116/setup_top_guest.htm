@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<!--<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">-->
+<!--#exec cmd="char_set" -->
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style type="text/css">
+a { FONT: bold 9pt Arial,Helvetica, sans-serif; text-decoration: none; color: #000000}
+ a:link {
+     color: #00000;
+     font-size: 7pt;
+     font-family: Arial;
+     text-decoration: none;
+    }
+    a:visited {
+     color: #00000;
+     font-size: 7pt;
+     font-family: Arial;
+     text-decoration: none;
+    }
+    a:active {
+     color: #000000;
+     font-size: 7pt;
+     text-decoration: none;
+    }
+    a:hover {
+     color: #0000ff;
+     text-decoration: underline;
+    }
+ </style>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+function MM_swapImgRestore() { //v3.0
+	if(top.topFrame.document.tf.swapImg.value != "0") return;
+	var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+
+function MM_swapImage() { //v3.0
+	if(top.topFrame.document.tf.swapImg.value != "0") return;
+	var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+	if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+
+function MM_findObj(n, d) { //v4.0 ??
+	var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+	d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+	if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+	for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+	if(!x && document.getElementById) x=document.getElementById(n); return x;
+}  		
+</SCRIPT>
+
+</HEAD>
+<BODY leftMargin=0 topMargin=0 marginheight="0" marginwidth="0" >
+ <form METHOD="post" ACTION="setup_top_guest.htm" NAME="tf">
+  <INPUT TYPE="hidden" NAME="page" VALUE="logout">
+  <INPUT TYPE="hidden" NAME="swapImg" VALUE="0">
+  <TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+			<table bgcolor="#cccccc" width="100%" border="0" cellspacing="1" cellpadding="0">
+				<tr>
+					<td rowspan="3" width="20" valign="bottom"><a href="http://www.belkin.com" target="_blank"><img src="../images/head_logo_guest.gif" border="0" width="238" height="62"></a></td>
+					<td colspan="4" height="21" align="right" nowrap>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="4" height="18">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="150" height="28"><img src="../images/shim.gif" width="1" height="28"></td>
+					<td height="28"></td>
+					<td height="28" align="right" nowrap class="top_nav">
+						<nobr>
+					</td>
+					<td height="28" align="right"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+ </TABLE>
+</form>
+</BODY>
+</HTML>

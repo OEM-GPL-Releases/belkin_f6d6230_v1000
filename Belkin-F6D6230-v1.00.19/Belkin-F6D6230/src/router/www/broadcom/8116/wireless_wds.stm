@@ -1,0 +1,281 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="/main_router.css" type="text/css">
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% include file="routine.txt"; %>
+ipm='<% Fid_str(108); %>.';
+macm='<% Fid_str(321); %>.';
+access_num_m='<% Fid_str(321); %>.';
+em='<% Fid_str(321); %>.';
+dup_mac='<% Fid_str(1273); %>.';
+rc= "<% Fid_str(610); %>";
+
+var wirelesserror = "<% Fid_str(362); %>";
+var wirelessenable = <% echo var="getWirelessStatus"; %>;
+var macaddresserror = "<% Fid_str(364); %>";
+var broadcastaddress = "<% Fid_str(835); %>";
+
+var SSID_array = new Array(32);
+var mac_array = new Array(36);	//5*6
+var mac_valid = new Array(5);	//4+1
+var emptymac = "<% Fid_str(615); %>";
+
+function limit_num() {
+	var i,j, f;
+	var fname,name_no;
+	var num;
+
+	num=0;
+	for(i=0; i< document.tF.length; i++)
+	{
+		f     = document.tF.elements[i].name;
+		fname = f.substr(0,7);
+		if ( fname == 'WDS_USE') {
+			if (document.tF.elements[i].checked == true) {
+				num++;
+			}
+			name_no = 'NAME'+f.substr(7,1);
+			for(j=0; j< document.tF.length; j++)
+			{
+				if (name_no == document.tF.elements[j].name) {
+					if (document.tF.elements[i].checked == true) {
+						document.tF.elements[j].disabled = false;
+					} else {
+						document.tF.elements[j].disabled = true;
+						document.tF.elements[j].value = '';
+					}
+				}
+			}
+		}
+	}
+	if (num>4) {
+		alert('<% Fid_str(1213); %>!');
+		return false;
+	}
+	return true;
+}
+
+
+function selectedchange(){
+	
+	
+	if(document.tF.WDS_ENABLE.selectedIndex == 1){
+		document.getElementById("wdstable").style.display="";
+  	}
+	else{
+		document.getElementById("wdstable").style.display="none";
+   	}
+}
+
+function evaltF()
+{
+	
+		var i, j, k, l, f, valid;
+		var row,col;
+		var fname, len;
+		var emptyflag = 0 ;
+		if(!wirelessenable){
+			alert(wirelesserror);
+			return false;
+		}
+		
+		for(i=0; i< document.tF.length; i++)
+		{
+			f     = document.tF.elements[i].name;
+			fname = f.substr(0,3);
+			if ( fname == 'MAC') {
+				len = f.length;
+				if (len == 6) {
+					row = f.substr(3,1);
+					col = f.substr(5,1);
+					j   = eval(row*6) + eval(col);
+					mac_array[j] = document.tF.elements[i].value;
+					mac_array[j] = mac_array[j].toUpperCase();
+				}
+				else if (len == 7) {
+					row = f.substr(3,2);
+					col = f.substr(6,1);
+					j   = eval(row*6) + eval(col);
+					mac_array[j] = document.tF.elements[i].value;
+					mac_array[j] = mac_array[j].toUpperCase();
+				}
+			}
+		}
+	
+		valid = 0;
+		for (i=1; i<=4; i++) {
+			mac_valid[i] = 0;
+			j = i*6;
+			if (!(isBlank_Zero(mac_array[j])) || !(isBlank_Zero(mac_array[j+1])) || !(isBlank_Zero(mac_array[j+2])) || !(isBlank_Zero(mac_array[j+3])) || !(isBlank_Zero(mac_array[j+4])) || !(isBlank_Zero(mac_array[j+5]))){
+				if (isNValid(mac_array[j]) || isNValid(mac_array[j+1]) || isNValid(mac_array[j+2]) || isNValid(mac_array[j+3]) || isNValid(mac_array[j+4]) || isNValid(mac_array[j+5]))
+					{alert(rc+i+" "+macaddresserror+"."+macm); return false;}
+				if ((mac_array[j].toUpperCase()=='FF') && (mac_array[j+1].toUpperCase()=='FF') && (mac_array[j+2].toUpperCase()=='FF') && (mac_array[j+3].toUpperCase()) && (mac_array[j+4].toUpperCase()) && (mac_array[j+5].toUpperCase()=='FF'))
+					{alert(rc+i+", "+broadcastaddress); return false;}
+				mac_valid[i] = 1;
+				valid++;
+	
+				for (k = i-1;k >= 1;k--) {
+					if (mac_valid[k] == 1) {
+						l = 6*k;
+						if ( (mac_array[j]== mac_array[l]) && (mac_array[j+1]== mac_array[l+1]) && (mac_array[j+2]== mac_array[l+2]) &&
+						     (mac_array[j+3]== mac_array[l+3]) && (mac_array[j+4]== mac_array[l+4]) && (mac_array[j+5]== mac_array[l+5]) ) {
+						     alert(rc+ k + " & " + rc + i + ": " + dup_mac );
+						     return false;
+						 }
+					}
+				}
+			}else if (!(isBlank(mac_array[j])) || !(isBlank(mac_array[j+1])) || !(isBlank(mac_array[j+2])) || !(isBlank(mac_array[j+3])) || !(isBlank(mac_array[j+4])) || !(isBlank(mac_array[j+5]))){
+				alert(rc+i+" "+ "<% Fid_str(616); %>" );			
+        			return false;
+			}
+			else{
+				emptyflag++;				
+			}
+		}
+		if(emptyflag>=4){
+			emptyflag = 0;
+			alert(emptymac);			
+        		return false;
+		}
+		return true;
+}
+
+function trigging()
+{
+	var evalRes = evaltF();
+	if(evalRes==true)
+		document.forms[0].submit();
+	else
+		document.forms[0].backbtn.click();
+	return evalRes;
+}
+
+function rescan() {
+	location.href = "/wireless_wds.stm";
+	return false;
+}
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload=selectedchange()>
+<form name="tF" action="/cgi-bin/wireless_wds.exe" method="post">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36"  colspan="2">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(352); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="1">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr align=left>
+								<td colspan=3 align=left>
+                                                       <% Fid_str(353); %><br><br><% Fid_str(354); %>
+                                                       <a href="javascript:void(0);" onClick="window.open('glossary.stm#WDS','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<b><font color=#0066FF><% Fid_str(231); %></font></b></a>
+								<br><br><% Fid_str(1185); %><br><br></td>
+							</tr>
+
+							<tr>
+								<!--<td width="16">&nbsp;</td>-->
+								<td width="205"><b><% Fid_str(356); %></b></td>
+								<td width="335">
+								<select size="1" name="WDS_ENABLE" class=selectList onchange= selectedchange()>;
+									<option value = 0 selected><% Fid_str(357); %></option>
+									<option value = 1><% Fid_str(358); %></option>
+								</select>									
+								</td>
+							</tr>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+							    var iDOD = <% echo var="wds_enable"; %>;
+							    document.tF.WDS_ENABLE.selectedIndex = iDOD;							    
+							</SCRIPT>
+						</table>	
+					</td>
+				</tr>
+			
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+					<tr>						
+						<td>
+						<TABLE id= wdstable cellSpacing=0 cellPadding=0 width=580 border=0 class="copy_1" style="display:none">
+							<tr>
+							 	<!--<td width="16">&nbsp;</td>-->
+								<td colspan=2> <b><% Fid_str(359); %></b></td>
+							</tr>
+							
+							<tr align=left>
+								<!--<td width="16">&nbsp;</td>-->
+								<td width="250">&nbsp;</td>
+								<td colspan=1 align=left>
+									<table border="0" cellspacing="1" cellpadding="5" height="0" width=70% class="copy_1">
+										 <!--
+										 <tr bgcolor="#666262">
+											<td width="5%" valign="middle" align="center"><font color=#ffffff><% Fid_str(896); %></font></td>
+											<td width="5%" valign="middle" align="center"><font color=#ffffff><% Fid_str(897); %></font></td>
+											<td valign="middle" align="center" nowrap><font color=#ffffff><% Fid_str(898); %></font></td>
+										</tr>
+										-->
+										<script language="javascript">
+										var i,j;
+										for(i=1;i<=4;i++)
+										{
+											document.write('<tr >');
+											document.write('<td valign="middle" align="center" nowrap>');											for (j=0;j<5;j++) 
+											{
+												document.write('<input type="text" name="MAC',i,'_',j,'" size="3" maxlength="2"> :');
+											}
+											document.write('<input type="text" name="MAC',i,'_5" size="3" maxlength="2">&nbsp;</td>');
+											document.write('</tr>');
+										}
+										</script>
+										<% exec cmd="WDSMAC"; %>
+									</table>	
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>			
+					
+			
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+							<td width="36">&nbsp;</td>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(249); %>" style="{height=22px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+              				<input type="submit" name="arc_action" value="<% Fid_str(360); %>" style="{height=22px;}" class="submitBtn" onClick="return evaltF();">
+							</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>		

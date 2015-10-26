@@ -1,0 +1,14 @@
+<script language="javascript">
+	document.write('<tr>');
+	document.write('<td colspan="2" height="20" width="140" background="/images/blu_bar.gif">');
+	document.write('<img src="/images/shim.gif" width="8" height="8">');
+	document.write('<a href="/tl_main_0.stm" class="section">Utilities</a>');
+	document.write('</td>');
+	document.write('</tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/system_r.stm">Restart Router</a></td></tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/tools_restore.stm">Restore Factory Default</a></td></tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/system_c.stm">Save/Backup Settings</a></td></tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/tools_backup.stm">Restore Previous Settings</a></td></tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/system_f.stm">Firmware Update</a></td></tr>');
+	document.write('<tr><td width="5">&nbsp;</td><td valign="top" class="leftLink"><a href="/system.stm">System Settings</a></td></tr>');
+</script>

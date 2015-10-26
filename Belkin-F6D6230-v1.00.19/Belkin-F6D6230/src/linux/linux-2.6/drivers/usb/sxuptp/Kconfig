@@ -1,0 +1,10 @@
+menu "Silex USB Deviceserver"
+
+config USB_DEVICESERVER
+	tristate "USB Deviceserver"
+
+config USB_DEVICESERVER_DEVFILTER
+	tristate "Device filter"
+
+endmenu
+

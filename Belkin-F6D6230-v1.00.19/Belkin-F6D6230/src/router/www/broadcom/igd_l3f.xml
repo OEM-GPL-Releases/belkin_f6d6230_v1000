@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+<specVersion>
+	<major>1</major>
+	<minor>0</minor>
+</specVersion>
+
+<actionList>
+<action>
+	<name>SetDefaultConnectionService</name>
+	<argumentList>
+	<argument>
+		<name>NewDefaultConnectionService</name>
+		<relatedStateVariable>DefaultConnectionService</relatedStateVariable>
+		<direction>in</direction>
+	</argument>
+	</argumentList>
+</action>
+
+<action>
+	<name>GetDefaultConnectionService</name>
+	<argumentList>
+	<argument>
+		<name>NewDefaultConnectionService</name>
+		<relatedStateVariable>DefaultConnectionService</relatedStateVariable>
+		<direction>out</direction>
+	</argument>
+	</argumentList>
+</action>
+</actionList>
+
+<serviceStateTable>
+<stateVariable sendEvents="yes">
+	<name>DefaultConnectionService</name>
+	<dataType>string</dataType>
+</stateVariable>
+</serviceStateTable>
+</scpd>
+
+<!-- 
+	File		: igd_l3f.xml
+	Descripte	: internet gateway device (Layer 3 Forwarding) description page
+	Copyright	: 
+	Authors		: Pert
+	Date		: 03/14/2002
+	Last Date	: 03/??/2002
+	Version		: v1.0
+-->

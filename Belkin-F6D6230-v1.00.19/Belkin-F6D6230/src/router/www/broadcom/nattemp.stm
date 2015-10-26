@@ -1,0 +1,15 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+</head>
+<frameset cols="180,*" frameborder="no" border="0" framespacing="0" rows="472*">
+	<frame name="leftFrame" scrolling="auto" noresize src="menu.stm?n=nat_m.stm">
+	<frame name="main2" src="nat_m.stm">
+</frameset>
+<noframes>
+	<body bgcolor="#FFFFFF" text="#000000">
+	</body>
+</noframes>
+</html>

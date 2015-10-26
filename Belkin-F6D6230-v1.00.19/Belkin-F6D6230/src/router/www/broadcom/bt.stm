@@ -1,0 +1,15 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+</head>
+
+<frameset cols="160,*" frameborder="NO" border="0" framespacing="0" rows="472*"> 
+  <frame name="leftFrame" scrolling="auto" noresize src="bt_menu.stm">
+  <frame name="btFrame" src="bt_main.stm">
+</frameset>
+<noframes><body bgcolor="#FFFFFF" text="#000000">
+
+</body></noframes>
+</html>

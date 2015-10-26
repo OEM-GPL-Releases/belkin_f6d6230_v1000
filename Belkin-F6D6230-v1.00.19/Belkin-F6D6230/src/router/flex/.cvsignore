@@ -1,0 +1,8 @@
+.bootstrap
+config.*
+stamp-h
+Makefile
+scan.c
+parse.c
+parse.h
+flex

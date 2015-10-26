@@ -1,0 +1,1875 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% include file="refreshmenu.txt"; %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% gs_gateway_stauts(); %>
+var gateway_lan_ip=lan_gateway_ip;
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+var ipm='<% Fid_str(1253); %>';
+var sm='<% Fid_str(88); %>';
+var rm='<% Fid_str(586); %>';
+
+
+function parseValueRangeBoth(valueL, valueW,index)
+{
+	var sub_valueL, rangeL, sub_rangeL;
+	var sub_valueW, rangeW, sub_rangeW;
+	var i;
+	var value1, value2;
+	
+	if(valueL == null || valueL.length == 0 ||
+	   valueW == null || valueW.length == 0)
+		return true;
+
+	sub_valueL = valueL.split(/\,/);
+	rangeL = new Array(sub_valueL.length);
+	for(i=0; i < sub_valueL.length; i++)
+	{
+		if(sub_valueL[i].charAt(0) == '-')
+		{
+			alert("NO"+(index+1)+" "+"<% Fid_str(88); %>");
+			return false;
+		}
+
+		rangeL[i] = new PORT_RANGE();
+		sub_rangeL = sub_valueL[i].split(/\-/);
+		if(sub_rangeL.length == 1)
+		{
+			//return true; //not range case, don't check anymore
+			rangeL[i].b_port = sub_rangeL[0];
+			rangeL[i].e_port = sub_rangeL[0];
+		}
+		else if(sub_rangeL.length == 2)
+		{
+			if(isNaN(sub_rangeL[0]) == false && sub_rangeL[1] == '*')
+			{
+				value1 = new Number(sub_rangeL[0]);
+				rangeL[i].b_port = sub_rangeL[0];
+				rangeL[i].e_port = 65535;
+			}
+			else
+			{
+				if(isNaN(sub_rangeL[0]) == true || isNaN(sub_rangeL[1]) == true)
+					return true;
+				value1 = new Number(sub_rangeL[0]);
+				value2 = new Number(sub_rangeL[1]);
+				if(value1.valueOf() > value2.valueOf())
+				{
+					rangeL[i].b_port = sub_rangeL[1];
+					rangeL[i].e_port = sub_rangeL[0];				
+				}
+				else
+				{
+					rangeL[i].b_port = sub_rangeL[0];
+					rangeL[i].e_port = sub_rangeL[1];
+				}
+			}
+		}
+		//else
+		//	return true;
+	}
+
+	sub_valueW = valueW.split(/\,/);
+	rangeW = new Array(sub_valueW.length);
+	if (sub_valueL.length != sub_valueW.length)
+		return true;
+
+	for(i=0; i < sub_valueW.length; i++)
+	{
+		if(sub_valueW[i].charAt(0) == '-')
+		{
+			alert("NO"+(index+1)+" "+"<% Fid_str(88); %>");
+			return false;
+		}
+		
+		rangeW[i] = new PORT_RANGE();
+		sub_rangeW = sub_valueW[i].split(/\-/);
+		if(sub_rangeW.length == 1)
+		{
+			//return true; //not range case, don't check anymore
+			rangeW[i].b_port = sub_rangeW[0];
+			rangeW[i].e_port = sub_rangeW[0];
+		}
+		else if(sub_rangeW.length == 2)
+		{
+			if(isNaN(sub_rangeW[0]) == false && sub_rangeW[1] == '*')
+			{
+				value1 = new Number(sub_rangeW[0]);
+				rangeW[i].b_port = sub_rangeW[0];
+				rangeW[i].e_port = 65535;
+			}
+			else
+			{
+				if(isNaN(sub_rangeW[0]) == true || isNaN(sub_rangeW[1]) == true)
+					return true;
+				value1 = new Number(sub_rangeW[0]);
+				value2 = new Number(sub_rangeW[1]);
+				if(value1.valueOf() > value2.valueOf())
+				{
+					rangeW[i].b_port = sub_rangeW[1];
+					rangeW[i].e_port = sub_rangeW[0];				
+				}
+				else
+				{
+					rangeW[i].b_port = sub_rangeW[0];
+					rangeW[i].e_port = sub_rangeW[1];
+				}
+			}
+		}
+		//else
+		//	return true;
+	}
+	
+	if (rangeL.length != rangeW.length)
+		return true;
+
+	for(i = 0; i < rangeL.length; i++)
+	{
+	    if((rangeL[i].b_port<=0 || rangeL[i].b_port>65535) ||
+	       (rangeL[i].e_port<=0 || rangeL[i].e_port>65535))
+	    {
+	        alert("NO"+(index+1)+" "+"<% Fid_str(88); %>");
+		    return false;
+		}
+		
+		if((rangeW[i].b_port<=0 || rangeW[i].b_port>65535) ||
+	       (rangeW[i].e_port<=0 || rangeW[i].e_port>65535))
+	    {
+	        alert("NO"+(index+1)+" "+"<% Fid_str(88); %>");
+		    return false;
+		}
+		
+		if ((rangeL[i].e_port - rangeL[i].b_port) != (rangeW[i].e_port - rangeW[i].b_port))
+		{
+			alert("NO"+(index+1)+" "+"<% Fid_str(1250); %>");
+			return false;
+		}
+	}
+	return true;
+}
+
+function VerifyVSEntry(index)
+{
+	var protocol_type, protocol; // 0: both
+	var sub_string;
+	var sub_value;
+	var i, j;
+	
+	if(index < 0 && index >= VIRTUAL_SERVER_NUMBER_PER_INTERFACE)
+		return true;
+
+	protocol_type = document.tF1["protocol"+index].options[document.tF1["protocol"+index].selectedIndex].value;
+	sub_string = parseIPValueRange(document.tF1["wan_ip"+index].value);
+	if(sub_string == null)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(1241); %>");
+		return false;
+	}
+	
+	sub_string = parseIPValueRange(document.tF1["lan_ip"+index].value);
+	if(isNValidLastIP(document.tF1["lan_ip"+index].value))
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(822); %>");
+		return false;
+	}
+	if((document.tF1.lan_ip_prefix.value+document.tF1["lan_ip"+index].value)==gateway_lan_ip)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(1240); %>");
+		return false;
+	}
+	if(protocol_type == both_proto)
+		protocol = tcp_proto;
+	else
+		protocol = protocol_type;
+	if (parseValueRangeBoth(document.tF1["lan_port"+index].value, document.tF1["wan_port"+index].value,index) == false)
+		return false;
+	sub_string = parseValueRange(document.tF1["wan_port"+index].value);
+	sub_value = parsePortValueRange(document.tF1["wan_port"+index].value);
+	
+	if(sub_string == null)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(1250); %>");
+		return false;
+	}
+	if(sub_string.length > PORT_MAX)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(1350); %> " + PORT_MAX + "");
+		return false;
+	}
+	j = 0;
+	for(i = 0; i < sub_string.length; i++)
+	{
+	    if((parseInt(sub_string[i].b_port)<=0 || parseInt(sub_string[i].b_port)>65535) ||
+	       (parseInt(sub_string[i].e_port)<=0 || parseInt(sub_string[i].e_port)>65535)){
+	        	alert("No" + (index+1) + "." + "<% Fid_str(672); %>");
+		    	return false;
+		}
+		if(parseInt(sub_value[i].b_port) > parseInt(sub_value[i].e_port)){
+			alert("No" + (index+1) + "." +"<% Fid_str(132); %>");
+		    	return false;
+		}	
+		j++;
+	}
+
+	if(protocol_type == both_proto)
+	{
+		protocol = udp_proto;
+		if((j+sub_string.length) > PORT_MAX)
+		{
+			alert("No" + (index+1) + "." + "<% Fid_str(1350); %> " + PORT_MAX + " ");
+			return false;
+		}
+	}
+
+	if(document.tF1["service_name"+index].value==''){ alert('No' + (index+1) + '.' + '<% Fid_str(1361); %>.'); return false; }
+      if (isIncludeDQuote(document.tF1["service_name"+index].value)) { alert('<% Fid_str(648); %>  ['+document.tF1["service_name"+index].value+'].'); return false; }
+      if (isIncludeBSlash(document.tF1["service_name"+index].value)) { alert('<% Fid_str(648); %>  ['+document.tF1["service_name"+index].value+'].'); return false; }
+
+	if(protocol_type == both_proto)
+		protocol = tcp_proto;
+	else
+		protocol = protocol_type;
+
+	sub_string = parseValueRange(document.tF1["lan_port"+index].value);
+	sub_value = parsePortValueRange(document.tF1["lan_port"+index].value);
+	
+	if(sub_string == null)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(672); %>");
+		return false;
+	}
+	if(sub_string.length > PORT_MAX)
+	{
+		alert("No" + (index+1) + "." + "<% Fid_str(1350); %> " + PORT_MAX + "");
+		return false;
+	}
+	j = 0;
+	for(i = 0; i < sub_string.length; i++)
+	{
+	    if((sub_string[i].b_port<=0 || sub_string[i].b_port>65535) ||
+	       (sub_string[i].e_port<=0 || sub_string[i].e_port>65535)){
+	        	alert("No" + (index+1) + "." + "<% Fid_str(672); %>");
+		    	return false;
+		}
+		
+		if(sub_value[i].b_port>sub_value[i].e_port){
+			alert("No" + (index+1) + "." +"<% Fid_str(133); %>");
+		    	return false;
+		}
+		j++;
+	}
+	if(protocol_type == both_proto)
+	{
+		protocol = udp_proto;
+		if((j+sub_string.length)> PORT_MAX)
+		{
+			alert("No" + (index+1) + "." + "<% Fid_str(1350); %>" + PORT_MAX + "");
+			return false;
+		}
+	}
+
+	for(var i=0;i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;i++)
+	{
+		for(var j=i+1;j<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;j++)
+		{
+			var p1, p2, proto1, proto2, ip1, ip2;
+			p1 = document.tF1["wan_port"+i].value;
+			p2 = document.tF1["wan_port"+j].value;
+			proto1 = document.tF1["protocol"+i].value;
+			proto2 = document.tF1["protocol"+j].value;
+			if(p1 != "" && p2 != "" && p1 == p2 && (proto1 == proto2 || proto1 == 255 || proto2 == 255))
+			{
+				name1 = document.tF1["service_name"+i].value;
+				name2 = document.tF1["service_name"+j].value;
+				alert("<% Fid_str(1373); %>" + name1 + " (" + p1 + ")" + " <--> " + name2 + " (" + p2 + ")");
+				return false;
+			}
+			
+			p1 = document.tF1["lan_port"+i].value;
+			p2 = document.tF1["lan_port"+j].value;
+			ip1 = document.tF1["lan_ip"+i].value;
+			ip2 = document.tF1["lan_ip"+j].value;
+			if(p1 != "" && p2 != "" && p1 == p2 && (proto1 == proto2 || proto1 == 255 || proto2 == 255) && ip1 == ip2)
+			{
+				name1 = document.tF1["service_name"+i].value;
+				name2 = document.tF1["service_name"+j].value;
+				alert("<% Fid_str(1373); %>" + name1 + " (" + p1 + ")" + " <--> " + name2 + " (" + p2 + ")");
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+function emptyvalue(index){
+	var field_name,field_name1,field_name2,field_name3;
+	var field_index, field_index1,field_index2,field_index3;
+
+	var protocol_type, protocol; // 0: both
+	var sub_string;
+	var sub_value;
+	var i, j;
+
+	if((document.tF1["service_name"+index].value=='')&&(document.tF1["lan_ip"+index].value=='')
+	&&(document.tF1["lan_port"+index].value=='')&&(document.tF1["wan_port"+index].value=='')){
+		return true;
+	 }else{
+	 	return false;
+	 }
+}
+
+function FillForwardObj(index, insertRow)
+{
+
+	var wanIpRange=document.tF1['wan_port'+index].value.split('-');		
+		
+	document.tF1['forward_port_from_start'+insertRow].value=wanIpRange[0];
+	if(wanIpRange[1]) 
+		document.tF1['forward_port_from_end'+insertRow].value=wanIpRange[1];
+	else
+		document.tF1['forward_port_from_end'+insertRow].value=wanIpRange[0];
+		
+	if(document.tF1['lan_ip'+index].value!="") 
+		document.tF1['forward_port_to_ip'+insertRow].value=document.tF1.lan_ip_prefix.value+document.tF1['lan_ip'+index].value;
+
+	var lanIpRange=document.tF1['lan_port'+index].value.split('-');
+	document.tF1['forward_port_to_start'+insertRow].value=lanIpRange[0];
+	if(lanIpRange[1]) 
+		document.tF1['forward_port_to_end'+insertRow].value=lanIpRange[1];
+	else
+		document.tF1['forward_port_to_end'+insertRow].value=lanIpRange[0];
+	
+	if(document.tF1['enable'+index].checked)
+		document.tF1['forward_port_enable'+insertRow].disabled=false;
+	else 
+		document.tF1['forward_port_enable'+insertRow].disabled=true;
+		
+	document.tF1['forward_port_desc'+insertRow].value=document.tF1['service_name'+index].value;
+}
+
+function btnApply() 
+{
+	var counterflag=0;
+	var	rowCounter=-1;
+	var index=0;
+	
+	document.tF1.lan_ip_prefix.value = lanip_oct1 + '.' + lanip_oct2 + '.' + lanip_oct3+ '.';
+	for(index=0;index<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;index++)
+	{
+		if((emptyvalue(index)==true)&&(emptyentry(index) == true)){
+			counterflag++;
+		} else {
+			if (VerifyVSEntry(index) == false) return false;
+			rowCounter++;
+		}		
+		if(document.tF1['protocol'+index].value=="6") {
+			document.tF1['forward_port_proto'+index].value="tcp";
+			FillForwardObj(index, index);
+		} else if(document.tF1['protocol'+index].value=="17") {
+			document.tF1['forward_port_proto'+index].value="udp";						
+			FillForwardObj(index, index);
+		}
+	}
+
+	// --- For BOTH Protocol
+	for(index=0;index<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;index++) {
+		if(document.tF1['protocol'+index].value=="255") {
+			if(rowCounter>=(VIRTUAL_SERVER_NUMBER_PER_INTERFACE-1)) {
+				alert('<% Fid_str(1311); %>');
+				return false;
+			}			
+			rowCounter++;
+			document.tF1['forward_port_proto'+rowCounter].value="tcp";
+			FillForwardObj(index, rowCounter);
+			rowCounter++;
+			document.tF1['forward_port_proto'+rowCounter].value="udp";						
+			FillForwardObj(index, rowCounter);		
+			rowCounter++;		
+		}
+		
+	}
+	
+	document.tF1.op_mode.value = "apply";
+	document.tF1.submit();
+	
+	return true;
+}
+
+function VIRTUAL_SERVER_ENTRY()
+{
+	var i;
+	this.index = -1;
+	this.enable = 0;
+	this.protocol = 0;
+	this.ip_count = 0;
+	this.ip = new Array(IP_MAX);
+	for(i=0; i < IP_MAX; i++)
+		this.ip[i] = new IP_RANGE();
+	this.lan_ip = "";
+	this.service_name = "";
+	this.port_count = 0;
+	this.port = new Array(PORT_MAX);
+	for(i=0; i < PORT_MAX; i++)
+		this.port[i] = new PORT_RANGE();
+	this.lan_port_count = 0;
+	this.lan_port = new Array(PORT_MAX);
+	for(i=0; i < PORT_MAX; i++)
+		this.lan_port[i] = new PORT_RANGE();
+};
+
+function VIRTUAL_SERVER_TABLE()
+{
+	var i;
+	this.interface_num = 0;
+	this.count = 0;
+	this.entry = new Array(VIRTUAL_SERVER_NUMBER_PER_INTERFACE);
+	for(i=0; i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE; i++)
+		this.entry[i] = new VIRTUAL_SERVER_ENTRY();
+}
+
+var VIRTUAL_SERVER = new VIRTUAL_SERVER_TABLE();
+var lanip_oct1, lanip_oct2, lanip_oct3;
+
+virtual_server_MAX_NUM = 143;
+var virtual_server = new Array(virtual_server_MAX_NUM);
+virtual_server[0] = new ObjVirServer("Active Worlds",4);
+virtual_server[0].entry[0] = new ObjVirtualServer("Active Worlds", true, "Active Worlds", "3000", "3000", "TCP", "", "3000", "3000");
+virtual_server[0].entry[1] = new ObjVirtualServer("Active Worlds", true, "Active Worlds", "5670", "5670", "TCP", "", "5670", "5670");
+virtual_server[0].entry[2] = new ObjVirtualServer("Active Worlds", true, "Active Worlds", "7777", "7777", "TCP", "", "7777", "7777");
+virtual_server[0].entry[3] = new ObjVirtualServer("Active Worlds", true, "Active Worlds", "7000", "7000", "TCP", "", "7000", "7000");
+virtual_server[1] = new ObjVirServer("Age of Empires",4);
+virtual_server[1].entry[0] = new ObjVirtualServer("Age of Empires", true, "Age of Empires", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[1].entry[1] = new ObjVirtualServer("Age of Empires", true, "Age of Empires", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[1].entry[2] = new ObjVirtualServer("Age of Empires", true, "Age of Empires", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[1].entry[3] = new ObjVirtualServer("Age of Empires", true, "Age of Empires", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[2] = new ObjVirServer("Age of Empires Expansion: The Rise of Rome",4);
+virtual_server[2].entry[0] = new ObjVirtualServer("Age of Empires Expansion: The Rise of Rome", true, "Age of Empires Expansion:The Rise of Rome", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[2].entry[1] = new ObjVirtualServer("Age of Empires Expansion: The Rise of Rome", true, "Age of Empires Expansion:The Rise of Rome", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[2].entry[2] = new ObjVirtualServer("Age of Empires Expansion: The Rise of Rome", true, "Age of Empires Expansion:The Rise of Rome", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[2].entry[3] = new ObjVirtualServer("Age of Empires Expansion: The Rise of Rome", true, "Age of Empires Expansion:The Rise of Rome", "2300", "2400", "UDP", "", "2300", "2400");   
+virtual_server[3] = new ObjVirServer("Age of Empires II Expansion: The Conquerors",4);
+virtual_server[3].entry[0] = new ObjVirtualServer("Age of Empires II Expansion: The Conquerors", true, "Age of Empires II Expansion:The Conquerors", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[3].entry[1] = new ObjVirtualServer("Age of Empires II Expansion: The Conquerors", true, "Age of Empires II Expansion:The Conquerors", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[3].entry[2] = new ObjVirtualServer("Age of Empires II Expansion: The Conquerors", true, "Age of Empires II Expansion:The Conquerors", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[3].entry[3] = new ObjVirtualServer("Age of Empires II Expansion: The Conquerors", true, "Age of Empires II Expansion:The Conquerors", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[4] = new ObjVirServer("Age of Empires II: The Age of Kings",4);
+virtual_server[4].entry[0] = new ObjVirtualServer("Age of Empires II: The Age of Kings", true, "Age of Empires II:The Age of Kings", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[4].entry[1] = new ObjVirtualServer("Age of Empires II: The Age of Kings", true, "Age of Empires II:The Age of Kings", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[4].entry[2] = new ObjVirtualServer("Age of Empires II: The Age of Kings", true, "Age of Empires II:The Age of Kings", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[4].entry[3] = new ObjVirtualServer("Age of Empires II: The Age of Kings", true, "Age of Empires II:The Age of Kings", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[5] = new ObjVirServer("Age of Kings",4);
+virtual_server[5].entry[0] = new ObjVirtualServer("Age of Kings", true, "Age of Kings", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[5].entry[1] = new ObjVirtualServer("Age of Kings", true, "Age of Kings", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[5].entry[2] = new ObjVirtualServer("Age of Kings", true, "Age of Kings", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[5].entry[3] = new ObjVirtualServer("Age of Kings", true, "Age of Kings", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[6] = new ObjVirServer("Age of Wonders",4);
+virtual_server[6].entry[0] = new ObjVirtualServer("Age of Wonders", true, "Age of Wonders", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[6].entry[1] = new ObjVirtualServer("Age of Wonders", true, "Age of Wonders", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[6].entry[2] = new ObjVirtualServer("Age of Wonders", true, "Age of Wonders", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[6].entry[3] = new ObjVirtualServer("Age of Wonders", true, "Age of Wonders", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[7] = new ObjVirServer("Aliens vs. Predator",3);
+virtual_server[7].entry[0] = new ObjVirtualServer("Aliens vs. Predator", true, "Aliens vs. Predator", "80", "80", "UDP", "", "80", "80");
+virtual_server[7].entry[1] = new ObjVirtualServer("Aliens vs. Predator", true, "Aliens vs. Predator", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[7].entry[2] = new ObjVirtualServer("Aliens vs. Predator", true, "Aliens vs. Predator", "8000", "8999", "UDP", "", "8000", "8999");
+virtual_server[7].entry[3] = new ObjVirtualServer("Age of Wonders", true, "Age of Wonders", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[8] = new ObjVirServer("Anarchy Online (BETA)",4);
+virtual_server[8].entry[0] = new ObjVirtualServer("Anarchy Online (BETA)", true, "Anarchy Online (BETA)", "7013", "7013", "TCP", "", "7013", "7013");
+virtual_server[8].entry[1] = new ObjVirtualServer("Anarchy Online (BETA)", true, "Anarchy Online (BETA)", "7013", "7013", "UDP", "", "7013", "7013");
+virtual_server[8].entry[2] = new ObjVirtualServer("Anarchy Online (BETA)", true, "Anarchy Online (BETA)", "7500", "7501", "TCP", "", "7500", "7501");
+virtual_server[8].entry[3] = new ObjVirtualServer("Anarchy Online (BETA)", true, "Anarchy Online (BETA)", "7500", "7501", "UDP", "", "7500", "7501");
+virtual_server[9] = new ObjVirServer("AOL Instant Messenger",1);
+virtual_server[9].entry[0] = new ObjVirtualServer("AOL Instant Messenger", true, "AOL Instant Messenger", "443", "443", "TCP", "", "443", "443");
+virtual_server[10] = new ObjVirServer("Audiogalaxy Satellite",2);
+virtual_server[10].entry[0] = new ObjVirtualServer("Audiogalaxy Satellite", true, "Audiogalaxy Satellite", "41000", "50000", "TCP", "", "41000", "50000");
+virtual_server[10].entry[1] = new ObjVirtualServer("Audiogalaxy Satellite", true, "Audiogalaxy Satellite", "1117", "5190", "TCP", "", "1117", "5190");
+virtual_server[11] = new ObjVirServer("Baldur's Gate",2);
+virtual_server[11].entry[0] = new ObjVirtualServer("Baldur's Gate", true, "Baldur's Gate", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[11].entry[1] = new ObjVirtualServer("Baldur's Gate", true, "Baldur's Gate", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[12] = new ObjVirServer("BattleCom",4);
+virtual_server[12].entry[0] = new ObjVirtualServer("BattleCom", true, "BattleCom", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[12].entry[1] = new ObjVirtualServer("BattleCom", true, "BattleCom", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[12].entry[2] = new ObjVirtualServer("BattleCom", true, "BattleCom", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[12].entry[3] = new ObjVirtualServer("BattleCom", true, "BattleCom", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[13] = new ObjVirServer("Battlefield Communicator",2);
+virtual_server[13].entry[0] = new ObjVirtualServer("Battlefield Communicator", true, "Battlefield Communicator", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[13].entry[1] = new ObjVirtualServer("Battlefield Communicator", true, "Battlefield Communicator", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[14] = new ObjVirServer("Black and White",4);
+virtual_server[14].entry[0] = new ObjVirtualServer("Black and White", true, "Black and White", "2611", "2612", "TCP", "", "2611", "2612");
+virtual_server[14].entry[1] = new ObjVirtualServer("Black and White", true, "Black and White", "6667", "6667", "TCP", "", "6667", "6667");
+virtual_server[14].entry[2] = new ObjVirtualServer("Black and White", true, "Black and White", "6500", "6500", "UDP", "", "6500", "6500");
+virtual_server[14].entry[3] = new ObjVirtualServer("Black and White", true, "Black and White", "27900", "27900", "UDP", "", "27900", "27900");
+virtual_server[15] = new ObjVirServer("Blizzard Battle.net",3);
+virtual_server[15].entry[0] = new ObjVirtualServer("Blizzard Battle.net", true, "Blizzard Battle.net", "4000", "4000", "TCP", "", "4000", "4000");
+virtual_server[15].entry[1] = new ObjVirtualServer("Blizzard Battle.net", true, "Blizzard Battle.net", "6112", "6112", "TCP", "", "6112", "6112");
+virtual_server[15].entry[2] = new ObjVirtualServer("Blizzard Battle.net", true, "Blizzard Battle.net", "6112", "6112", "UDP", "", "6112", "6112");
+virtual_server[16] = new ObjVirServer("Buddy Phone",1);
+virtual_server[16].entry[0] = new ObjVirtualServer("Buddy Phone", true, "Buddy Phone", "700", "701", "UDP", "", "700", "701");
+virtual_server[17] = new ObjVirServer("Bungie.net",1);
+virtual_server[17].entry[0] = new ObjVirtualServer("Bungie.net", true, "Bungie.net", "3453", "3453", "TCP", "", "3453", "3453");
+virtual_server[18] = new ObjVirServer("Camerades",2);
+virtual_server[18].entry[0] = new ObjVirtualServer("Camerades", true, "Camerades", "2047", "2048", "TCP", "", "2047", "2048");
+virtual_server[18].entry[1] = new ObjVirtualServer("Camerades", true, "Camerades", "2047", "2048", "UDP", "", "2047", "2048");
+virtual_server[19] = new ObjVirServer("CART Precision Racing",4);
+virtual_server[19].entry[0] = new ObjVirtualServer("CART Precision Racing", true, "CART Precision Racing", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[19].entry[1] = new ObjVirtualServer("CART Precision Racing", true, "CART Precision Racing", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[19].entry[2] = new ObjVirtualServer("CART Precision Racing", true, "CART Precision Racing", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[19].entry[3] = new ObjVirtualServer("CART Precision Racing", true, "CART Precision Racing", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[20] = new ObjVirServer("Close Combat for Windows",4);
+virtual_server[20].entry[0] = new ObjVirtualServer("Close Combat for Windows", true, "Close Combat for Windows", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[20].entry[1] = new ObjVirtualServer("Close Combat for Windows", true, "Close Combat for Windows", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[20].entry[2] = new ObjVirtualServer("Close Combat for Windows", true, "Close Combat for Windows", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[20].entry[3] = new ObjVirtualServer("Close Combat for Windows", true, "Close Combat for Windows", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[21] = new ObjVirServer("Close Combat III: The Russian Front",4);
+virtual_server[21].entry[0] = new ObjVirtualServer("Close Combat III: The Russian Front", true, "The Russian Front", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[21].entry[1] = new ObjVirtualServer("Close Combat III: The Russian Front", true, "The Russian Front", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[21].entry[2] = new ObjVirtualServer("Close Combat III: The Russian Front", true, "The Russian Front", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[21].entry[3] = new ObjVirtualServer("Close Combat III: The Russian Front", true, "The Russian Front", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[22] = new ObjVirServer("Close Combat: A Bridge Too Far",4);
+virtual_server[22].entry[0] = new ObjVirtualServer("Close Combat: A Bridge Too Far", true, "Close Combat: A Bridge Too Far", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[22].entry[1] = new ObjVirtualServer("Close Combat: A Bridge Too Far", true, "Close Combat: A Bridge Too Far", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[22].entry[2] = new ObjVirtualServer("Close Combat: A Bridge Too Far", true, "Close Combat: A Bridge Too Far", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[22].entry[3] = new ObjVirtualServer("Close Combat: A Bridge Too Far", true, "Close Combat: A Bridge Too Far", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[23] = new ObjVirServer("Combat Flight Simulator 2: WWII Pacific Theater",4);
+virtual_server[23].entry[0] = new ObjVirtualServer("Combat Flight Simulator 2: WWII Pacific Theater", true, "Combat Flight Simulator 2: WWII Pacific Theater", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[23].entry[1] = new ObjVirtualServer("Combat Flight Simulator 2: WWII Pacific Theater", true, "Combat Flight Simulator 2: WWII Pacific Theater", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[23].entry[2] = new ObjVirtualServer("Combat Flight Simulator 2: WWII Pacific Theater", true, "Combat Flight Simulator 2: WWII Pacific Theater", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[23].entry[3] = new ObjVirtualServer("Combat Flight Simulator 2: WWII Pacific Theater", true, "Combat Flight Simulator 2: WWII Pacific Theater", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[24] = new ObjVirServer("Combat Flight Simulator: WWII Europe Series",4);
+virtual_server[24].entry[0] = new ObjVirtualServer("Combat Flight Simulator: WWII Europe Series", true, "Combat Flight Simulator: WWII Europe Series", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[24].entry[1] = new ObjVirtualServer("Combat Flight Simulator: WWII Europe Series", true, "Combat Flight Simulator: WWII Europe Series", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[24].entry[2] = new ObjVirtualServer("Combat Flight Simulator: WWII Europe Series", true, "Combat Flight Simulator: WWII Europe Series", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[24].entry[3] = new ObjVirtualServer("Combat Flight Simulator: WWII Europe Series", true, "Combat Flight Simulator: WWII Europe Series", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[25] = new ObjVirServer("Crimson Skies",4);
+virtual_server[25].entry[0] = new ObjVirtualServer("Crimson Skies", true, "Crimson Skies", "28805", "28805", "TCP", "", "28805", "28805");
+virtual_server[25].entry[1] = new ObjVirtualServer("Crimson Skies", true, "Crimson Skies", "28801", "28801", "TCP", "", "28801", "28801");
+virtual_server[25].entry[2] = new ObjVirtualServer("Crimson Skies", true, "Crimson Skies", "3040", "3040", "TCP", "", "3040", "3040");
+virtual_server[25].entry[3] = new ObjVirtualServer("Crimson Skies", true, "Crimson Skies", "1121", "1121", "TCP", "", "1121", "1121");
+virtual_server[26] = new ObjVirServer("Dark Reign",1);
+virtual_server[26].entry[0] = new ObjVirtualServer("Dark Reign", true, "Dark Reign", "21154", "21156", "UDP", "", "21154", "21156");
+virtual_server[27] = new ObjVirServer("Dark Reign 2",2);
+virtual_server[27].entry[0] = new ObjVirtualServer("Dark Reign 2", true, "Dark Reign 2", "26214", "26214", "TCP", "", "26214", "26214");
+virtual_server[27].entry[1] = new ObjVirtualServer("Dark Reign 2", true, "Dark Reign 2", "26214", "26214", "UDP", "", "26214", "26214"); 
+virtual_server[28] = new ObjVirServer("Delta Force 2",1);
+virtual_server[28].entry[0] = new ObjVirtualServer("Delta Force 2", true, "Delta Force 2", "3568", "3569", "UDP", "", "3568", "3569");
+virtual_server[29] = new ObjVirServer("Delta Three PC to Phone",6);
+virtual_server[29].entry[0] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "12053", "12053", "TCP", "", "12053", "12053");
+virtual_server[29].entry[1] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "12083", "12083", "TCP", "", "12083", "12083");
+virtual_server[29].entry[2] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "12080", "12080", "UDP", "", "12080", "12080");
+virtual_server[29].entry[3] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "12120", "12120", "UDP", "", "12120", "12120"); 
+virtual_server[29].entry[4] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "12122", "12122", "UDP", "", "12122", "12122");
+virtual_server[29].entry[5] = new ObjVirtualServer("Delta Three PC to Phone", true, "Delta Three PC to Phone", "24150", "24179", "UDP", "", "24150", "24179");
+virtual_server[30] = new ObjVirServer("Descent 3",3);
+virtual_server[30].entry[0] = new ObjVirtualServer("Descent 3", true, "Descent 3", "7170", "7170", "TCP", "", "7170", "7170");
+virtual_server[30].entry[1] = new ObjVirtualServer("Descent 3", true, "Descent 3", "2092", "2092", "UDP", "", "2092", "2092");
+virtual_server[30].entry[2] = new ObjVirtualServer("Descent 3", true, "Descent 3", "3445", "3445", "UDP", "", "3445", "3445");
+virtual_server[31] = new ObjVirServer("Descent Freespace",5);
+virtual_server[31].entry[0] = new ObjVirtualServer("Descent Freespace", true, "Descent Freespace", "3999", "3999", "TCP", "", "3999", "3999");
+virtual_server[31].entry[1] = new ObjVirtualServer("Descent Freespace", true, "Descent Freespace", "4000", "4000", "UDP", "", "4000", "4000");
+virtual_server[31].entry[2] = new ObjVirtualServer("Descent Freespace", true, "Descent Freespace", "7000", "7000", "UDP", "", "7000", "7000");
+virtual_server[31].entry[3] = new ObjVirtualServer("Descent Freespace", true, "Descent Freespace", "3493", "3493", "UDP", "", "3493", "3493"); 
+virtual_server[31].entry[4] = new ObjVirtualServer("Descent Freespace", true, "Descent Freespace", "3440", "3440", "UDP", "", "3440", "3440");
+virtual_server[32] = new ObjVirServer("Diablo (1.07+)",1);
+virtual_server[32].entry[0] = new ObjVirtualServer("Diablo (1.07+)", true, "Diablo (1.07+)", "6112", "6112", "TCP", "", "6112", "6112");
+virtual_server[33] = new ObjVirServer("Diablo I",2);
+virtual_server[33].entry[0] = new ObjVirtualServer("Diablo I", true, "Diablo I", "6112", "6112", "TCP", "", "6112", "6112");
+virtual_server[33].entry[1] = new ObjVirtualServer("Diablo I", true, "Diablo I", "6112", "6112", "UDP", "", "6112", "6112");
+virtual_server[34] = new ObjVirServer("Diablo II",2);
+virtual_server[34].entry[0] = new ObjVirtualServer("Diablo II", true, "Diablo II", "4000", "4000", "TCP", "", "4000", "4000");
+virtual_server[34].entry[1] = new ObjVirtualServer("Diablo II", true, "Diablo II", "6112", "6119", "UDP", "", "6112", "6119");
+virtual_server[35] = new ObjVirServer("DialPad.Com",5);
+virtual_server[35].entry[0] = new ObjVirtualServer("DialPad.Com", true, "DialPad.Com", "51200", "51201", "UDP", "", "51200", "51201");
+virtual_server[35].entry[1] = new ObjVirtualServer("DialPad.Com", true, "DialPad.Com", "7175", "7175", "TCP", "", "7175", "7175");
+virtual_server[35].entry[2] = new ObjVirtualServer("DialPad.Com", true, "DialPad.Com", "51210", "51210", "TCP", "", "51210", "51210");
+virtual_server[35].entry[3] = new ObjVirtualServer("DialPad.Com", true, "DialPad.Com", "8680", "8686", "TCP", "", "8680", "8686"); 
+virtual_server[35].entry[4] = new ObjVirtualServer("DialPad.Com", true, "DialPad.Com", "1584", "1585", "TCP", "", "1584", "1585");
+virtual_server[36] = new ObjVirServer("DirectX 7 Games",3);
+virtual_server[36].entry[0] = new ObjVirtualServer("DirectX 7 Games", true, "DirectX 7 Games", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[36].entry[1] = new ObjVirtualServer("DirectX 7 Games", true, "DirectX 7 Games", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[36].entry[2] = new ObjVirtualServer("DirectX 7 Games", true, "DirectX 7 Games", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[37] = new ObjVirServer("DirectX 8 Games",2);
+virtual_server[37].entry[0] = new ObjVirtualServer("DirectX 8 Games", true, "DirectX 8 Games", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[37].entry[1] = new ObjVirtualServer("DirectX 8 Games", true, "DirectX 8 Games", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[38] = new ObjVirServer("Domain Name Server (DNS)",2);
+virtual_server[38].entry[0] = new ObjVirtualServer("Domain Name Server (DNS)", true, "Domain Name Server (DNS)", "53", "53", "TCP", "", "53", "53");
+virtual_server[38].entry[1] = new ObjVirtualServer("Domain Name Server (DNS)", true, "Domain Name Server (DNS)", "53", "53", "UDP", "", "53", "53");
+virtual_server[39] = new ObjVirServer("Doom",2);
+virtual_server[39].entry[0] = new ObjVirtualServer("Doom", true, "Doom", "666", "666", "TCP", "", "666", "666");
+virtual_server[39].entry[1] = new ObjVirtualServer("Doom", true, "Doom", "666", "666", "UDP", "", "666", "666");
+virtual_server[40] = new ObjVirServer("Dune 2000",2);
+virtual_server[40].entry[0] = new ObjVirtualServer("Dune 2000", true, "Dune 2000", "4000", "4000", "TCP", "", "4000", "4000");
+virtual_server[40].entry[1] = new ObjVirtualServer("Dune 2000", true, "Dune 2000", "1140", "1234", "UDP", "", "1140", "1234");
+virtual_server[41] = new ObjVirServer("Dwyco Video Conferencing",4);
+virtual_server[41].entry[0] = new ObjVirtualServer("Dwyco Video Conferencing", true, "Dwyco Video Conferencing", "12000", "16090", "UDP", "", "12000", "16090");
+virtual_server[41].entry[1] = new ObjVirtualServer("Dwyco Video Conferencing", true, "Dwyco Video Conferencing", "1024", "5000", "TCP", "", "1024", "5000");
+virtual_server[41].entry[2] = new ObjVirtualServer("Dwyco Video Conferencing", true, "Dwyco Video Conferencing", "6700", "6702", "TCP", "", "6700", "6702");
+virtual_server[41].entry[3] = new ObjVirtualServer("Dwyco Video Conferencing", true, "Dwyco Video Conferencing", "6880", "6880", "TCP", "", "6880", "6880");
+virtual_server[42] = new ObjVirServer("Elite Force",4);
+virtual_server[42].entry[0] = new ObjVirtualServer("Elite Force", true, "Elite Force", "26000", "26000", "UDP", "", "26000", "26000");
+virtual_server[42].entry[1] = new ObjVirtualServer("Elite Force", true, "Elite Force", "27500", "27500", "UDP", "", "27500", "27500");
+virtual_server[42].entry[2] = new ObjVirtualServer("Elite Force", true, "Elite Force", "27910", "27910", "UDP", "", "27910", "27910");
+virtual_server[42].entry[3] = new ObjVirtualServer("Elite Force", true, "Elite Force", "27960", "27960", "UDP", "", "27960", "27960");
+virtual_server[43] = new ObjVirServer("Everquest",3);
+virtual_server[43].entry[0] = new ObjVirtualServer("Everquest", true, "Everquest", "1024", "6000", "TCP", "", "1024", "6000");
+virtual_server[43].entry[1] = new ObjVirtualServer("Everquest", true, "Everquest", "1024", "6000", "UDP", "", "1024", "6000");
+virtual_server[43].entry[2] = new ObjVirtualServer("Everquest", true, "Everquest", "6001", "7000", "TCP", "", "6001", "7000");
+virtual_server[44] = new ObjVirServer("F-16",1);
+virtual_server[44].entry[0] = new ObjVirtualServer("F-16", true, "F-16", "3862", "3863", "UDP", "", "3862", "3863");
+virtual_server[45] = new ObjVirServer("F-22 Lightning 3",3);
+virtual_server[45].entry[0] = new ObjVirtualServer("F-22 Lightning 3", true, "F-22 Lightning 3", "3875", "3875", "UDP", "", "3875", "3875");
+virtual_server[45].entry[1] = new ObjVirtualServer("F-22 Lightning 3", true, "F-22 Lightning 3", "4533", "4534", "UDP", "", "4533", "4534");
+virtual_server[45].entry[2] = new ObjVirtualServer("F-22 Lightning 3", true, "F-22 Lightning 3", "4660", "4670", "UDP", "", "4660", "4670");
+virtual_server[46] = new ObjVirServer("F-22 Raptor",1);
+virtual_server[46].entry[0] = new ObjVirtualServer("F-22 Raptor", true, "F-22 Raptor", "3874", "3875", "UDP", "", "3874", "3875");
+virtual_server[47] = new ObjVirServer("F22 Raptor (Novalogic)",1);
+virtual_server[47].entry[0] = new ObjVirtualServer("F22 Raptor (Novalogic)", true, "F22 Raptor (Novalogic)", "3874", "3874", "UDP", "", "3874", "3874");
+virtual_server[48] = new ObjVirServer("Falcon 4.0",1);
+virtual_server[48].entry[0] = new ObjVirtualServer("Falcon 4.0", true, "Falcon 4.0", "2934", "2935", "UDP", "", "2934", "2935");
+virtual_server[49] = new ObjVirServer("Fighter Ace II",6);
+virtual_server[49].entry[0] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "50000", "50100", "TCP", "", "50000", "50100");
+virtual_server[49].entry[1] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "50000", "50100", "UDP", "", "50000", "50100");
+virtual_server[49].entry[2] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[49].entry[3] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[49].entry[4] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[49].entry[5] = new ObjVirtualServer("Fighter Ace II", true, "Fighter Ace II", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[50] = new ObjVirServer("Flight Simulator 2000",4);
+virtual_server[50].entry[0] = new ObjVirtualServer("Flight Simulator 2000", true, "Flight Simulator 2000", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[50].entry[1] = new ObjVirtualServer("Flight Simulator 2000", true, "Flight Simulator 2000", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[50].entry[2] = new ObjVirtualServer("Flight Simulator 2000", true, "Flight Simulator 2000", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[50].entry[3] = new ObjVirtualServer("Flight Simulator 2000", true, "Flight Simulator 2000", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[51] = new ObjVirServer("Flight Simulator 98",4);
+virtual_server[51].entry[0] = new ObjVirtualServer("Flight Simulator 98", true, "Flight Simulator 98", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[51].entry[1] = new ObjVirtualServer("Flight Simulator 98", true, "Flight Simulator 98", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[51].entry[2] = new ObjVirtualServer("Flight Simulator 98", true, "Flight Simulator 98", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[51].entry[3] = new ObjVirtualServer("Flight Simulator 98", true, "Flight Simulator 98", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[52] = new ObjVirServer("Freetel",1);
+virtual_server[52].entry[0] = new ObjVirtualServer("Freetel", true, "Freetel", "21300", "21303", "UDP", "", "21300", "21303");
+virtual_server[53] = new ObjVirServer("FTP Server",1);
+virtual_server[53].entry[0] = new ObjVirtualServer("FTP Server", true, "FTP Server", "21", "21", "TCP", "", "21", "21");
+virtual_server[54] = new ObjVirServer("GNUtella",2);
+virtual_server[54].entry[0] = new ObjVirtualServer("GNUtella", true, "GNUtella", "6346", "6347", "TCP", "", "6346", "6347");
+virtual_server[54].entry[1] = new ObjVirtualServer("GNUtella", true, "GNUtella", "6346", "6347", "UDP", "", "6346", "6347");
+virtual_server[55] = new ObjVirServer("Golf 1998 Edition",4);
+virtual_server[55].entry[0] = new ObjVirtualServer("Golf 1998 Edition", true, "Golf 1998 Edition", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[55].entry[1] = new ObjVirtualServer("Golf 1998 Edition", true, "Golf 1998 Edition", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[55].entry[2] = new ObjVirtualServer("Golf 1998 Edition", true, "Golf 1998 Edition", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[55].entry[3] = new ObjVirtualServer("Golf 1998 Edition", true, "Golf 1998 Edition", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[56] = new ObjVirServer("Golf 1999 Edition",4);
+virtual_server[56].entry[0] = new ObjVirtualServer("Golf 1999 Edition", true, "Golf 1999 Edition", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[56].entry[1] = new ObjVirtualServer("Golf 1999 Edition", true, "Golf 1999 Edition", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[56].entry[2] = new ObjVirtualServer("Golf 1999 Edition", true, "Golf 1999 Edition", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[56].entry[3] = new ObjVirtualServer("Golf 1999 Edition", true, "Golf 1999 Edition", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[57] = new ObjVirServer("Golf 2001 Edition",4);
+virtual_server[57].entry[0] = new ObjVirtualServer("Golf 2001 Edition", true, "Golf 2001 Edition", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[57].entry[1] = new ObjVirtualServer("Golf 2001 Edition", true, "Golf 2001 Edition", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[57].entry[2] = new ObjVirtualServer("Golf 2001 Edition", true, "Golf 2001 Edition", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[57].entry[3] = new ObjVirtualServer("Golf 2001 Edition", true, "Golf 2001 Edition", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[58] = new ObjVirServer("Go2Call",2);
+virtual_server[58].entry[0] = new ObjVirtualServer("Go2Call", true, "Go2Call", "2090", "2091", "UDP", "", "2090", "2091");
+virtual_server[58].entry[1] = new ObjVirtualServer("Go2Call", true, "Go2Call", "2090", "2090", "TCP", "", "2090", "2090");
+virtual_server[59] = new ObjVirServer("Half Life",6);
+virtual_server[59].entry[0] = new ObjVirtualServer("Half Life", true, "Half Life", "6003", "6003", "TCP", "", "6003", "6003");
+virtual_server[59].entry[1] = new ObjVirtualServer("Half Life", true, "Half Life", "6003", "6003", "UDP", "", "6003", "6003");
+virtual_server[59].entry[2] = new ObjVirtualServer("Half Life", true, "Half Life", "7001", "7001", "TCP", "", "7001", "7001");
+virtual_server[59].entry[3] = new ObjVirtualServer("Half Life", true, "Half Life", "7001", "7001", "UDP", "", "7001", "7001");
+virtual_server[59].entry[4] = new ObjVirtualServer("Half Life", true, "Half Life", "27005", "27005", "UDP", "", "27005", "27005");
+virtual_server[59].entry[5] = new ObjVirtualServer("Half Life", true, "Half Life", "27010", "27015", "UDP", "", "27010", "27015");
+virtual_server[60] = new ObjVirServer("Half Life Server",1);
+virtual_server[60].entry[0] = new ObjVirtualServer("Half Life Server", true, "Half Life Server", "27015", "27015", "UDP", "", "27015", "27015");
+virtual_server[61] = new ObjVirServer("Heretic II Server",2);
+virtual_server[61].entry[0] = new ObjVirtualServer("Heretic II Server", true, "Heretic II Server", "28910", "28910", "TCP", "", "28910", "28910");
+virtual_server[61].entry[1] = new ObjVirtualServer("Heretic II Server", true, "Heretic II Server", "28910", "28910", "UDP", "", "28910", "28910");
+virtual_server[62] = new ObjVirServer("I76",1);
+virtual_server[62].entry[0] = new ObjVirtualServer("I76", true, "I76", "21154", "21156", "UDP", "", "21154", "21156");
+virtual_server[63] = new ObjVirServer("Ivisit",2);
+virtual_server[63].entry[0] = new ObjVirtualServer("Ivisit", true, "Ivisit", "9943", "9943", "UDP", "", "9943", "9943");
+virtual_server[63].entry[1] = new ObjVirtualServer("Ivisit", true, "Ivisit", "56768", "56768", "UDP", "", "56768", "56768");
+virtual_server[64] = new ObjVirServer("IRC",3);
+virtual_server[64].entry[0] = new ObjVirtualServer("IRC", true, "IRC", "1024", "5000", "TCP", "", "1024", "5000");
+virtual_server[64].entry[1] = new ObjVirtualServer("IRC", true, "IRC", "6660", "6669", "TCP", "", "6660", "6669");
+virtual_server[64].entry[2] = new ObjVirtualServer("IRC", true, "IRC", "113", "113", "UDP", "", "113", "113");
+virtual_server[65] = new ObjVirServer("IStreamVideo2HP",2);
+virtual_server[65].entry[0] = new ObjVirtualServer("IStreamVideo2HP", true, "IStreamVideo2HP", "8076", "8077", "TCP", "", "8076", "8077");
+virtual_server[65].entry[1] = new ObjVirtualServer("IStreamVideo2HP", true, "IStreamVideo2HP", "8076", "8077", "UDP", "", "8076", "8077");
+virtual_server[66] = new ObjVirServer("KaZaA",1);
+virtual_server[66].entry[0] = new ObjVirtualServer("KaZaA", true, "KaZaA", "1024", "1024", "TCP", "", "1024", "1024");
+virtual_server[67] = new ObjVirServer("Kohan Immortal Sovereigns",4);
+virtual_server[67].entry[0] = new ObjVirtualServer("Kohan Immortal Sovereigns", true, "Kohan Immortal Sovereigns", "3855", "3855", "TCP", "", "3855", "3855");
+virtual_server[67].entry[1] = new ObjVirtualServer("Kohan Immortal Sovereigns", true, "Kohan Immortal Sovereigns", "3855", "3855", "UDP", "", "3855", "3855");
+virtual_server[67].entry[2] = new ObjVirtualServer("Kohan Immortal Sovereigns", true, "Kohan Immortal Sovereigns", "17437", "17437", "TCP", "", "17437", "113");
+virtual_server[67].entry[3] = new ObjVirtualServer("Kohan Immortal Sovereigns", true, "Kohan Immortal Sovereigns", "17437", "17437", "UDP", "", "17437", "113");
+virtual_server[68] = new ObjVirServer("LapLink Gold",1);
+virtual_server[68].entry[0] = new ObjVirtualServer("LapLink Gold", true, "LapLink Gold", "1547", "1547", "TCP", "", "1547", "1547");
+virtual_server[69] = new ObjVirServer("Links 2001",4);
+virtual_server[69].entry[0] = new ObjVirtualServer("Links 2001", true, "Links 2001", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[69].entry[1] = new ObjVirtualServer("Links 2001", true, "Links 2001", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[69].entry[2] = new ObjVirtualServer("Links 2001", true, "Links 2001", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[69].entry[3] = new ObjVirtualServer("Links 2001", true, "Links 2001", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[70] = new ObjVirServer("Lotus Notes Server",1);
+virtual_server[70].entry[0] = new ObjVirtualServer("Lotus Notes Server", true, "Lotus Notes Server", "1352", "1352", "TCP", "", "1352", "1352");
+virtual_server[71] = new ObjVirServer("Mail (POP3)",1);
+virtual_server[71].entry[0] = new ObjVirtualServer("Mail (POP3)", true, "Mail (POP3)", "110", "110", "TCP", "", "110", "110");
+virtual_server[72] = new ObjVirServer("Mail (SMTP)",1);
+virtual_server[72].entry[0] = new ObjVirtualServer("Mail (SMTP)", true, "Mail (SMTP)", "25", "25", "TCP", "", "25", "25");
+virtual_server[73] = new ObjVirServer("MechCommander 2.0",4);
+virtual_server[73].entry[0] = new ObjVirtualServer("MechCommander 2.0", true, "MechCommander 2.0", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[73].entry[1] = new ObjVirtualServer("MechCommander 2.0", true, "MechCommander 2.0", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[73].entry[2] = new ObjVirtualServer("MechCommander 2.0", true, "MechCommander 2.0", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[73].entry[3] = new ObjVirtualServer("MechCommander 2.0", true, "MechCommander 2.0", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[74] = new ObjVirServer("MechWarrior 3",2);
+virtual_server[74].entry[0] = new ObjVirtualServer("MechWarrior 3", true, "MechWarrior 3", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[74].entry[1] = new ObjVirtualServer("MechWarrior 3", true, "MechWarrior 3", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[75] = new ObjVirServer("MechWarrior 4",4);
+virtual_server[75].entry[0] = new ObjVirtualServer("MechWarrior 4", true, "MechWarrior 4", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[75].entry[1] = new ObjVirtualServer("MechWarrior 4", true, "MechWarrior 4", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[75].entry[2] = new ObjVirtualServer("MechWarrior 4", true, "MechWarrior 4", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[75].entry[3] = new ObjVirtualServer("MechWarrior 4", true, "MechWarrior 4", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[76] = new ObjVirServer("Media Player 7",2);
+virtual_server[76].entry[0] = new ObjVirtualServer("Media Player 7", true, "Media Player 7", "1755", "1755", "TCP", "", "1755", "1755");
+virtual_server[76].entry[1] = new ObjVirtualServer("Media Player 7", true, "Media Player 7", "70", "7000", "UDP", "", "70", "7000");
+virtual_server[77] = new ObjVirServer("Midtown Madness",2);
+virtual_server[77].entry[0] = new ObjVirtualServer("Midtown Madness", true, "Midtown Madness", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[77].entry[1] = new ObjVirtualServer("Midtown Madness", true, "Midtown Madness", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[78] = new ObjVirServer("Midtown Madness 2",4);
+virtual_server[78].entry[0] = new ObjVirtualServer("Midtown Madness 2", true, "Midtown Madness 2", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[78].entry[1] = new ObjVirtualServer("Midtown Madness 2", true, "Midtown Madness 2", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[78].entry[2] = new ObjVirtualServer("Midtown Madness 2", true, "Midtown Madness 2", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[78].entry[3] = new ObjVirtualServer("Midtown Madness 2", true, "Midtown Madness 2", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[79] = new ObjVirServer("Mig 29",1);
+virtual_server[79].entry[0] = new ObjVirtualServer("Mig 29", true, "Mig 29", "3862", "3863", "UDP", "", "3862", "3863");
+virtual_server[80] = new ObjVirServer("Monster Truck Madness",4);
+virtual_server[80].entry[0] = new ObjVirtualServer("Monster Truck Madness", true, "Monster Truck Madness", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[80].entry[1] = new ObjVirtualServer("Monster Truck Madness", true, "Monster Truck Madness", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[80].entry[2] = new ObjVirtualServer("Monster Truck Madness", true, "Monster Truck Madness", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[80].entry[3] = new ObjVirtualServer("Monster Truck Madness", true, "Monster Truck Madness", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[81] = new ObjVirServer("Monster Truck Madness 2",4);
+virtual_server[81].entry[0] = new ObjVirtualServer("Monster Truck Madness 2", true, "Monster Truck Madness 2", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[81].entry[1] = new ObjVirtualServer("Monster Truck Madness 2", true, "Monster Truck Madness 2", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[81].entry[2] = new ObjVirtualServer("Monster Truck Madness 2", true, "Monster Truck Madness 2", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[81].entry[3] = new ObjVirtualServer("Monster Truck Madness 2", true, "Monster Truck Madness 2", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[82] = new ObjVirServer("Motocross Madness",6);
+virtual_server[82].entry[0] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[82].entry[1] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[82].entry[2] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[82].entry[3] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[82].entry[4] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[82].entry[5] = new ObjVirtualServer("Motocross Madness", true, "Motocross Madness", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[83] = new ObjVirServer("Motocross Madness 2",4);   
+virtual_server[83].entry[0] = new ObjVirtualServer("Motocross Madness 2", true, "Motocross Madness 2", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[83].entry[1] = new ObjVirtualServer("Motocross Madness 2", true, "Motocross Madness 2", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[83].entry[2] = new ObjVirtualServer("Motocross Madness 2", true, "Motocross Madness 2", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[83].entry[3] = new ObjVirtualServer("Motocross Madness 2", true, "Motocross Madness 2", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[84] = new ObjVirServer("Motorhead Server",2);   
+virtual_server[84].entry[0] = new ObjVirtualServer("Motorhead Server", true, "Motorhead Server", "16000", "16000", "TCP", "", "16000", "16000");
+virtual_server[84].entry[1] = new ObjVirtualServer("Motorhead Server", true, "Motorhead Server", "16000", "16000", "UDP", "", "16000", "16000");
+virtual_server[85] = new ObjVirServer("MSN Gaming Zone",6);
+virtual_server[85].entry[0] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "6667", "6667", "TCP", "", "6667", "6667");
+virtual_server[85].entry[1] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "28800", "29000", "TCP", "", "28800", "29000");
+virtual_server[85].entry[2] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[85].entry[3] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[85].entry[4] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[85].entry[5] = new ObjVirtualServer("MSN Gaming Zone", true, "MSN Gaming Zone", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[86] = new ObjVirServer("MSN Messenger",5);
+virtual_server[86].entry[0] = new ObjVirtualServer("MSN Messenger", true, "MSN Messenger", "6891", "6901", "TCP", "", "6891", "6901");
+virtual_server[86].entry[1] = new ObjVirtualServer("MSN Messenger", true, "MSN Messenger", "1863", "1963", "TCP", "", "1863", "1963");
+virtual_server[86].entry[2] = new ObjVirtualServer("MSN Messenger", true, "MSN Messenger", "1863", "1863", "UDP", "", "1863", "1863");
+virtual_server[86].entry[3] = new ObjVirtualServer("MSN Messenger", true, "MSN Messenger", "5190", "5190", "UDP", "", "5190", "5190");
+virtual_server[86].entry[4] = new ObjVirtualServer("MSN Messenger", true, "MSN Messenger", "6901", "6901", "UDP", "", "6901", "6901");
+virtual_server[87] = new ObjVirServer("Myth",1);
+virtual_server[87].entry[0] = new ObjVirtualServer("Myth", true, "Myth", "3453", "3453", "TCP", "", "3453", "3453");
+virtual_server[88] = new ObjVirServer("Myth II Server",1);
+virtual_server[88].entry[0] = new ObjVirtualServer("Myth II Server", true, "Myth II Server", "3453", "3453", "TCP", "", "3453", "3453"); 
+virtual_server[89] = new ObjVirServer("Myth: The Fallen Lords",1);
+virtual_server[89].entry[0] = new ObjVirtualServer("Myth: The Fallen Lords", true, "Myth: The Fallen Lords", "3453", "3453", "TCP", "", "3453", "3453");
+virtual_server[90] = new ObjVirServer("Need for Speed",2);
+virtual_server[90].entry[0] = new ObjVirtualServer("Need for Speed", true, "Need for Speed", "9442", "9442", "TCP", "", "9442", "9442"); 
+virtual_server[90].entry[1] = new ObjVirtualServer("Need for Speed", true, "Need for Speed", "6112", "6112", "UDP", "", "6112", "6112"); 
+virtual_server[91] = new ObjVirServer("NetMech",1);
+virtual_server[91].entry[0] = new ObjVirtualServer("NetMech", true, "NetMech", "21154", "21156", "UDP", "", "21154", "21156"); 
+virtual_server[92] = new ObjVirServer("Network Time Protocol (NTP)",1);
+virtual_server[92].entry[0] = new ObjVirtualServer("Network Time Protocol (NTP)", true, "Network Time Protocol (NTP)", "123", "123", "UDP", "", "123", "123"); 
+virtual_server[93] = new ObjVirServer("News Server (NNTP)",1);
+virtual_server[93].entry[0] = new ObjVirtualServer("News Server (NNTP)", true, "News Server (NNTP)", "119", "119", "TCP", "", "119", "119");
+virtual_server[94] = new ObjVirServer("OKWeb",3);
+virtual_server[94].entry[0] = new ObjVirtualServer("OKWeb", true, "OKWeb", "80", "80", "TCP", "", "80", "80"); 
+virtual_server[94].entry[1] = new ObjVirtualServer("OKWeb", true, "OKWeb", "443", "443", "TCP", "", "443", "443");
+virtual_server[94].entry[2] = new ObjVirtualServer("OKWeb", true, "OKWeb", "5210", "5220", "TCP", "", "5210", "5220");
+virtual_server[95] = new ObjVirServer("OKWin",3);
+virtual_server[95].entry[0] = new ObjVirtualServer("OKWin", true, "OKWin", "1729", "1729", "TCP", "", "1729", "1729"); 
+virtual_server[95].entry[1] = new ObjVirtualServer("OKWin", true, "OKWin", "1909", "1909", "TCP", "", "1909", "1909");
+virtual_server[95].entry[2] = new ObjVirtualServer("OKWin", true, "OKWin", "80", "80", "TCP", "", "80", "80");
+virtual_server[96] = new ObjVirServer("Outlaws",2);
+virtual_server[96].entry[0] = new ObjVirtualServer("Outlaws", true, "Outlaws", "5310", "5310", "TCP", "", "5310", "5310"); 
+virtual_server[96].entry[1] = new ObjVirtualServer("Outlaws", true, "Outlaws", "5310", "5310", "UDP", "", "5310", "5310");
+virtual_server[97] = new ObjVirServer("pcAnywhere v7.5",2);
+virtual_server[97].entry[0] = new ObjVirtualServer("pcAnywhere v7.5", true, "pcAnywhere v7.5", "5631", "5631", "TCP", "", "5631", "5631"); 
+virtual_server[97].entry[1] = new ObjVirtualServer("pcAnywhere v7.5", true, "pcAnywhere v7.5", "5631", "5631", "UDP", "", "5631", "5631");
+virtual_server[98] = new ObjVirServer("PhoneFree",5);
+virtual_server[98].entry[0] = new ObjVirtualServer("PhoneFree", true, "PhoneFree", "1034", "1035", "TCP", "", "1034", "1035"); 
+virtual_server[98].entry[1] = new ObjVirtualServer("PhoneFree", true, "PhoneFree", "1034", "1035", "UDP", "", "1034", "1035"); 
+virtual_server[98].entry[2] = new ObjVirtualServer("PhoneFree", true, "PhoneFree", "9900", "9901", "UDP", "", "9900", "9901"); 
+virtual_server[98].entry[3] = new ObjVirtualServer("PhoneFree", true, "PhoneFree", "2644", "2644", "TCP", "", "2644", "2644");
+virtual_server[98].entry[4] = new ObjVirtualServer("PhoneFree", true, "PhoneFree", "8000", "8000", "TCP", "", "8000", "8000");
+virtual_server[99] = new ObjVirServer("Polycom ViaVideo H.323",1);
+virtual_server[99].entry[0] = new ObjVirtualServer("Polycom ViaVideo H.323", true, "Polycom ViaVideo H.323", "3230", "3235", "TCP", "", "3230", "3235");
+virtual_server[100] = new ObjVirServer("Polycom ViaVideo H.324",1);
+virtual_server[100].entry[0] = new ObjVirtualServer("Polycom ViaVideo H.324", true, "Polycom ViaVideo H.324", "3230", "3235", "UDP", "", "3230", "3235");
+virtual_server[101] = new ObjVirServer("Quake",2);
+virtual_server[101].entry[0] = new ObjVirtualServer("Quake", true, "Quake", "26000", "26000", "TCP", "", "26000", "26000");
+virtual_server[101].entry[1] = new ObjVirtualServer("Quake", true, "Quake", "26000", "26000", "UDP", "", "26000", "26000");
+virtual_server[102] = new ObjVirServer("Quake II (Client and Server)",1);
+virtual_server[102].entry[0] = new ObjVirtualServer("Quake II (Client and Server)", true, "Quake II (Client and Server)", "27910", "27910", "UDP", "", "27910", "27910");
+virtual_server[103] = new ObjVirServer("Quake III",1);
+virtual_server[103].entry[0] = new ObjVirtualServer("Quake III", true, "Quake III", "27660", "27680", "UDP", "", "27660", "27680");
+virtual_server[104] = new ObjVirServer("Red Alert",1);
+virtual_server[104].entry[0] = new ObjVirtualServer("Red Alert", true, "Red Alert", "5009", "5009", "UDP", "", "5009", "5009");
+virtual_server[105] = new ObjVirServer("Rise of Rome",2);
+virtual_server[105].entry[0] = new ObjVirtualServer("Rise of Rome", true, "Rise of Rome", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[105].entry[1] = new ObjVirtualServer("Rise of Rome", true, "Rise of Rome", "47624", "47624", "UDP", "", "47624", "47624");
+virtual_server[106] = new ObjVirServer("Roger Wilco",2);
+virtual_server[106].entry[0] = new ObjVirtualServer("Roger Wilco", true, "Roger Wilco", "3782", "3782", "TCP", "", "3782", "3782");
+virtual_server[106].entry[1] = new ObjVirtualServer("Roger Wilco", true, "Roger Wilco", "3782", "3783", "UDP", "", "3782", "3783"); 
+virtual_server[107] = new ObjVirServer("Rogue Spear",1);
+virtual_server[107].entry[0] = new ObjVirtualServer("Rogue Spear", true, "Rogue Spear", "2346", "2346", "TCP", "", "2346", "2346"); 
+virtual_server[108] = new ObjVirServer("Secure Shell Server (SSH)",1);
+virtual_server[108].entry[0] = new ObjVirtualServer("Secure Shell Server (SSH)", true, "Secure Shell Server (SSH)", "22", "22", "TCP", "", "22", "22");
+virtual_server[109] = new ObjVirServer("Secure Web Server (HTTPS)",1);
+virtual_server[109].entry[0] = new ObjVirtualServer("Secure Web Server (HTTPS)", true, "Secure Web Server (HTTPS)", "443", "443", "TCP", "", "443", "443");
+virtual_server[110] = new ObjVirServer("ShoutCast",1);
+virtual_server[110].entry[0] = new ObjVirtualServer("ShoutCast", true, "ShoutCast", "8000", "8005", "TCP", "", "8000", "8005");
+virtual_server[111] = new ObjVirServer("SNMP",1);
+virtual_server[111].entry[0] = new ObjVirtualServer("SNMP", true, "SNMP", "161", "161", "UDP", "", "161", "161");
+virtual_server[112] = new ObjVirServer("SNMP Trap",1);
+virtual_server[112].entry[0] = new ObjVirtualServer("SNMP Trap", true, "SNMP Trap", "162", "162", "UDP", "", "162", "162");
+virtual_server[113] = new ObjVirServer("Speak Freely",1);
+virtual_server[113].entry[0] = new ObjVirtualServer("Speak Freely", true, "Speak Freely", "2074", "2076", "UDP", "", "2074", "2076");
+virtual_server[114] = new ObjVirServer("StarCraft",1);
+virtual_server[114].entry[0] = new ObjVirtualServer("StarCraft", true, "StarCraft", "6112", "6112", "UDP", "", "6112", "6112"); 
+virtual_server[115] = new ObjVirServer("Starfleet Command",4);   
+virtual_server[115].entry[0] = new ObjVirtualServer("Starfleet Command", true, "Starfleet Command", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[115].entry[1] = new ObjVirtualServer("Starfleet Command", true, "Starfleet Command", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[115].entry[2] = new ObjVirtualServer("Starfleet Command", true, "Starfleet Command", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[115].entry[3] = new ObjVirtualServer("Starfleet Command", true, "Starfleet Command", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[116] = new ObjVirServer("StarLancer",4);   
+virtual_server[116].entry[0] = new ObjVirtualServer("StarLancer", true, "StarLancer", "47624", "47624", "TCP", "", "47624", "47624");
+virtual_server[116].entry[1] = new ObjVirtualServer("StarLancer", true, "StarLancer", "6073", "6073", "TCP", "", "6073", "6073");
+virtual_server[116].entry[2] = new ObjVirtualServer("StarLancer", true, "StarLancer", "2300", "2400", "TCP", "", "2300", "2400");
+virtual_server[116].entry[3] = new ObjVirtualServer("StarLancer", true, "StarLancer", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[117] = new ObjVirServer("SWAT3",2);   
+virtual_server[117].entry[0] = new ObjVirtualServer("SWAT3", true, "SWAT3", "16639", "16639", "TCP", "", "16639", "16639");
+virtual_server[117].entry[1] = new ObjVirtualServer("SWAT3", true, "SWAT3", "16638", "16638", "UDP", "", "16638", "16638");
+virtual_server[118] = new ObjVirServer("Telnet Server",1);   
+virtual_server[118].entry[0] = new ObjVirtualServer("Telnet Server", true, "Telnet Server", "23", "23", "TCP", "", "23", "23");
+virtual_server[119] = new ObjVirServer("The 4th Coming",2);   
+virtual_server[119].entry[0] = new ObjVirtualServer("The 4th Coming", true, "The 4th Coming", "11677", "11677", "UDP", "", "11677", "11677");
+virtual_server[119].entry[1] = new ObjVirtualServer("The 4th Coming", true, "The 4th Coming", "11679", "11679", "UDP", "", "11679", "11679");
+virtual_server[120] = new ObjVirServer("Tiberian Sun: C&C",2);   
+virtual_server[120].entry[0] = new ObjVirtualServer("Tiberian Sun: C&C", true, "Tiberian Sun: C&C", "4000", "4000", "TCP", "", "4000", "4000");
+virtual_server[120].entry[1] = new ObjVirtualServer("Tiberian Sun: C&C", true, "Tiberian Sun: C&C", "1140", "1234", "UDP", "", "1140", "1234");
+virtual_server[121] = new ObjVirServer("Tiberian Sun: C&C III",1);   
+virtual_server[121].entry[0] = new ObjVirtualServer("Tiberian Sun: C&C III", true, "Tiberian Sun: C&C III", "1234", "1234", "UDP", "", "1234", "1234");
+virtual_server[122] = new ObjVirServer("Total Annihilation",1);   
+virtual_server[122].entry[0] = new ObjVirtualServer("Total Annihilation", true, "Total Annihilation", "47624", "47624", "UDP", "", "47624", "47624"); 
+virtual_server[123] = new ObjVirServer("Ultima",5);
+virtual_server[123].entry[0] = new ObjVirtualServer("Ultima", true, "Ultima", "5001", "5010", "TCP", "", "5001", "5010"); 
+virtual_server[123].entry[1] = new ObjVirtualServer("Ultima", true, "Ultima", "7775", "7777", "TCP", "", "7775", "7777"); 
+virtual_server[123].entry[2] = new ObjVirtualServer("Ultima", true, "Ultima", "8800", "8900", "TCP", "", "8800", "8900"); 
+virtual_server[123].entry[3] = new ObjVirtualServer("Ultima", true, "Ultima", "9999", "9999", "TCP", "", "9999", "9999");
+virtual_server[123].entry[4] = new ObjVirtualServer("Ultima", true, "Ultima", "7875", "7875", "TCP", "", "7875", "7875"); 
+virtual_server[124] = new ObjVirServer("Unreal Tournament",3);
+virtual_server[124].entry[0] = new ObjVirtualServer("Unreal Tournament", true, "Unreal Tournament", "7777", "7790", "UDP", "", "7777", "7790"); 
+virtual_server[124].entry[1] = new ObjVirtualServer("Unreal Tournament", true, "Unreal Tournament", "27900", "27900", "UDP", "", "27900", "27900"); 
+virtual_server[124].entry[2] = new ObjVirtualServer("Unreal Tournament", true, "Unreal Tournament", "8080", "8080", "TCP", "", "8080", "8080");
+virtual_server[125] = new ObjVirServer("Urban Assault",4);
+virtual_server[125].entry[0] = new ObjVirtualServer("Urban Assault", true, "Urban Assault", "47624", "47624", "TCP", "", "47624", "47624"); 
+virtual_server[125].entry[1] = new ObjVirtualServer("Urban Assault", true, "Urban Assault", "6073", "6073", "TCP", "", "6073", "6073"); 
+virtual_server[125].entry[2] = new ObjVirtualServer("Urban Assault", true, "Urban Assault", "2300", "2400", "TCP", "", "2300", "2400"); 
+virtual_server[125].entry[3] = new ObjVirtualServer("Urban Assault", true, "Urban Assault", "2300", "2400", "UDP", "", "2300", "2400");
+virtual_server[126] = new ObjVirServer("VoxPhone 3.0",2);
+virtual_server[126].entry[0] = new ObjVirtualServer("VoxPhone 3.0", true, "VoxPhone 3.0", "12380", "12380", "TCP", "", "12380", "12380"); 
+virtual_server[126].entry[1] = new ObjVirtualServer("VoxPhone 3.0", true, "VoxPhone 3.0", "12380", "12380", "UDP", "", "12380", "12380"); 
+virtual_server[127] = new ObjVirServer("Warbirds 2",1);
+virtual_server[127].entry[0] = new ObjVirtualServer("Warbirds 2", true, "Warbirds 2", "912", "912", "TCP", "", "912", "912");
+virtual_server[128] = new ObjVirServer("Web Server (HTTP)",1);
+virtual_server[128].entry[0] = new ObjVirtualServer("Web Server (HTTP)", true, "Web Server (HTTP)", "80", "80", "TCP", "", "80", "80");
+virtual_server[129] = new ObjVirServer("WebPhone 3.0",1);
+virtual_server[129].entry[0] = new ObjVirtualServer("WebPhone 3.0", true, "WebPhone 3.0", "21845", "21845", "TCP", "", "21845", "21845");
+virtual_server[130] = new ObjVirServer("Windows 2000 Terminal Server",2);
+virtual_server[130].entry[0] = new ObjVirtualServer("Windows 2000 Terminal Server", true, "Windows 2000 Terminal Server", "3389", "3389", "TCP", "", "3389", "3389"); 
+virtual_server[130].entry[1] = new ObjVirtualServer("Windows 2000 Terminal Server", true, "Windows 2000 Terminal Server", "3389", "3389", "UDP", "", "3389", "3389");
+virtual_server[131] = new ObjVirServer("X Windows",2);
+virtual_server[131].entry[0] = new ObjVirtualServer("X Windows", true, "X Windows", "6000", "6000", "TCP", "", "6000", "6000"); 
+virtual_server[131].entry[1] = new ObjVirtualServer("X Windows", true, "X Windows", "6000", "6000", "UDP", "", "6000", "6000");
+virtual_server[132] = new ObjVirServer("Yahoo Pager",1);
+virtual_server[132].entry[0] = new ObjVirtualServer("Yahoo Pager", true, "Yahoo Pager", "5050", "5050", "TCP", "", "5050", "5050");
+virtual_server[133] = new ObjVirServer("Yahoo Messenger Chat",2);
+virtual_server[133].entry[0] = new ObjVirtualServer("Yahoo Messenger Chat", true, "Yahoo Messenger Chat", "5000", "5001", "TCP", "", "5000", "5001"); 
+virtual_server[133].entry[1] = new ObjVirtualServer("Yahoo Messenger Chat", true, "Yahoo Messenger Chat", "5055", "5055", "UDP", "", "5055", "5055");
+virtual_server[134] = new ObjVirServer("Pal Talk",5);
+virtual_server[134].entry[0] = new ObjVirtualServer("Pal Talk", true, "Pal Talk", "2090", "2090", "UDP", "", "2090", "2090"); 
+virtual_server[134].entry[1] = new ObjVirtualServer("Pal Talk", true, "Pal Talk", "2091", "2091", "UDP", "", "2091", "2091");
+virtual_server[134].entry[2] = new ObjVirtualServer("Pal Talk", true, "Pal Talk", "2090", "2090", "TCP", "", "2090", "2090");
+virtual_server[134].entry[3] = new ObjVirtualServer("Pal Talk", true, "Pal Talk", "2091", "2091", "TCP", "", "2091", "2091");
+virtual_server[134].entry[4] = new ObjVirtualServer("Pal Talk", true, "Pal Talk", "2095", "2095", "TCP", "", "2095", "2095");
+virtual_server[135] = new ObjVirServer("Real Player 8 Plus",1);
+virtual_server[135].entry[0] = new ObjVirtualServer("Real Player 8 Plus", true, "Real Player 8 Plus", "7070", "7070", "UDP", "", "7070", "7070");
+virtual_server[136] = new ObjVirServer("RealAudio",1);
+virtual_server[136].entry[0] = new ObjVirtualServer("RealAudio", true, "RealAudio", "6790", "32000", "UDP", "", "6790", "32000");
+virtual_server[137] = new ObjVirServer("Netmeeting 2.0, 3.0, Intel Video Phone",6);
+virtual_server[137].entry[0] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1024", "65534", "UDP", "", "1024", "65534"); 
+virtual_server[137].entry[1] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1024", "1502", "TCP", "", "1024", "1502");
+virtual_server[137].entry[2] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1504", "1730", "TCP", "", "1504", "1730");
+virtual_server[137].entry[3] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1732", "65534", "TCP", "", "1732", "65534");
+virtual_server[137].entry[4] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1503", "1503", "TCP", "", "1503", "1503");
+virtual_server[137].entry[5] = new ObjVirtualServer("Netmeeting 2.0, 3.0, Intel Video Phone", true, "Netmeeting 2.0, 3.0, Intel Video Phone", "1731", "1731", "TCP", "", "1731", "1731"); 
+virtual_server[138] = new ObjVirServer("Westwood Online",3);
+virtual_server[138].entry[0] = new ObjVirtualServer("Westwood Online", true, "Westwood Online", "4000", "4000", "UDP", "", "4000", "4000"); 
+virtual_server[138].entry[1] = new ObjVirtualServer("Westwood Online", true, "Westwood Online", "1140", "1234", "TCP", "", "1140", "1234");
+virtual_server[138].entry[2] = new ObjVirtualServer("Westwood Online", true, "Westwood Online", "1140", "1234", "UDP", "", "1140", "1234");
+virtual_server[139] = new ObjVirServer("CuSeeMe",12);
+virtual_server[139].entry[0] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "24032", "24032", "UDP", "", "24032", "24032"); 
+virtual_server[139].entry[1] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "1414", "1414", "UDP", "", "1414", "1414");
+virtual_server[139].entry[2] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "1424", "1424", "UDP", "", "1424", "1424");
+virtual_server[139].entry[3] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "1503", "1503", "TCP", "", "1503", "1503");
+virtual_server[139].entry[4] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "1720", "1720", "TCP", "", "1720", "1720");
+virtual_server[139].entry[5] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "1812", "1813", "UDP", "", "1812", "1813"); 
+virtual_server[139].entry[6] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "7640", "7640", "UDP", "", "7640", "7640"); 
+virtual_server[139].entry[7] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "7642", "7642", "TCP", "", "7642", "7642");
+virtual_server[139].entry[8] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "7648", "7648", "TCP", "", "7648", "7648");
+virtual_server[139].entry[9] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "7648", "7648", "UDP", "", "7648", "7648");
+virtual_server[139].entry[10] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "7649", "7649", "TCP", "", "7649", "7649");
+virtual_server[139].entry[11] = new ObjVirtualServer("CuSeeMe", true, "CuSeeMe", "56800", "56800", "UDP", "", "56800", "56800");
+virtual_server[140] = new ObjVirServer("ICUII Client",6);
+virtual_server[140].entry[0] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "2019", "2019", "TCP", "", "2019", "2019"); 
+virtual_server[140].entry[1] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "2000", "2038", "TCP", "", "2000", "2038");
+virtual_server[140].entry[2] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "2050", "2051", "TCP", "", "2050", "2051");
+virtual_server[140].entry[3] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "2069", "2069", "TCP", "", "2069", "2069");
+virtual_server[140].entry[4] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "2085", "2085", "TCP", "", "2085", "2085");
+virtual_server[140].entry[5] = new ObjVirtualServer("ICUII Client", true, "ICUII Client", "3010", "3030", "TCP", "", "3010", "3030");  
+virtual_server[141] = new ObjVirServer("IPSEC",1);
+virtual_server[141].entry[0] = new ObjVirtualServer("IPSEC", true, "IPSEC", "500", "500", "UDP", "", "500", "500"); 
+virtual_server[142] = new ObjVirServer("TFTP",1);
+virtual_server[142].entry[0] = new ObjVirtualServer("TFTP", true, "TFTP", "69", "69", "UDP", "", "69", "69"); 
+
+function ObjVirServer(name, entry_num)
+{
+	this.name=name;
+	this.entry_num=entry_num;
+	this.entry=new Array(6);
+}
+function ObjVirtualServer(name, enable, service_name, wan_port_low, wan_port_high, type, lan_ip, lan_port_low, lan_port_high)
+{
+	this.name=name;
+	this.enable=enable;
+	this.service_name=service_name;
+	this.wan_port_low=wan_port_low;
+	this.wan_port_high=wan_port_high;
+	this.type=type;
+	this.lan_ip=lan_ip;
+	this.lan_port_low=lan_port_low;
+	this.lan_port_high=lan_port_high;
+}
+
+function clearCall(index)
+{
+	index = index - 1;
+
+	if(index < 0 && index > VIRTUAL_SERVER_NUMBER_PER_INTERFACE)
+		return;
+	eval('document.tF1.lan_ip'+index).value = ""; //lan_ip
+	eval('document.tF1.service_name'+index).value = ""; //service_name
+	eval('document.tF1.protocol'+index).options[0].selected = true; //protocol type
+	eval('document.tF1.lan_port'+index).value = ""; //lan_port
+	eval('document.tF1.wan_port'+index).value = ""; //wan_port
+	eval('document.tF1.enable'+index).checked = false; //enable
+}
+
+function ClearEntry(entry)
+{
+	var index;
+
+	if(entry=='all')
+	{
+ 		if(confirm("<% Fid_str(907); %>"))
+ 		{
+			var count=0;
+			for(i=1;i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE+1;i++)
+			{
+				count=i;
+				count=count+'';
+				clearCall(count);
+			}
+			document.tF1.lan_ip_prefix.value = lanip_oct1 + '.' + lanip_oct2 + '.' + lanip_oct3+ '.';	
+			for(index=0;index<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;index++)
+			{
+				/*if(emptyentry(index) == false)
+				{
+					if (VerifyVSEntry(index) == false)
+					return false;			
+				}*/
+				if((emptyvalue(index)==true)&&(emptyentry(index) == true)) ;
+				else{
+					if (VerifyVSEntry(index) == false)
+						return false;
+				}		
+			
+			}	
+			//document.tF1.submit();
+			return true;
+		}		
+ 	}
+ 	else
+ 	{
+ 		if(confirm("<% Fid_str(906); %>" + entry + "?")){
+			clearCall(entry);
+			document.tF1.lan_ip_prefix.value = lanip_oct1 + '.' + lanip_oct2 + '.' + lanip_oct3+ '.';	
+			for(index=0;index<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;index++)
+			{
+				/*if(emptyentry(index) == false)
+				{
+					if (VerifyVSEntry(index) == false)
+					return false;			
+				}*/
+				if((emptyvalue(index)==true)&&(emptyentry(index) == true)) ;
+				else{
+					if (VerifyVSEntry(index) == false)
+						return false;
+				}		
+			
+			}	
+			//document.tF1.submit();
+			return true;
+		}
+	}	
+}
+
+function emptyentry(count)
+{
+	if((eval('document.tF1.enable'+count).checked == false))
+		return true;
+	else 
+		return false;
+}
+
+function EntryCount()
+{
+	var ret_entry=0;
+	var count=0;
+	var i=0;
+
+	for (i=0;i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;i++)
+	{
+ 		count=i;
+ 		count=count+'';
+ 		if((emptyentry(count)==true)&&(emptyvalue(i)==true))
+ 		{
+			ret_entry++;
+ 		}
+	}
+	return ret_entry;
+}
+
+function GetEmptyEntry()
+{
+	var ret_entry=0;
+	var count=0;
+	var i=0;
+
+	for (i=0;i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;i++)
+	{
+ 		count=i;
+ 		count=count+'';
+ 		if((emptyentry(count)==true)&&(emptyvalue(i)==true))
+ 		{
+			ret_entry=i;
+			return ret_entry;
+ 		}
+	}
+	alert("<% Fid_str(905); %>");	//andy change 20070331
+	return ret_entry;
+}
+
+function addvirtsvr(c,i,j)
+{
+	var count=c;
+	count=count+'';
+	eval('document.tF1.lan_ip'+count).value = virtual_server[i].entry[j].lan_ip;
+	eval('document.tF1.service_name'+count).value = virtual_server[i].entry[j].service_name;
+	if(virtual_server[i].entry[j].type == "TCP")
+		eval('document.tF1.protocol'+count).options[0].selected = true;
+	else if(virtual_server[i].entry[j].type == "UDP")
+		eval('document.tF1.protocol'+count).options[1].selected = true;
+	else if(virtual_server[i].entry[j].type == "TCP&UDP")
+		eval('document.tF1.protocol'+count).options[2].selected = true;
+	else
+		alert("<% Fid_str(851); %>");
+	if (virtual_server[i].entry[j].lan_port_low == virtual_server[i].entry[j].lan_port_high)
+		eval('document.tF1.lan_port'+count).value = virtual_server[i].entry[j].lan_port_low;
+	else
+		eval('document.tF1.lan_port'+count).value = virtual_server[i].entry[j].lan_port_low + "-" + virtual_server[i].entry[j].lan_port_high;
+	if (virtual_server[i].entry[j].wan_port_low == virtual_server[i].entry[j].wan_port_high)
+		eval('document.tF1.wan_port'+count).value = virtual_server[i].entry[j].wan_port_low;
+	else
+		eval('document.tF1.wan_port'+count).value = virtual_server[i].entry[j].wan_port_low + "-" + virtual_server[i].entry[j].wan_port_high;
+	eval('document.tF1.enable'+count).checked = virtual_server[i].entry[j].enable;
+}
+
+function AddVirtualServer(server_name)
+{
+	var i=0; var j=0;var k=0;
+	var field_name,field_index;
+	var service_name;
+	
+	for(k=0;k<VIRTUAL_SERVER_NUMBER_PER_INTERFACE;k++){
+		service_name = document.tF1["service_name"+k].value;
+		if((service_name!='')&&(service_name == server_name)){
+			alert(" <% Fid_str(1601); %>");	
+			return false;
+		}else 
+			continue;	
+	}	
+	for(i=0; i<virtual_server_MAX_NUM; i++)
+	{
+ 		if(virtual_server[i].name == server_name)
+ 		{
+			var entry_num = virtual_server[i].entry_num;
+			var empty_entry;
+			empty_entry = EntryCount();
+			if(empty_entry<entry_num)
+			{
+				alert("<% Fid_str(905); %>");
+				return;
+			}
+			for(j=0; j<entry_num; j++)
+			{
+				empty_entry = GetEmptyEntry();
+				addvirtsvr(empty_entry,i,j);
+			}
+ 		}
+	}
+	
+}
+
+function ModifyVirtualServer(index)
+{
+	if(index < 0 && index >= VIRTUAL_SERVER_NUMBER_PER_INTERFACE)
+		return;
+
+	var field_name, field_index, field_index1;
+	var protocol_type, protocol; // 0: both
+	var sub_string;
+	var i, j;
+
+	document.tF1.index.value = index; // index
+
+	field_name = "enable" + index; // enable
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	document.tF1.enable.value = trueValueToInt(document.tF1.elements[field_index].checked);
+
+	field_name = "protocol" + index; // protocol
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	protocol_type = document.tF1.elements[field_index].options[document.tF1.elements[field_index].selectedIndex].value;
+
+	field_name = "wan_ip" + index; // wan_ip
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	sub_string = parseIPValueRange(document.tF1.elements[field_index].value);
+	if(sub_string == null)
+	{
+		alert("WAN IP Address error");
+		return;
+	}
+	if(sub_string.length > IP_MAX)
+	{
+		alert("<% Fid_str(1350); %> " + IP_MAX + " ");
+		return;
+	}
+	for(i = 0; i < sub_string.length; i++)
+	{
+		field_name = "ip" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].ip;
+
+		field_name = "ip_count" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].count;
+	}
+	document.tF1.ip_range_count.value = sub_string.length;
+
+	if(protocol_type == both_proto)
+		protocol = tcp_proto;
+	else
+		protocol = protocol_type;
+
+	//Kenlo+ fix NTC bug.. LAN Port range not match Public Port range
+	field_name = "lan_port" + index; // wan_port
+	field_index1 = getElementsByFieldName(document.tF1, field_name);
+	//Kenlo-
+
+	field_name = "wan_port" + index; // wan_port
+	field_index = getElementsByFieldName(document.tF1, field_name);
+
+	//Kenlo+ fix NTC bug.. LAN Port range not match Public Port range
+	if (parseValueRangeBoth(document.tF1.elements[field_index1].value, document.tF1.elements[field_index].value) == false)
+		return;
+	//Kenlo-
+
+	sub_string = parseValueRange(document.tF1.elements[field_index].value);
+	if(sub_string == null)
+	{
+		alert("WAN Port error");
+		return;
+	}
+	if(sub_string.length > PORT_MAX)
+	{
+		alert("<% Fid_str(1350); %>" + PORT_MAX + " ");
+		return;
+	}
+	j = 0;
+	for(i = 0; i < sub_string.length; i++)
+	{
+	    if((sub_string[i].b_port<=0 || sub_string[i].b_port>65535) ||
+	       (sub_string[i].e_port<=0 || sub_string[i].e_port>65535)){
+	        alert("<% Fid_str(349); %>");
+		    return;
+		}
+		field_name = "protocol" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = protocol;
+
+		field_name = "b_port" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].b_port;
+
+		field_name = "e_port" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].e_port;
+
+		j++;
+	}
+
+	if(protocol_type == both_proto)
+	{
+		protocol = udp_proto;
+		if((j+sub_string.length)> PORT_MAX)
+		{
+			alert("<% Fid_str(1350); %> " + PORT_MAX + "");
+			return;
+		}
+		for(i = 0; i < sub_string.length; i++)
+		{
+			field_name = "protocol" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = protocol;
+
+			field_name = "b_port" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = sub_string[i].b_port;
+
+			field_name = "e_port" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = sub_string[i].e_port;
+
+			//Kenlo, This should be a bug. j++;
+		}
+		j = j + i; //Kenlo
+	}
+	document.tF1.port_range_count.value = j;
+
+	field_name = "lan_ip" + index; // lan_ip
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	if(isNValidLastIP(document.tF1.elements[field_index].value))
+	{
+		alert("<% Fid_str(943); %>" + "<% Fid_str(1381); %>");
+		return;
+	}
+
+
+	sub_string = document.tF1.elements[field_index].value;
+	field_name = "lan_ip";
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	document.tF1.elements[field_index].value = lanip_oct1 + '.' + lanip_oct2 + '.' + lanip_oct3+ '.' + sub_string;
+
+	//Kenlo
+	field_name = "service_name" + index;
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	if (isIncludeDQuote(document.tF1.elements[field_index].value)) { alert('<% Fid_str(1352); %>.'); return false; }
+	if (isIncludeBSlash(document.tF1.elements[field_index].value)) { alert('<% Fid_str(1353); %>.'); return false; }
+	sub_string = document.tF1.elements[field_index].value;
+	field_name = "service_name";
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	document.tF1.elements[field_index].value = sub_string;
+	
+	if(protocol_type == both_proto)
+		protocol = tcp_proto;
+	else
+		protocol = protocol_type;
+	field_name = "lan_port" + index; // lan_port
+	field_index = getElementsByFieldName(document.tF1, field_name);
+	sub_string = parseValueRange(document.tF1.elements[field_index].value);
+	if(sub_string == null)
+	{
+		alert("LAN Port error");
+		return;
+	}
+	if(sub_string.length> PORT_MAX)
+	{
+		alert("<% Fid_str(1350); %>" + PORT_MAX + " ");
+		return;
+	}
+	j = 0;
+	//penguin, lan port
+	for(i = 0; i < sub_string.length; i++)
+	{
+	    if((sub_string[i].b_port<=0 || sub_string[i].b_port>65535) ||
+	       (sub_string[i].e_port<=0 || sub_string[i].e_port>65535)){
+	        alert("<% Fid_str(349); %>");
+		    return;
+		}
+		field_name = "lan_protocol" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = protocol;
+
+		field_name = "lan_b_port" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].b_port;
+
+		field_name = "lan_e_port" + i;
+		field_index = getElementsByFieldName(document.tF1, field_name);
+		document.tF1.elements[field_index].value = sub_string[i].e_port;
+
+		j++;
+	}
+	if(protocol_type == both_proto)
+	{
+		protocol = udp_proto;
+		if((j+sub_string.length)> PORT_MAX)
+		{
+			alert("<% Fid_str(1350); %>" + PORT_MAX + " entries");
+			return;
+		}
+		for(i = 0; i < sub_string.length; i++)
+		{
+			field_name = "lan_protocol" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = protocol;
+
+			field_name = "lan_b_port" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = sub_string[i].b_port;
+
+			field_name = "lan_e_port" + (i+j);
+			field_index = getElementsByFieldName(document.tF1, field_name);
+			document.tF1.elements[field_index].value = sub_string[i].e_port;
+
+			j++;
+		}
+	}
+	document.tF1.lan_port_range_count.value = j;
+
+	document.tF1.op_mode.value = "modify";
+	document.tF1.submit();
+}
+
+function ClearVirtualServer(index)
+{
+	if(index < 0 && index >= VIRTUAL_SERVER_NUMBER_PER_INTERFACE)
+		return;
+	document.tF1.index.value = index; // index
+	document.tF1.op_mode.value = "delete";
+	document.tF1.submit();
+}
+//Kenlo Add -
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+</script>
+<% gs_fw_virtual("VirtualServer"); %>
+
+<script>
+function onLoad()
+{
+	var counter=VIRTUAL_SERVER.entry.length;
+	var i, j, k;
+			
+	for(i=0; i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE-1; i++) {
+		
+		if(	VIRTUAL_SERVER.entry[i].service_name!='' &&
+			VIRTUAL_SERVER.entry[i].enable==VIRTUAL_SERVER.entry[i+1].enable &&
+			VIRTUAL_SERVER.entry[i].lan_ip==VIRTUAL_SERVER.entry[i+1].lan_ip &&
+			VIRTUAL_SERVER.entry[i].service_name==VIRTUAL_SERVER.entry[i+1].service_name &&			
+			VIRTUAL_SERVER.entry[i].port[0].b_port==VIRTUAL_SERVER.entry[i+1].port[0].b_port &&
+			VIRTUAL_SERVER.entry[i].port[0].e_port==VIRTUAL_SERVER.entry[i+1].port[0].e_port &&
+			VIRTUAL_SERVER.entry[i].lan_port[0].b_port == VIRTUAL_SERVER.entry[i+1].lan_port[0].b_port &&
+			VIRTUAL_SERVER.entry[i].lan_port[0].e_port == VIRTUAL_SERVER.entry[i+1].lan_port[0].e_port ) {
+		
+			VIRTUAL_SERVER.entry[i]=VIRTUAL_SERVER.entry[i+1];
+			VIRTUAL_SERVER.entry[i].protocol=255;			
+
+			for(j=i+1; j<VIRTUAL_SERVER_NUMBER_PER_INTERFACE-1; j++) {
+				VIRTUAL_SERVER.entry[j]=VIRTUAL_SERVER.entry[j+1];
+			}		
+		}
+	}
+		
+	for(i=0; i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE; i++) {
+		if(VIRTUAL_SERVER.entry[i].service_name=='') {
+			
+			for(j=i; j<	VIRTUAL_SERVER_NUMBER_PER_INTERFACE; j++) {
+				if(VIRTUAL_SERVER.entry[j].service_name=='') continue;
+				else break;
+			}
+			
+			for(k=i; k<VIRTUAL_SERVER_NUMBER_PER_INTERFACE-1; k++) {
+				if(j==VIRTUAL_SERVER_NUMBER_PER_INTERFACE) break;
+				VIRTUAL_SERVER.entry[k]=VIRTUAL_SERVER.entry[j];
+				j++;
+			}	
+			
+		}
+	}
+}
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" >
+<% File_include("menu.stm"); %>
+<form name="tF1" method="post" action="apply.cgi">
+<input type="hidden" name="arc_action" value="Apply Changes">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="0">
+<input type="hidden" name="restart_page" value="">
+<input type="hidden" name="location_page" value="nat_v.stm">
+<input type="hidden" name="op_mode" value="">
+<input type="hidden" name="interface_num" value="7">
+<input type="hidden" name="index" value="0">
+<input type="hidden" name="protocol" value="0">
+<input type="hidden" name="enable" value="0">
+<input type="hidden" name="lan_ip" value="0">
+<input type="hidden" name="service_name" value="">
+<input type="hidden" name="ip_range_count" value="">
+<input type="hidden" name="port_range_count" value="">
+<input type="hidden" name="lan_port_range_count" value="">
+<SCRIPT language=JavaScript>
+	var i;
+	for(i=0; i < IP_MAX; i++)
+	{
+		document.writeln('<input type="hidden" name="ip', i, '" value="">');
+		document.writeln('<input type="hidden" name="ip_count', i, '" value="">');
+	}
+	for(i=0; i < PORT_MAX; i++)
+	{
+		document.writeln('<input type="hidden" name="b_port', i, '" value="">');
+		document.writeln('<input type="hidden" name="e_port', i, '" value="">');
+
+		document.writeln('<input type="hidden" name="lan_protocol', i, '" value="">');
+		document.writeln('<input type="hidden" name="lan_b_port', i, '" value="">');
+		document.writeln('<input type="hidden" name="lan_e_port', i, '" value="">');
+	}
+</script>
+
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="0">
+<input type="hidden" name="restart_page" value="">
+<input type="hidden" name="location_page" value="nat_v.stm">
+<input type="hidden" name="interface_num" value="7">
+<input type="hidden" name="lan_ip_prefix" value="0">
+<% gs_hidden_vports("20"); %>
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>		
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(129); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr align=left>
+								<td colspan=3 align=left class="body">
+									<% Fid_str(134); %>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#virtual_server");><font color=#0066FF><b><% Fid_str(47); %></font></b></a>
+								<br><br></td>
+							</tr>
+								<tr>
+							    			<td align=center>
+												<input type="button" value="<% Fid_str(48); %>" class="submitBtn" style="height=22px;width:150px;" onClick="javascript:window.location.reload(true);return false">&nbsp;&nbsp;
+												&nbsp;&nbsp;	&nbsp;&nbsp;<input type="button" value="<% Fid_str(49); %>" class="submitBtn" style="height=22px;width:150px;" onClick="btnApply()">
+											</td><td></td>
+																		</tr>
+																		<tr high=50><td>	&nbsp;&nbsp;</td><td>	&nbsp;&nbsp;</td></tr>
+								<tr>
+								<td class="body"><b><% Fid_str(113); %>&nbsp;</b>
+									<select name="virtual_server_list">
+										<option value="Active Worlds"><% Fid_str(135); %></option>
+										<option value="Age of Empires"><% Fid_str(136); %></option>
+										<option value="Age of Empires Expansion: The Rise of Rome"><% Fid_str(137); %></option>
+										<option value="Age of Empires II Expansion: The Conquerors"><% Fid_str(138); %></option>
+										<option value="Age of Empires II: The Age of Kings"><% Fid_str(139); %></option>
+										<option value="Age of Kings"><% Fid_str(140); %></option>
+										<option value="Age of Wonders"><% Fid_str(141); %></option>
+										<option value="Aliens vs. Predator"><% Fid_str(142); %></option>
+										<option value="Anarchy Online (BETA)"><% Fid_str(143); %></option-->
+										<option value="AOL Instant Messenger"><% Fid_str(144); %></option>
+										<option value="Audiogalaxy Satellite"><% Fid_str(145); %></option>
+										<option value="Baldur's Gate"><% Fid_str(146); %></option>
+										<option value="BattleCom"><% Fid_str(147); %></option>
+										<option value="Battlefield Communicator"><% Fid_str(148); %></option>
+										<option value="Black and White"><% Fid_str(149); %></option>
+										<option value="Blizzard Battle.net"><% Fid_str(150); %></option>
+										<option value="Buddy Phone"><% Fid_str(151); %></option>
+										<option value="Bungie.net"><% Fid_str(152); %></option>
+										<option value="Camerades"><% Fid_str(153); %></option>
+										<option value="CART Precision Racing"><% Fid_str(154); %></option>
+										<option value="Close Combat for Windows"><% Fid_str(155); %></option>
+										<option value="Close Combat III: The Russian Front"><% Fid_str(156); %></option>
+										<option value="Close Combat: A Bridge Too Far"><% Fid_str(157); %></option>
+										<option value="Combat Flight Simulator 2: WWII Pacific Theater"><% Fid_str(158); %></option>
+										<option value="Combat Flight Simulator: WWII Europe Series"><% Fid_str(159); %></option>
+										<option value="Crimson Skies"><% Fid_str(160); %></option>
+										<option value="CuSeeMe"><% Fid_str(274); %></option>
+										<option value="Dark Reign"><% Fid_str(161); %></option>
+										<option value="Dark Reign 2"><% Fid_str(162); %></option>
+										<option value="Delta Force 2"><% Fid_str(163); %></option>
+										<option value="Delta Three PC to Phone"><% Fid_str(164); %></option>
+										<option value="Descent 3"><% Fid_str(165); %></option>
+										<option value="Descent Freespace"><% Fid_str(166); %></option>
+										<option value="Diablo (1.07+)"><% Fid_str(167); %></option-->
+										<option value="Diablo I"><% Fid_str(168); %></option>
+										<option value="Diablo II"><% Fid_str(169); %></option>
+										<option value="DialPad.Com"><% Fid_str(170); %></option>
+										<option value="DirectX 7 Games"><% Fid_str(171); %></option>
+										<option value="DirectX 8 Games"><% Fid_str(172); %></option>
+										<option value="Domain Name Server (DNS)"><% Fid_str(173); %></option>
+										<option value="Doom"><% Fid_str(174); %></option>
+										<option value="Dune 2000"><% Fid_str(175); %></option>
+										<option value="Dwyco Video Conferencing"><% Fid_str(176); %></option>
+										<option value="Elite Force"><% Fid_str(177); %></option>
+										<option value="Everquest"><% Fid_str(178); %></option>
+										<option value="F-16"><% Fid_str(179); %></option>
+										<option value="F-22 Lightning 3"><% Fid_str(180); %></option>
+										<option value="F-22 Raptor"><% Fid_str(181); %></option>
+										<option value="F22 Raptor (Novalogic)"><% Fid_str(182); %></option>
+										<option value="Falcon 4.0"><% Fid_str(183); %></option>
+										<option value="Fighter Ace II"><% Fid_str(184); %></option>
+										<option value="Flight Simulator 2000"><% Fid_str(185); %></option>
+										<option value="Flight Simulator 98"><% Fid_str(186); %></option>
+										<option value="Freetel"><% Fid_str(187); %></option>
+										<option value="FTP Server"><% Fid_str(188); %></option>
+										<option value="GNUtella"><% Fid_str(189); %></option>
+										<option value="Golf 1998 Edition"><% Fid_str(190); %></option>
+										<option value="Golf 1999 Edition"><% Fid_str(191); %></option>
+										<option value="Golf 2001 Edition"><% Fid_str(192); %></option>
+										<option value="Go2Call"><% Fid_str(193); %></option>
+										<option value="Half Life"><% Fid_str(194); %></option>
+										<option value="Half Life Server"><% Fid_str(195); %></option>
+										<option value="Heretic II Server"><% Fid_str(196); %></option>
+										<option value="I76"><% Fid_str(197); %></option>
+										<option value="ICUII Client"><% Fid_str(275); %></option>
+										<option value="Ivisit"><% Fid_str(198); %></option>
+										<option value="IPSEC"><% Fid_str(199); %></option>
+										<option value="IRC"><% Fid_str(199); %></option>
+										<option value="IStreamVideo2HP"><% Fid_str(200); %></option>
+										<option value="KaZaA"><% Fid_str(201); %></option>
+										<option value="Kohan Immortal Sovereigns"><% Fid_str(202); %></option>
+										<option value="LapLink Gold"><% Fid_str(203); %></option>
+										<option value="Links 2001"><% Fid_str(204); %></option>
+										<option value="Lotus Notes Server"><% Fid_str(205); %></option>
+										<option value="Mail (POP3)"><% Fid_str(206); %></option>
+										<option value="Mail (SMTP)"><% Fid_str(207); %></option>
+										<option value="MechCommander 2.0"><% Fid_str(208); %></option>
+										<option value="MechWarrior 3"><% Fid_str(209); %></option>
+										<option value="MechWarrior 4"><% Fid_str(210); %></option>
+										<option value="Media Player 7"><% Fid_str(211); %></option>
+										<option value="Midtown Madness"><% Fid_str(212); %></option>
+										<option value="Midtown Madness 2"><% Fid_str(213); %></option>
+										<option value="Mig 29"><% Fid_str(214); %></option>
+										<option value="Monster Truck Madness"><% Fid_str(215); %></option>
+										<option value="Monster Truck Madness 2"><% Fid_str(216); %></option>
+										<option value="Motocross Madness"><% Fid_str(217); %></option>
+										<option value="Motocross Madness 2"><% Fid_str(218); %></option>
+										<option value="Motorhead Server"><% Fid_str(219); %></option>
+										<option value="MSN Gaming Zone"><% Fid_str(220); %></option>
+										<option value="MSN Messenger"><% Fid_str(221); %></option>
+										<option value="Myth"><% Fid_str(222); %></option>
+										<option value="Myth II Server"><% Fid_str(223); %></option>
+										<option value="Myth: The Fallen Lords"><% Fid_str(224); %></option>
+										<option value="Need for Speed"><% Fid_str(225); %></option>
+										<option value="NetMech"><% Fid_str(226); %></option>
+										<option value="Netmeeting 2.0, 3.0, Intel Video Phone"><% Fid_str(272); %></option>
+										<option value="Network Time Protocol (NTP)"><% Fid_str(227); %></option>
+										<option value="News Server (NNTP)"><% Fid_str(228); %></option>
+										<option value="OKWeb"><% Fid_str(229); %></option>
+										<option value="OKWin"><% Fid_str(230); %></option>
+										<option value="Outlaws"><% Fid_str(231); %></option>
+										<option value="Pal Talk"><% Fid_str(269); %></option>
+										<option value="pcAnywhere v7.5"><% Fid_str(232); %></option>
+										<option value="PhoneFree"><% Fid_str(233); %></option>
+										<option value="Polycom ViaVideo H.323"><% Fid_str(234); %></option>
+										<option value="Polycom ViaVideo H.324"><% Fid_str(235); %></option>
+										<option value="Quake"><% Fid_str(236); %></option>
+										<option value="Quake II (Client and Server)"><% Fid_str(237); %></option>
+										<option value="Quake III"><% Fid_str(238); %></option>
+										<option value="RealAudio"><% Fid_str(271); %></option>
+										<option value="Real Player 8 Plus"><% Fid_str(270); %></option>
+										<option value="Red Alert"><% Fid_str(239); %></option>
+										<option value="Rise of Rome"><% Fid_str(240); %></option>
+										<option value="Roger Wilco"><% Fid_str(241); %></option>
+										<option value="Rogue Spear"><% Fid_str(242); %></option>
+										<option value="Secure Shell Server (SSH)"><% Fid_str(243); %></option>
+										<option value="Secure Web Server (HTTPS)"><% Fid_str(244); %></option>
+										<option value="ShoutCast"><% Fid_str(245); %></option>
+										<option value="SNMP"><% Fid_str(246); %></option>
+										<option value="SNMP Trap"><% Fid_str(247); %></option>
+										<option value="Speak Freely"><% Fid_str(248); %></option>
+										<option value="StarCraft"><% Fid_str(249); %></option>
+										<option value="Starfleet Command"><% Fid_str(250); %></option>
+										<option value="StarLancer"><% Fid_str(251); %></option>
+										<option value="SWAT3"><% Fid_str(252); %></option>
+										<option value="Telnet Server"><% Fid_str(253); %></option>
+										<option value="The 4th Coming"><% Fid_str(254); %></option>
+										<option value="TFTP"><% Fid_str(255); %></option>
+										<option value="Tiberian Sun: C&C III"><% Fid_str(256); %></option>
+										<option value="Total Annihilation"><% Fid_str(257); %></option>
+										<option value="Ultima"><% Fid_str(258); %></option>
+										<option value="Unreal Tournament"><% Fid_str(259); %></option>
+										<option value="Urban Assault"><% Fid_str(260); %></option>
+										<option value="VoxPhone 3.0"><% Fid_str(261); %></option>
+										<option value="Warbirds 2"><% Fid_str(262); %></option>
+										<option value="Web Server (HTTP)"><% Fid_str(263); %></option>
+										<option value="WebPhone 3.0"><% Fid_str(264); %></option>
+										<option value="Westwood Online"><% Fid_str(273); %></option>
+										<option value="Windows 2000 Terminal Server"><% Fid_str(265); %></option>
+										<option value="X Windows"><% Fid_str(266); %></option>
+										<option value="Yahoo Pager"><% Fid_str(267); %></option>
+										<option value="Yahoo Messenger Chat"><% Fid_str(268); %></option>
+									</select>
+								</td>
+								<td clospan=2>&nbsp;</td>
+								<td align="right"><input type="button" style="height=22px;width:120px;" name="add_btn" value="<% Fid_str(113); %>"   class="submitBtn" onClick="AddVirtualServer(document.tF1.virtual_server_list.value);"></td>
+							</tr>
+								
+							<tr height=28>
+								<td class="body"><b><% Fid_str(276); %>&nbsp;</b>
+									<select name="clear_entry_list">
+										<script>
+											for(var i=1;i<=VIRTUAL_SERVER_NUMBER_PER_INTERFACE;i++)
+												document.write('<option value='+i+'>'+i+'</option>');
+										</script>
+										<option value='all'><% Fid_str(376); %></option>
+										<!--option value='all'>all</option-->
+									</select>
+								</td>											
+								<td>&nbsp;</td>
+								<td align="right"><input type="button" style="height=22px;width:120px;" name="clear_btn" value="<% Fid_str(411); %>"  class="submitBtn" onClick="ClearEntry(document.tF1.clear_entry_list.value)"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td colspan=3 align=left>
+						<table width="580" border="0" cellspacing="1" cellpadding="2" class="copy_1" align="left">
+							<tr bgcolor="#666262">
+								
+					<td width=1% nowrap class="body"><font color=#ffffff><b></b></FONT></td>
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(96); %></b></FONT></td>
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(277); %></b></FONT></td>								
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><B><% Fid_str(278); %></B></FONT></td>								
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(279); %></b></FONT></td>
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(280); %></b></FONT></td>
+					<td width=1% nowrap align="center" class="body"><font color=#ffffff><b><% Fid_str(281); %></b></FONT></td>
+								
+					</tr>
+					<script language="javascript">
+						var i, j, k;
+						var wan_ip, wan_port, lan_ip, lan_port, protocol, IP;
+						var service_name;
+						var sub_addr, tmp, field_name;
+						var enable;
+						var cur_proto = 4;
+						var bBothProto = false;
+						
+						onLoad();
+						
+						for(i=0; i<VIRTUAL_SERVER_NUMBER_PER_INTERFACE; i++)
+						{
+							bBothProto = false;
+							protocol = tcp_proto;
+					
+							enable = "";
+							if(VIRTUAL_SERVER.entry[i].enable == 1)
+								enable = "checked";
+					
+							wan_ip = "";
+							k = 0;
+							for(j=0; j<IP_MAX; j++)
+							{
+								if(VIRTUAL_SERVER.entry[i].ip[j].count == 0) continue;
+								if(VIRTUAL_SERVER.entry[i].ip[j].ip == "0.0.0.0")
+								{
+									wan_ip = "*";
+									break;
+								}
+								else
+								{
+									if(k != 0)
+										wan_ip += ",";
+									k++;
+									if(VIRTUAL_SERVER.entry[i].ip[j].count == 1)
+									{
+										wan_ip += VIRTUAL_SERVER.entry[i].ip[j].ip;
+									}
+									else
+									{
+						    				sub_addr = VIRTUAL_SERVER.entry[i].ip[j].ip.split(/\./);
+						    				tmp = parseInt(sub_addr[3]) + VIRTUAL_SERVER.entry[i].ip[j].count - 1;
+											wan_ip += VIRTUAL_SERVER.entry[i].ip[j].ip + "-" + tmp;
+									}
+								}
+							}
+					
+							cur_proto = 4;
+							wan_port = "";
+							k = 0;
+							for(j=0; j<PORT_MAX; j++)
+							{
+								if((VIRTUAL_SERVER.entry[i].port[j].b_port ==0)&&(VIRTUAL_SERVER.entry[i].port[j].e_port==0))
+									continue;
+								if(cur_proto == 4)
+									cur_proto = VIRTUAL_SERVER.entry[i].port[j].protocol;
+								else
+								{
+									if(cur_proto != VIRTUAL_SERVER.entry[i].port[j].protocol)
+									{
+										bBothProto = true;
+										break;
+									}
+								}
+								protocol = cur_proto;
+								if((k != 0)&&(VIRTUAL_SERVER.entry[i].port[j].b_port!=0)&&(VIRTUAL_SERVER.entry[i].port[j].e_port!=0))
+									wan_port += ",";
+								k++;
+									
+								if(VIRTUAL_SERVER.entry[i].port[j].b_port == VIRTUAL_SERVER.entry[i].port[j].e_port)
+									wan_port += VIRTUAL_SERVER.entry[i].port[j].b_port;
+								else
+									wan_port += VIRTUAL_SERVER.entry[i].port[j].b_port + "-" + VIRTUAL_SERVER.entry[i].port[j].e_port;
+							}
+					
+						    IP = VIRTUAL_SERVER.entry[i].lan_ip.split(/\./);
+						    if(IP[3])
+							    lan_ip = new Number(IP[3]);
+							else
+							    lan_ip = "";
+			
+							cur_proto = 4;
+							lan_port = "";
+							k = 0;
+							for(j=0; j<PORT_MAX; j++)
+							{
+							      if((VIRTUAL_SERVER.entry[i].lan_port[j].b_port==0)&&(VIRTUAL_SERVER.entry[i].lan_port[j].e_port==0))
+									continue;											      	
+								if(cur_proto == 4)
+									cur_proto = VIRTUAL_SERVER.entry[i].lan_port[j].protocol;
+								else
+								{
+									if(cur_proto != VIRTUAL_SERVER.entry[i].lan_port[j].protocol)
+										break;
+								}
+										
+								if((k != 0)&&(VIRTUAL_SERVER.entry[i].lan_port[j].b_port!=0)&&(VIRTUAL_SERVER.entry[i].lan_port[j].e_port !=0))
+									lan_port += ",";
+								k++;
+										
+								if(VIRTUAL_SERVER.entry[i].lan_port[j].b_port == VIRTUAL_SERVER.entry[i].lan_port[j].e_port)
+									lan_port += VIRTUAL_SERVER.entry[i].lan_port[j].b_port;
+								else 
+									lan_port+= VIRTUAL_SERVER.entry[i].lan_port[j].b_port + "-" + VIRTUAL_SERVER.entry[i].lan_port[j].e_port;
+							}
+
+							service_name = VIRTUAL_SERVER.entry[i].service_name;
+								
+							document.writeln('<tr bgcolor="#B4B2B2">');
+							document.writeln('<td align=center nowrap class="plaintext" >', i+1, '</td>');
+							document.writeln('<td align="center" class="plaintext">');
+							document.writeln('<input type="checkbox" name="enable', i,'" value="',VIRTUAL_SERVER.entry[i].enable, '"', enable, '></td>');
+							document.writeln('<td align="left" class="plaintext">');
+							document.writeln('<INPUT size="12" type="text" maxlength="40" name="service_name', i, '" value="');
+							document.writeln( service_name);
+							document.writeln('"></td>');
+							document.writeln('<td align="left" class="plaintext">');
+							document.writeln('<INPUT size="12" type="text" maxlength="40" name="wan_port', i, '" value="', wan_port, '"></td>');
+							document.writeln('<td align="left" class="plaintext">');
+							document.writeln('<SELECT name="protocol', i,'">');
+							document.writeln('<OPTION value=6>TCP</OPTION>');
+							document.writeln('<OPTION value=17>UDP</OPTION>');
+							document.writeln('<OPTION value=255>TCP&UDP</OPTION>');
+							document.writeln('</SELECT>');
+							document.writeln('</td>');
+									
+							document.writeln('<INPUT size="15" type="hidden" maxlength="25" name="wan_ip', i, '" value="*">');
+							document.writeln('<td align="left" class="plaintext">');
+							document.writeln(lanip_oct1, '.', lanip_oct2, '.', lanip_oct3, 
+											'.<INPUT size="3" type="text" maxlength="3" name="lan_ip', i, 
+											'" value="', lan_ip, '"></td>');
+							document.writeln('<td align="left" class="plaintext">');
+							document.writeln('<INPUT size="12" type="text" maxlength="40" name="lan_port', i, 
+											'" value="', lan_port, '"></td>');
+							document.writeln('</TR>');
+					
+							if(bBothProto)
+										protocol = 255;
+							if(VIRTUAL_SERVER.entry[i].protocol==255) 
+										protocol=255;
+										
+							field_name = "protocol" + i;
+							k = document.getElementsByName("protocol" + i );
+							for(j=0; j<3; j++)
+							{
+								if(k[0].options[j].value == protocol)
+								{
+									k[0].options[j].selected = true;
+									break;
+								}
+							}
+						}		
+					</script>
+					
+							<tr>
+								<td colspan="7" class="plaintext_bold">
+									<table border=0 class="copy_1" align="center">
+										<tr align="center">
+											<td width="150">&nbsp;</td>
+											<td>
+												<input type="button" value="<% Fid_str(48); %>" class="submitBtn" style="height=22px;width:150px;" onClick="javascript:window.location.reload(true);return false">&nbsp;&nbsp;
+												&nbsp;&nbsp;<input type="button" name="action" value="<% Fid_str(49); %>" class="submitBtn" style="height=22px;width:150px;" onClick="btnApply()">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>						
+			</table>
+			</form>
+		</td>
+	</tr>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>
+						

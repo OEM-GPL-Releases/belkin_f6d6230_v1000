@@ -1,0 +1,462 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="mootabs.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script src="mootools.js" type="text/javascript" charset="utf-8"></script>
+<script src="mootabs.js" type="text/javascript" charset="utf-8"></script>
+<script src="routine_data.js" type="text/javascript" charset="utf-8"></script>
+<% File_include("refreshmenu.txt"); %>
+<style>
+.boldhead
+{
+	font-family: Arial,Helvetica,sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+#client_list_panel
+{
+	left:250px;
+	top:50px;
+}
+</style>
+<script language="javascript">
+<% dhcp_client_list(); %>
+<% static_client_list(); %>
+
+
+function dw(s) {document.write(s);}
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+var fw_s="<% Fid_str(23); %>";
+var vaccrest="<% Fid_str(1710); %>";
+var va_schd="<% Fid_str(1735); %>";
+var va_day="<% Fid_str(1743); %>";
+var va_day0="<% Fid_str(1744); %>";
+var va_day1="<% Fid_str(1745); %>";
+var va_day2="<% Fid_str(1746); %>";
+var va_day3="<% Fid_str(1747); %>";
+var va_day4="<% Fid_str(1748); %>";
+var va_day5="<% Fid_str(1749); %>";
+var va_day6="<% Fid_str(1750); %>";
+var va_day7="<% Fid_str(1751); %>";
+var va_day8="<% Fid_str(1752); %>";
+var va_time0="<% Fid_str(70); %>";
+var va_time1="<% Fid_str(1753); %>";
+var va_time2="<% Fid_str(1592); %>";
+var va_time3="<% Fid_str(1593); %>";
+var va_blurl="<% Fid_str(1754); %>";
+var va_blkey="<% Fid_str(1755); %>";
+var va_blsrv="<% Fid_str(1756); %>";
+
+var va_js01="<% Fid_str(1757); %>";
+var va_js02="<% Fid_str(1758); %>";
+var va_js03="<% Fid_str(113); %>";
+var va_js04="<% Fid_str(317); %>";
+var va_js05="<% Fid_str(318); %>";
+var va_js06="<% Fid_str(1293); %>";
+var va_js07="<% Fid_str(898); %>";
+var va_js08="<% Fid_str(114); %>";
+var va_js09="<% Fid_str(1411); %>";
+var va_js10="<% Fid_str(1761); %>";
+var va_js11="<% Fid_str(1764); %>";
+
+var va_blsrv1="<% Fid_str(1411); %>";
+var va_blsrv2="<% Fid_str(1579); %>";
+/*
+var va_list="Internet Access PC List";
+var va_list1="List of PCs";
+var va_list_h="Enter MAC Address of the PCs in this format: xxxxxxxxxxxx";
+var va_list_ip="Enter the IP Address of the PCs";
+var va_list_ipr="Enter the IP Range of the PCs";
+var va_range="IP Range";
+var va_psummary="Internet Policy Summary";
+var va_policy1="No.";
+var va_policy2="Policy Name";
+var va_policy3="Days (Sun - Sat)";
+var va_policy4="Time of Day";
+*/
+var vz_dns="DNS";
+var vz_ping="Ping";
+var vz_http="HTTP";
+var vz_https="HTTPS";
+var vz_ftp="FTP";
+var vz_pop3="POP3";
+var vz_imap="IMAP";
+var vz_smtp="SMTP";
+var vz_nntp="NNTP";
+var vz_telnet="Telnet";
+var vz_snmp="SNMP";
+var vz_tftp="TFTP";
+var vz_ike="IKE";
+var vz_icmp="ICMP";
+var vz_tcp="TCP";
+var vz_udp="UDP";
+var vz_both="TCP & UDP";
+var descrition='<% Fid_str(1762); %>';
+var macaddresserror = "<% Fid_str(902); %>";
+var rc= "<% Fid_str(903); %>";
+
+var exist_mList='<% Fid_str(2615); %>';
+var exist_cList='<% Fid_str(2616); %>';
+
+var skuid=<% nvram_get("gs_sku_id"); %>;
+<% File_include("my_function.txt"); %>
+<% File_include("routine.txt"); %>
+<% exec cmd="my_function"; %>
+<% login_timeout(); %>
+
+
+</script>
+<script src="firewall_ac.js" type="text/javascript" charset="utf-8"></script>
+<script>
+function initMemberList()
+{
+
+<% firewall_ac(); %>
+
+}
+function initAccessControlEnable()
+{
+	var ac_enable = <% nvram_get("access_control_enabled"); %>;
+	if(ac_enable == 1)
+		document.tF.ac_enable[0].checked = true;
+	else
+		document.tF.ac_enable[1].checked = true;
+	ShowHideMemberTable();
+}
+</script>
+</head>
+<body text=#000000 bgColor=#ffffff leftMargin=0 topMargin=0 marginheight="0" marginwidth="0">
+<div id="popup_base" class="popup_base"></div>
+<% File_include("menu.stm"); %>
+<form name="tF" METHOD="POST">
+	<div id="client_list_panel" class="popup_panel" style="display:none">
+		<div class="head_bold2" style="margin-bottom:10px"><% Fid_str(1730); %></div>
+		<table width="500" cellspacing="2" cellpadding="2" border="0" class="body info_table" id="cclist_table">
+			<tr>
+				<th><% Fid_str(1731); %></th>
+				<th><% Fid_str(330); %></th>
+				<th><% Fid_str(14); %></th>
+				<th><% Fid_str(1599); %></th>
+			</tr>
+		</table>
+		<div>
+			<input type="button" class="submitBtn" name="add_cancel" value="<% Fid_str(1399); %>" onclick="HideClientListPanel()">
+		</div>
+	</div>
+	
+	<table border="0" cellpadding="0" cellspacing="0" width="720" bgcolor="#ffffff" style="margin:20px;margin-left:36px">
+		<tr>
+			<td width="700" height="24" colspan="2" class="head_bold">
+				<script language="javascript" type="text/javascript">dw(fw_s + " > " + vaccrest);</script>
+			</td>
+		</tr>
+		<tr>
+			<td width="700" colspan="2" class="body">
+				<script language="javascript" type="text/javascript">dw(descrition);</script><a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#access_control");>
+				<b><font color=#0066FF><% Fid_str(47); %></font></b></a><br><br>
+			</td>
+		</tr>
+		<tr style="height:30px">
+			<td class="body" style="width:220px">
+				<b><script language="javascript" type="text/javascript">dw(vaccrest + " <% Fid_str(779); %>");</script></b>&nbsp;&nbsp;
+			</td>
+			<td class="body">
+				<input name="ac_enable" type="radio" onclick="ShowHideMemberTable()"><% Fid_str(317); %>&nbsp;
+				<input name="ac_enable" type="radio" onclick="ShowHideMemberTable()"><% Fid_str(318); %>
+			</td>
+		</tr>
+		<tr style="height:30px">
+			<td class="body">
+				<b><% Fid_str(2103); %></b>&nbsp;&nbsp;</b>
+			</td>
+			<td class="body">
+				<input name="ac_landing_password" type="password" size="20" maxlength="16" value="<% nvram_get("landing_password"); %>">
+			</td>
+		</tr>
+	</table>
+	<table border="0" cellpadding="0" cellspacing="0" width="720" bgcolor="#ffffff" style="margin-left:36px">
+		<tr id="member_tr">
+			<td valign="top" colspan="2">
+				<table width="700" cellspacing="1" cellpadding="2" border="0" class="body info_table">
+					<caption><% Fid_str(1732); %></caption>
+					<tr>
+						<th width="65"><% Fid_str(1733); %></th>
+						<th><% Fid_str(1731); %></th>
+						<th width="140"><% Fid_str(14); %></th>
+						<th width="150"><% Fid_str(320); %></th>
+						<th width="150"><% Fid_str(1734); %></th>
+						<th width="60"><% Fid_str(1599); %></th>
+					</tr>
+				</table>
+				<div id="member_info_panel" style="overflow-y:auto; width: 720px">
+					<table width="700" cellspacing="1" cellpadding="2" border="0" class="body info_table member_list" id="member_table">
+					</table>
+				</div>
+				<table width="700" cellspacing="1" cellpadding="2" border="0" class="body info_table" id="add_btn_table">
+					<tr>
+						<td width="65"></td>
+						<td></td>
+						<td width="140"></td>
+						<td width="150"></td>
+						<td width="150"></td>
+						<td width="60">
+							<input type="button" id="btn_show_client_list" class="submitBtn" style="width:100%" value="" onclick="ShowClientListPanel();">
+							<script>document.getElementById("btn_show_client_list").value=va_js03;</script>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr id="content_tr">
+			<td colspan="2">
+				<div id="member_panel">
+					<div id="member_label" class="body" style="font-weight:bold;margin-top:20px;margin-bottom:5px"></div>
+					<div id="myTabs">
+						<ul class="mootabs_title">
+							<li title="Schedule"><% Fid_str(1735); %></li>
+							<li title="Blocked Services"><% Fid_str(1736); %></li>
+							<li title="Website Blocking by URL Address"><% Fid_str(1765); %></li>
+							<li title="Website Blocking by Keyword"><% Fid_str(1766); %></li>
+						</ul>
+							
+						<div id="Blocked Services" class="mootabs_panel">
+							<div class="head_bold2" style="margin-bottom:10px">
+							</div>
+							<table class="body info_table" border="0">
+								<tr>
+									<th><% Fid_str(1738); %></th>
+									<th><% Fid_str(1736); %></th>
+									<th><% Fid_str(1739); %></th>
+								</tr>
+								<script>
+								for(var i=0;i<5;i++)
+								{
+									dw("<tr>");
+									dw("<td>" + (i+1) + "</td>");
+									dw("<td nowrap><select size='1' name='blocked_service_" + i + "' onchange='CheckService(" + i + ")'></select>&nbsp; </td>");
+									dw("<td nowrap>");
+									dw("<select name='svc_type_" + (i*2) + "' size='1' onchange='CheckPortRange(" + (i*2) + ")'></select>");
+									dw("<input class='num' maxlength='60' size='60' name='port_range_" + (i*2) +"' value=''>");
+									//dw("<select name='svc_type_" + (i*2+1)+ "' size='1' onchange='CheckPortRange(" + (i*2+1) + ")'></select>");
+									//dw("<input class='num' maxlength='60' size='30' name='port_range_" + (i*2+1) + "' value=''>");
+									dw("</td>");
+									dw("</tr>");
+								}
+								</script>
+							</table>
+						</div>
+							
+						<div id="Schedule" class="mootabs_panel">
+							<div class="head_bold2" style="margin-bottom:10px">
+							</div>
+							<table class="body">
+								<tr>
+									<td nowrap>
+										<b><script language="javascript" type="text/javascript">dw(va_day);</script> ></b>&nbsp;
+									</td>
+									<td nowrap>&nbsp;</td>
+								</tr>
+								<tr>
+									<td nowrap>&nbsp; &nbsp;
+										<input  type="checkbox" name="alldays" value="1" onClick="BlockAllClickCheck(this.checked)" checked>
+										<script language="javascript" type="text/javascript">dw(va_day0);</script>
+									</td>
+									<td nowrap>&nbsp; &nbsp;
+										<input  type="checkbox" name="sun" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day1);</script>
+										<input  type="checkbox" name="mon" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day2);</script>
+										<input  type="checkbox" name="tue" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day3);</script>
+										<input  type="checkbox" name="wed" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day4);</script>
+										<input  type="checkbox" name="thu" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day5);</script>
+										<input  type="checkbox" name="fri" value="1">
+										<script language="javascript" type="text/javascript">dw(va_day6);</script>
+										<input  type="checkbox" name="sat" value="1">
+										<script language="javascript" type="text/javascript">
+											dw(va_day7);
+										</script>
+									</td>
+								</tr>
+							</table>
+							<table class="body">
+								<tr>
+									<td nowrap>
+										<b><script language="javascript" type="text/javascript">dw(va_time0);</script> ></b> &nbsp;
+									</td>
+									<td nowrap colspan="3">&nbsp;</td>
+								</tr>
+								<tr>
+									<td nowrap>&nbsp; &nbsp;
+										<input type="radio" name="time" value="24hrs" onClick="CheckTimeDisable();" checked>
+										<script language="javascript" type="text/javascript">
+											dw(va_time1);
+										</script>
+									</td>
+									<td nowrap>&nbsp; &nbsp; &nbsp;
+										<input type="radio" name="time" value="settimes" onClick="CheckTimeDisable();"></td>
+									<td nowrap>&nbsp;
+										<b><script language="javascript" type="text/javascript">dw(va_time2);</script> ></b>
+									</td>
+									<td nowrap align="right">
+										<b><select name="starthour" id="starthour" onchange="CheckScheduleRange()"></select></b> : 
+										<b><select name="startminute" id="startminute" onchange="CheckScheduleRange()"></select></b>
+									</td>
+									<td nowrap>&nbsp;</td>
+									<td nowrap></td>
+									<td nowrap>&nbsp;
+										<b><script language="javascript" type="text/javascript">dw(va_time3);</script> ></b>
+									</td>
+									<td nowrap align="right">
+										<b><select name="endhour" id="endhour" onchange="CheckScheduleRange()"></select></b> :
+										<b><select name="endminute" id="endminute" onchange="CheckScheduleRange()"></select></b>
+									</td>
+								</tr>
+								<tr>
+									<td nowrap></td>
+									<td nowrap></td>
+								</tr>
+							</table>
+						</div>
+							
+						<div id="Website Blocking by URL Address" class="mootabs_panel">
+							<div class="head_bold2" style="margin-bottom:10px">
+							</div>
+							<table class="body info_table">
+								<tr>
+									<th><% Fid_str(1738); %></th>
+								<th><% Fid_str(1740); %></th>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td nowrap><input type="text" name="url1" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>2</td>
+									<td nowrap><input TYPE="text" name="url2" VALUE="" MAXLENGTH="64" SIZE="64"></td>
+								</tr>
+								</tr>
+									<td>3</td>
+									<td nowrap><input type="text" name="url3" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>4</td>
+									<td nowrap><input type="text" name="url4" value="" maxlength="64" size="64"></td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td nowrap><input type="text" name="url5" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>6</td>
+									<td nowrap><input TYPE="text" name="url6" VALUE="" MAXLENGTH="64" SIZE="64"></td>
+								</tr>
+								</tr>
+									<td>7</td>
+									<td nowrap><input type="text" name="url7" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>8</td>
+									<td nowrap><input type="text" name="url8" value="" maxlength="64" size="64"></td>
+								</tr>
+								<tr>
+									<td>9</td>
+									<td nowrap><input type="text" name="url9" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>10</td>
+									<td nowrap><input TYPE="text" name="url10" VALUE="" MAXLENGTH="64" SIZE="64"></td>
+								</tr>
+							</table>
+						</div>
+							
+						<div id="Website Blocking by Keyword" class="mootabs_panel">
+							<div class="head_bold2" style="margin-bottom:10px">
+							</div>
+							<table class="body info_table">
+								<tr>
+									<th><% Fid_str(1738); %></th>
+									<th><% Fid_str(1741); %></th>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td nowrap><input type="text" name="keyword1" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>2</td>
+									<td nowrap><input type="text" name="keyword2" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>3</td>
+									<td nowrap><input type="text" name="keyword3" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>4</td>
+									<td nowrap><input type="text" name="keyword4" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>5</td>
+									<td nowrap><input type="text" name="keyword5" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>6</td>
+									<td nowrap><input type="text" name="keyword6" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>7</td>
+									<td nowrap><input type="text" name="keyword7" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>8</td>
+									<td nowrap><input type="text" name="keyword8" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>9</td>
+									<td nowrap><input type="text" name="keyword9" value="" maxlength="64" size="64"></td>
+								</tr>
+								</tr>
+									<td>10</td>
+									<td nowrap><input type="text" name="keyword10" value="" maxlength="64" size="64"></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<table border="0" class="body" style="margin-top:20px">
+		<tr>
+			<td width="70">&nbsp;</td>
+			<td colspan="2" >
+				<script language="javascript">
+					if(navigator.appName != "Netscape")
+					{
+						document.write('<input type="button" value="<% Fid_str(48); %>" style="{width:150px;}" class="submitBtn" onClick="javascript:window.location.reload();">');
+					}
+					else
+					{
+						document.write('<a href="/firewall_ac.stm"><input type="button" value="<% Fid_str(48); %>" style="{width:150px;}" class="submitBtn"></a>');
+					}
+				</script>
+				&nbsp;&nbsp;
+				<input type="button" name="savesetting" value="<% Fid_str(49); %>" style="{width:150px;}" class="submitBtn" onclick="SubmitInit()">
+			</td>
+		</tr>
+	</table>
+</form>
+		
+		</td>
+	</tr>
+</table>
+</body>
+</html>

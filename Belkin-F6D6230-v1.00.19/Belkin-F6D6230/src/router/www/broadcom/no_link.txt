@@ -1,0 +1,48 @@
+<tr>
+    <td>
+        <table cellpadding="0" cellspacing="0" border="0" width="180">
+            <tr>
+                <td>
+                    <table cellpadding="3" cellspacing="0" border="0" width="180">
+                        <tr>
+                            <script language="JavaScript">
+                                document.write('<td align="left" valign="middle" nowrap bgcolor=',wizardbg,'>');
+                            </script>
+                                <table>
+                                    <tr>
+                                        <td class="section">&#187;&nbsp;SETUP WIZARD</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+<tr>
+<td bgcolor="#FFFFFF"><img src="images/clear.gif" alt="" border="0" width="1" height="1"></td>
+</tr>
+
+<script language="javascript">
+{	//
+
+var x=new Array("SYSTEM","WAN","LAN","WIRELESS","NAT","ROUTE","FIREWALL","SNMP","ADSL","VoIP","UPnP","QoS","DDNS","USB","TOOLS","STATUS");
+var i;
+	for(i=0;i<16;i++)
+	{
+	    document.write('<tr><td>');
+	    document.write('<table cellpadding="0" cellspacing="0" border="0" width="180">');
+	    document.write('<tr><td>');
+	    document.write('<table cellpadding="3" cellspacing="0" border="0" width="180">');
+	    document.write('<tr>');
+	    document.write('<td onmouseover="this.style.backgroundColor='+mouseover+'" onmouseout="this.style.backgroundColor='+mouseout+'">');
+	    document.write(x[i]);
+	    document.write('</td></tr></table>');
+	    document.write('</td></tr></table>');
+	    document.write('</td></tr>');
+	    document.write('<tr><td bgcolor="#FFFFFF"><img src="images/clear.gif" alt="" border="0" width="1" height="1"></td></tr>');
+	}
+}
+</script>

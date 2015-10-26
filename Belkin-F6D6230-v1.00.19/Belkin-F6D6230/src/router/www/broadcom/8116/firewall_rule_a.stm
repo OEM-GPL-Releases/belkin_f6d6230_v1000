@@ -1,0 +1,218 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<style type="text/css">
+<!--
+.leftLink {  font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; line-height: 15px; font-weight: bold; color: #003366; text-decoration: none}
+.top_nav {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.section {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 15px; font-weight: bold; color: #FFFFFF; text-decoration: none}
+.head_bold {  font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 15px; font-weight: bold; color: #003399; text-decoration: none}
+a {  text-decoration: none; color: #003366}
+a:hover {  text-decoration: underline; color: #000000}
+.copy_1 {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; line-height: 14px; color: #003366}
+.submitBtn {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;border-color: #666262; background-color: #666262; color: #ffffff}
+
+//-->
+</style>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% exec cmd="ModifyRuleIndex"; %>
+<% include file="routine.txt"; %>
+
+var x=new Array("Every Day","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+
+function isNValidTime(h, m) {
+	if (isNaN(h) || isNaN(m) || (h < 0) || (h > 23) || (m < 0) || (m > 59))
+		return true;
+	else
+		return false;
+}
+
+function isNValidTimeBound(sh, sm, eh, em) {
+	var ss = sh * 60 + sm;
+	var ee = eh * 60 + em;
+
+	if ((ss - ee) > 0) return true;
+	else return false;
+}
+
+function evaltF() {
+	if (isBlank(document.tF.RuleName.value)) { alert('<% Fid_str(1121); %>.'); return false; }
+	if (isNValidTime(document.tF.T0_s_h.value, document.tF.T0_s_m.value) ||
+		isNValidTime(document.tF.T0_e_h.value, document.tF.T0_e_m.value)) {
+		alert('<% Fid_str(1123); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T0_s_h.value, document.tF.T0_s_m.value,
+						  document.tF.T0_e_h.value, document.tF.T0_e_m.value)) {
+		alert('<% Fid_str(1124); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T1_s_h.value, document.tF.T1_s_m.value) ||
+		isNValidTime(document.tF.T1_e_h.value, document.tF.T1_e_m.value)) {
+		alert('<% Fid_str(1125); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T1_s_h.value, document.tF.T1_s_m.value,
+						  document.tF.T1_e_h.value, document.tF.T1_e_m.value)) {
+		alert('<% Fid_str(1126); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T2_s_h.value, document.tF.T2_s_m.value) ||
+		isNValidTime(document.tF.T2_e_h.value, document.tF.T2_e_m.value)) {
+		alert('<% Fid_str(1127); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T2_s_h.value, document.tF.T2_s_m.value,
+						  document.tF.T2_e_h.value, document.tF.T2_e_m.value)) {
+		alert('<% Fid_str(1128); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T3_s_h.value, document.tF.T3_s_m.value) ||
+		isNValidTime(document.tF.T3_e_h.value, document.tF.T3_e_m.value)) {
+		alert('<% Fid_str(1129); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T3_s_h.value, document.tF.T3_s_m.value,
+						  document.tF.T3_e_h.value, document.tF.T3_e_m.value)) {
+		alert('<% Fid_str(1130); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T4_s_h.value, document.tF.T4_s_m.value) ||
+		isNValidTime(document.tF.T4_e_h.value, document.tF.T4_e_m.value)) {
+		alert('<% Fid_str(1131); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T4_s_h.value, document.tF.T4_s_m.value,
+						  document.tF.T4_e_h.value, document.tF.T4_e_m.value)) {
+		alert('<% Fid_str(1132); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T5_s_h.value, document.tF.T5_s_m.value) ||
+		isNValidTime(document.tF.T5_e_h.value, document.tF.T5_e_m.value)) {
+		alert('<% Fid_str(1133); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T5_s_h.value, document.tF.T5_s_m.value,
+						  document.tF.T5_e_h.value, document.tF.T5_e_m.value)) {
+		alert('<% Fid_str(1134); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T6_s_h.value, document.tF.T6_s_m.value) ||
+		isNValidTime(document.tF.T6_e_h.value, document.tF.T6_e_m.value)) {
+		alert('<% Fid_str(1135); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T6_s_h.value, document.tF.T6_s_m.value,
+						  document.tF.T6_e_h.value, document.tF.T6_e_m.value)) {
+		alert('<% Fid_str(1136); %>');
+		return false;
+	}
+	if (isNValidTime(document.tF.T7_s_h.value, document.tF.T7_s_m.value) ||
+		isNValidTime(document.tF.T7_e_h.value, document.tF.T7_e_m.value)) {
+		alert('<% Fid_str(1137); %>');
+		return false;
+	}
+	if (isNValidTimeBound(document.tF.T7_s_h.value, document.tF.T7_s_m.value,
+						  document.tF.T7_e_h.value, document.tF.T7_e_m.value)) {
+		alert('<% Fid_str(1138); %>');
+		return false;
+	}
+	return true;
+}
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<FORM NAME=tF METHOD=POST ACTION="/cgi-bin/aoschadd.exe">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(1); %>&gt; <% Fid_str(2); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td width="5">&nbsp;</td>
+					<td>
+						<table border=0 cellspacing=2 cellpadding=0 width="620" align="left" bordercolor="#9999FF" class="copy_1">
+							<tr valign="top">
+								<td nowrap class="copy_1" bgcolor="#FFFFFF">
+									<div align="left" class="copy_1">
+									<% Fid_str(262); %>
+									<a href="javascript:void(0);" onClick="window.open('glossary.stm#ip_filter','help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');">
+									<font color=#0066FF><b><% Fid_str(4); %></b></font></a></div><br>
+								</td>
+							</tr>
+							<tr>
+								<td nowrap>
+									<a href="/firewall_a.stm"><b>&gt;&gt;<% Fid_str(5); %></b></a>&nbsp;&nbsp;&nbsp;
+									<a href="/firewall_u.stm"><b>&gt;&gt; <% Fid_str(6); %></b></a>&nbsp;&nbsp;&nbsp;
+									<a href="/firewall_rule.stm"><b>&gt;&gt; <% Fid_str(7); %></b></a>&nbsp;&nbsp;
+								<br><br></td>
+							</tr>
+							<tr><td>&nbsp;</td></tr>
+							<tr>
+								<td colspan=3><b>&gt; <% Fid_str(131); %></b></td>
+							</tr>
+							<tr>
+								<td align=left colspan=3><b><% Fid_str(132); %> &gt;</b>&nbsp;&nbsp;
+									<input type="text" name="RuleName" size="20" maxlength="15">
+								<br><br></td>
+							</tr>
+							<tr>
+								<td align=left colspan=3><b><% Fid_str(133); %> &gt;</b>&nbsp;&nbsp;
+									<input type="text" name="RuleComment" size="20" maxlength="19">
+								<br><br></td>
+							</tr>
+							<tr>
+								<td>
+									<table border=0 cellspacing=2 cellpadding=0 width="600" align="left" class="copy_1">
+										<tr bgcolor="#666262">
+											<td width="27%" align="center"><font color=#ffffff><% Fid_str(129); %></font></td>
+											<td width="32%" align="center"><font color=#ffffff><% Fid_str(135); %></font></td>
+											<td width="25%" align="center"><font color=#ffffff><% Fid_str(136); %></font></td>
+										</tr>
+										<script language="javascript">
+										var i;
+										for(i=0;i<8;i++)
+										{
+										document.write('<tr bgcolor="#B4B2B2">');
+										document.write('<td width="27%" align="center" height="22">',x[i],'</td>');
+										document.write('<td width="32%" align="center" height="22">');
+										document.write('<input type="text" name="T',i,'_s_h" size="2" maxlength="2"><b>&nbsp;:&nbsp;</b><input type="text" name="T',i,'_s_m" size="2" maxlength="2"></td>');
+										document.write('<td width="25%" align="center" height="22">');
+										document.write('<input type="text" name="T',i,'_e_h" size="2" maxlength="2"><b>&nbsp;:&nbsp;</b><input type="text" name="T',i,'_e_m" size="2" maxlength="2"></td>');
+										document.write('</tr>');
+										}
+										</script>
+										<script language="javascript">
+										if(rule_index!=-1)
+											document.write('<input NAME=index TYPE=hidden VALUE=',rule_index,'>');
+										</script>
+							<% exec cmd="OScheduleShow"; %>
+							<tr><td>&nbsp;</td></tr>
+							<tr>
+								<td width="36">&nbsp;</td>
+								<td colspan="2" align=center>
+									<input type="button" value="<% Fid_str(78); %>" style="{height=22px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+									&nbsp;&nbsp;
+									<input type="submit" name="arc_action" value="<% Fid_str(986); %>" style="{height=22px;}" class="submitBtn" onClick="return evaltF();">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</tr>
+	</td>
+</tr>
+</table>
+</form>
+</body>
+</html>

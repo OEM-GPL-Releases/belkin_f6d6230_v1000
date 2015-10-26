@@ -1,0 +1,758 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% File_include("routine.txt"); %>
+<% gs_Lan_IP_Addr("gs_Lan_IP_Address"); %> // get lan_ip[]
+<% gs_Wan_IP_Subnet("gs_Wan_IP_Subnet"); %> // get wan_subnet[]
+var guest_ip="<% nvram_get("lan1_ipaddr"); %>";
+
+function guest_IP_overlap(ip)
+{
+if(guest_ip.indexOf(ip)>=0)
+{
+return true;
+}
+}
+
+function isValid_LAN_IP_Range() {
+	if(document.tF.lan_ip1.value == 10) return true; //10.*.*.*
+	if(document.tF.lan_ip1.value == 172 && (document.tF.lan_ip2.value > 15 && document.tF.lan_ip2.value < 32 ) )
+		return true; //172.16.0.0 ~ 172.31.255.255
+
+	if(document.tF.lan_ip1.value == 192 && document.tF.lan_ip2.value == 168) return true; //192.168.*.*
+	return false;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function ipcheck() {
+	if(document.tF.lan_ip1.value<128)
+	 {
+	   document.tF.lan_mask2.value = 0;
+	   document.tF.lan_mask3.value = 0;
+	   document.tF.lan_mask4.value = 0;
+	 }
+	 if((document.tF.lan_ip1.value<192)&&(document.tF.lan_ip1.value>127))
+	 {
+	   document.tF.lan_mask2.value = 255;
+	   document.tF.lan_mask3.value = 0;
+	   document.tF.lan_mask4.value = 0;
+	 }
+	 if((document.tF.lan_ip1.value<240)&&(document.tF.lan_ip1.value>191))
+	 {
+	   document.tF.lan_mask2.value = 255;
+	   document.tF.lan_mask3.value = 255;
+	   document.tF.lan_mask4.value = 0;
+	 } 
+}
+
+function disableDHCP13(flag)
+{
+	document.tF.DhcpStartIP1.disabled=flag;
+	document.tF.DhcpStartIP2.disabled=flag;
+	document.tF.DhcpStartIP3.disabled=flag;
+	document.tF.DhcpEndIP1.disabled=flag;
+	document.tF.DhcpEndIP2.disabled=flag;
+	document.tF.DhcpEndIP3.disabled=flag;
+}
+function disableDHCP4(flag)
+{
+	document.tF.DhcpStartIP4.disabled=flag;
+	document.tF.DhcpEndIP4.disabled=flag;
+}
+
+//++by jack for domain name check 20070330
+var errorhostname='<% Fid_str(713); %>.';
+
+function checklocalname()
+{	
+	var localname=document.tF.domain_name.value.toLowerCase();
+	for(i=0;i<localname.length;i++)
+	{
+		var token=localname.charAt(i);
+		if(token=='`' || token=='~' || token=='!' || token=='@' || token=='#'
+		|| token=='$' || token=='%' || token=='^' || token=='&' || token=='*'
+		|| token=='(' || token==')' || token=='=' || token=='+' || token=='['
+		|| token==']' || token=='{' || token=='}' || token=='\\' || token=='|'
+		|| token==';' || token==':' || token=='\'' || token=='\"' || token=='<'
+		|| token=='>' || token=='/' || token=='?' )
+		{
+			alert(errorhostname);
+			return false;
+		}
+	}
+	return true;
+}
+//++by jack for domain name check 20070330
+
+function evaltF()
+{
+	var lanIP = document.tF.lan_ip1.value + "." + 
+				document.tF.lan_ip2.value + "." + 
+				document.tF.lan_ip3.value + "." + 
+				document.tF.lan_ip4.value;
+	var Esubmask = 	document.tF.lan_mask1.value + "." + 
+					document.tF.lan_mask2.value + "." + 
+					document.tF.lan_mask3.value + "." + 
+					document.tF.lan_mask4.value;
+	var EdhcpS = document.tF.DhcpStartIP1.value + "." + 
+				document.tF.DhcpStartIP2.value + "." + 
+				document.tF.DhcpStartIP3.value + "." + 
+				document.tF.DhcpStartIP4.value;
+	var EdhcpE = document.tF.DhcpEndIP1.value + "." + 
+				document.tF.DhcpEndIP2.value + "." + 
+				document.tF.DhcpEndIP3.value + "." + 
+				document.tF.DhcpEndIP4.value;
+
+	var ip_range=document.tF.lan_ip1.value + "." + 
+				document.tF.lan_ip2.value + "." + 
+				document.tF.lan_ip3.value + "." ;			
+
+	var lIP4 = parseInt(document.tF.lan_ip4.value);
+	var sIP4 = parseInt(document.tF.DhcpStartIP4.value);
+	var eIP4 = parseInt(document.tF.DhcpEndIP4.value);
+
+	if(	(isNValidInt(document.tF.lan_mask1.value))||
+		(isNValidInt(document.tF.lan_mask2.value))||
+		(isNValidInt(document.tF.lan_mask3.value))||
+		(isNValidInt(document.tF.lan_mask4.value))){
+		message = '<% Fid_str(766); %>';
+		alert(message);
+		return false;
+	}
+
+	if(isNValidSubnetMask( document.tF.lan_mask1.value, document.tF.lan_mask2.value, document.tF.lan_mask3.value, document.tF.lan_mask4.value )){
+		message = '<% Fid_str(766); %>';
+		alert(message);
+		return false;
+	}
+	
+	if(isValidIP(lanIP) == false){
+		message = '<% Fid_str(405); %>';
+		alert(message);
+		return false;
+	}
+	
+	if(isValid_LAN_IP_Range() == false){
+		message = '<% Fid_str(405); %>';
+		alert(message);
+		return false;
+	}
+
+	if( 0 != isValidIPAddress3(document.tF.lan_ip1, document.tF.lan_ip2, document.tF.lan_ip3, document.tF.lan_ip4,document.tF.lan_mask1, document.tF.lan_mask2, document.tF.lan_mask3, document.tF.lan_mask4)){
+		message = '<% Fid_str(405); %>';
+		alert(message);
+		return false;
+	}		
+
+      if(guest_IP_overlap(ip_range))
+      {
+      		message = "The IP address is already used by Guest Access, please use another IP address!\n";
+		alert(message);
+		return false;
+      }
+
+	if(navigator.appName != "Netscape")
+	{// IE
+		if(	!(isBlank_Zero(document.tF.lan_ip1.value))||
+			!(isBlank_Zero(document.tF.lan_ip2.value))||
+			!(isBlank_Zero(document.tF.lan_ip3.value))||
+			!(isBlank_Zero(document.tF.lan_ip4.value))){
+			if(	isNValidIP(document.tF.lan_ip1.value) || 
+				isNValidIP(document.tF.lan_ip2.value) || 
+				isNValidIP(document.tF.lan_ip3.value) ||
+				isNValidIP(document.tF.lan_ip4.value)){
+				message = '<% Fid_str(1240); %>';
+				alert(message);
+				return false;
+			}
+		}
+		
+	        if(wan_subnet_len>=24){
+	            if((document.tF.lan_ip1.value & 255) == wan_subnet[0]){
+	                if((document.tF.lan_ip2.value & 255) == wan_subnet[1]){
+	                    if((document.tF.lan_ip3.value & 255) == wan_subnet[2]){
+					message = '<% Fid_str(766); %>';
+					alert(message);
+					return false;
+	                    }
+	                }
+	            }
+	        }
+	        
+	 	if(document.tF.dhcp_enable[0].checked==true)
+	 	{
+			if(	!(isBlank_Zero(document.tF.DhcpStartIP1.value))||
+				!(isBlank_Zero(document.tF.DhcpStartIP2.value))||
+				!(isBlank_Zero(document.tF.DhcpStartIP3.value))||
+				!(isBlank_Zero(document.tF.DhcpStartIP4.value))){
+				if(	isNValidIP(document.tF.DhcpStartIP1.value) || 
+					isNValidIP(document.tF.DhcpStartIP2.value) || 
+					isNValidIP(document.tF.DhcpStartIP3.value) ||
+					isNValidIP(document.tF.DhcpStartIP4.value) ||
+					document.tF.DhcpStartIP4.value == "255" ) {
+					message = '<% Fid_str(1228); %>';
+					alert(message); 
+					return false; 
+				}
+			}
+			if(	!(isBlank_Zero(document.tF.DhcpEndIP1.value))||
+				!(isBlank_Zero(document.tF.DhcpEndIP2.value))||
+				!(isBlank_Zero(document.tF.DhcpEndIP3.value))||
+				!(isBlank_Zero(document.tF.DhcpEndIP4.value))){
+				if(	isNValidIP(document.tF.DhcpEndIP1.value) || 
+					isNValidIP(document.tF.DhcpEndIP2.value) || 
+					isNValidIP(document.tF.DhcpEndIP3.value) ||
+					isNValidIP(document.tF.DhcpEndIP4.value) ||
+					document.tF.DhcpEndIP4.value == "255" ) {
+					message ='<% Fid_str(1229); %>';
+					alert(message); 
+					return false; 
+				}
+			}
+
+		 	if(	(document.tF.DhcpStartIP1.value & 255) != (document.tF.lan_ip1.value & 255) || 
+				((document.tF.DhcpStartIP2.value & 255) != (document.tF.lan_ip2.value & 255)) || 
+				((document.tF.DhcpStartIP3.value & 255) != (document.tF.lan_ip3.value & 255)) )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+			if(	
+				(( document.tF.DhcpStartIP1.value & document.tF.lan_mask1.value ) != ( document.tF.lan_ip1.value & document.tF.lan_mask1.value )) ||
+				(( document.tF.DhcpStartIP2.value & document.tF.lan_mask2.value ) != ( document.tF.lan_ip2.value & document.tF.lan_mask2.value )) ||
+				(( document.tF.DhcpStartIP3.value & document.tF.lan_mask3.value ) != ( document.tF.lan_ip3.value & document.tF.lan_mask3.value )) ||
+				(( document.tF.DhcpStartIP4.value & document.tF.lan_mask4.value ) != ( document.tF.lan_ip4.value & document.tF.lan_mask4.value ))
+			  )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+		 	if((document.tF.DhcpEndIP1.value & 255) != (document.tF.lan_ip1.value & 255) || ((document.tF.DhcpEndIP2.value & 255) != (document.tF.lan_ip2.value & 255)) ||((document.tF.DhcpEndIP3.value & 255) != (document.tF.lan_ip3.value & 255)) )
+			{
+				message ='<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+			if(	
+				(( document.tF.DhcpEndIP1.value & document.tF.lan_mask1.value ) != ( document.tF.lan_ip1.value & document.tF.lan_mask1.value )) ||
+				(( document.tF.DhcpEndIP2.value & document.tF.lan_mask2.value ) != ( document.tF.lan_ip2.value & document.tF.lan_mask2.value )) ||
+				(( document.tF.DhcpEndIP3.value & document.tF.lan_mask3.value ) != ( document.tF.lan_ip3.value & document.tF.lan_mask3.value )) ||
+				(( document.tF.DhcpEndIP4.value & document.tF.lan_mask4.value ) != ( document.tF.lan_ip4.value & document.tF.lan_mask4.value ))
+			  )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+		 	if((document.tF.DhcpEndIP4.value - document.tF.DhcpStartIP4.value) < 0)
+			{ 
+				message = '<% Fid_str(398); %>';
+				alert(message); 
+				return false; 
+			}
+		 	if((lIP4 > (sIP4-1)) && (lIP4 < (eIP4+1)))
+			{ 
+				message = '<% Fid_str(399); %>';
+				alert(message); 
+				return false; 
+			}				
+	 	}
+	 	if((document.tF.lan_ip1.value != lan_ip[0]) || (document.tF.lan_ip2.value != lan_ip[1]) ||
+	 		(document.tF.lan_ip3.value != lan_ip[2]) || (document.tF.lan_ip4.value != lan_ip[3]))
+	 	{
+	 		if (!confirm("<% Fid_str(406); %>"))
+			{
+				return false;
+			}
+			alert("<% Fid_str(404); %>");
+			
+		}
+	}
+	else
+	{	// Netscape
+		if(!(isBlank_Zero(document.tF.lan_ip1.value))||!(isBlank_Zero(document.tF.lan_ip2.value))||!(isBlank_Zero(document.tF.lan_ip3.value))||!(isBlank_Zero(document.tF.lan_ip4.value))){
+			if(isNValidIP(document.tF.lan_ip1.value) || isNValidIP(document.tF.lan_ip2.value) || isNValidIP(document.tF.lan_ip3.value) ||isNValidIP(document.tF.lan_ip4.value)){
+				message = '<% Fid_str(1240); %>';
+				alert(message);
+				return false;
+			}
+		}
+	        if(wan_subnet_len>=24){
+	            if((document.tF.lan_ip1.value & 255) == wan_subnet[0]){
+	                if((document.tF.lan_ip2.value & 255) == wan_subnet[1]){
+	                    if((document.tF.lan_ip3.value & 255) == wan_subnet[2]){
+					message = '<% Fid_str(766); %>';
+					alert(message);
+					return false;
+	                    }
+	                }
+	            }
+	        }
+	        
+	 	if(document.tF.dhcp_enable[0].checked==true)
+	 	{
+			if(!(isBlank_Zero(document.tF.DhcpStartIP1.value))||!(isBlank_Zero(document.tF.DhcpStartIP2.value))||!(isBlank_Zero(document.tF.DhcpStartIP3.value))||!(isBlank_Zero(document.tF.DhcpStartIP4.value))){
+				if(isNValidIP(document.tF.DhcpStartIP1.value) || isNValidIP(document.tF.DhcpStartIP2.value) || isNValidIP(document.tF.DhcpStartIP3.value) ||isNValidIP(document.tF.DhcpStartIP4.value) || document.tF.DhcpStartIP4.value == "255") {
+					message = message = '<% Fid_str(1228); %>';
+					alert(message); 
+					return false; 
+				}
+			}
+			if(!(isBlank_Zero(document.tF.DhcpEndIP1.value))||!(isBlank_Zero(document.tF.DhcpEndIP2.value))||!(isBlank_Zero(document.tF.DhcpEndIP3.value))||!(isBlank_Zero(document.tF.DhcpEndIP4.value))){
+				if(isNValidIP(document.tF.DhcpEndIP1.value) || isNValidIP(document.tF.DhcpEndIP2.value) || isNValidIP(document.tF.DhcpEndIP3.value) ||isNValidIP(document.tF.DhcpEndIP4.value) || document.tF.DhcpEndIP4.value == "255") {
+					message = message = '<% Fid_str(1229); %>';
+					alert(message); 
+					return false; 
+				}
+			}
+		 	if((document.tF.DhcpStartIP1.value & 255) != (document.tF.lan_ip1.value & 255) || ((document.tF.DhcpStartIP2.value & 255) != (document.tF.lan_ip2.value & 255)) || ((document.tF.DhcpStartIP3.value & 255) != (document.tF.lan_ip3.value & 255)) )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+			if(	
+				(( document.tF.DhcpStartIP1.value & document.tF.lan_mask1.value ) != ( document.tF.lan_ip1.value & document.tF.lan_mask1.value )) ||
+				(( document.tF.DhcpStartIP2.value & document.tF.lan_mask2.value ) != ( document.tF.lan_ip2.value & document.tF.lan_mask2.value )) ||
+				(( document.tF.DhcpStartIP3.value & document.tF.lan_mask3.value ) != ( document.tF.lan_ip3.value & document.tF.lan_mask3.value )) ||
+				(( document.tF.DhcpStartIP4.value & document.tF.lan_mask4.value ) != ( document.tF.lan_ip4.value & document.tF.lan_mask4.value ))
+			  )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+		 	if((document.tF.DhcpEndIP1.value & 255) != (document.tF.lan_ip1.value & 255) || ((document.tF.DhcpEndIP2.value & 255) != (document.tF.lan_ip2.value & 255)) ||((document.tF.DhcpEndIP3.value & 255) != (document.tF.lan_ip3.value & 255)) )
+			{
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}
+			if(	
+				(( document.tF.DhcpEndIP1.value & document.tF.lan_mask1.value ) != ( document.tF.lan_ip1.value & document.tF.lan_mask1.value )) ||
+				(( document.tF.DhcpEndIP2.value & document.tF.lan_mask2.value ) != ( document.tF.lan_ip2.value & document.tF.lan_mask2.value )) ||
+				(( document.tF.DhcpEndIP3.value & document.tF.lan_mask3.value ) != ( document.tF.lan_ip3.value & document.tF.lan_mask3.value )) ||
+				(( document.tF.DhcpEndIP4.value & document.tF.lan_mask4.value ) != ( document.tF.lan_ip4.value & document.tF.lan_mask4.value ))
+			  )
+			{ 
+				message = '<% Fid_str(397); %>';
+				alert(message); 
+				return false; 
+			}			
+		 	if((document.tF.DhcpEndIP4.value - document.tF.DhcpStartIP4.value) < 0)
+			{ 
+				message = '<% Fid_str(398); %>';
+				alert(message); 
+				return false; 
+			}				
+			var snIP4 = parseInt(document.tF.DhcpStartIP4.value);
+			var enIP4 = parseInt(document.tF.DhcpEndIP4.value);
+		 	if((lIP4 > (snIP4-1)) &&(lIP4 < (enIP4+1)))
+			{ 
+				message =  '<% Fid_str(399); %>';
+				alert(message); 
+				return false; 
+			}					
+		 	document.tF.LeaseTime.value=document.tF.LeaseTime.value;
+		 	document.tF.DhcpStartIP1.value=document.tF.DhcpStartIP1.value;
+		 	document.tF.DhcpStartIP2.value=document.tF.DhcpStartIP2.value;
+		 	document.tF.DhcpStartIP3.value=document.tF.DhcpStartIP3.value;
+		 	document.tF.DhcpStartIP4.value=document.tF.DhcpStartIP4.value;
+		 	document.tF.DhcpEndIP1.value=document.tF.DhcpEndIP1.value;
+		 	document.tF.DhcpEndIP2.value=document.tF.DhcpEndIP2.value;
+		 	document.tF.DhcpEndIP3.value=document.tF.DhcpEndIP3.value;
+		 	document.tF.DhcpEndIP4.value=document.tF.DhcpEndIP4.value;
+		 	document.tF.domain_name.value=document.tF.domain_name.value;
+	 	}
+	 	if((document.tF.lan_ip1.value != lan_ip[0]) || (document.tF.lan_ip2.value != lan_ip[1]) ||
+	 		(document.tF.lan_ip3.value != lan_ip[2]) || (document.tF.lan_ip4.value != lan_ip[3]))
+	 	{
+	 		if (!confirm("<% Fid_str(406); %>"))
+			{
+				return false;
+			}
+			alert("<% Fid_str(404); %>.");
+			
+		}
+	}
+	
+	if(document.tF.dhcp_enable[0].checked==true)
+	{
+	  if(checklocalname()==false)
+	    return false;
+	}//++by jack for domain name check 20070330
+	
+	disableDHCP13(false); 
+	disableDHCP4(false); 
+	onApply();
+   	return true;
+}
+
+function onload()
+{
+	onInitial();
+	if (document.tF.dhcp_enable[0].checked==true) showL();
+	if (document.tF.dhcp_enable[1].checked==true) hideL();
+
+}
+
+function showL() {
+	document.getElementById("l1").style.display='';
+  	return true;
+}
+
+function hideL() {
+	document.getElementById("l1").style.display='none';
+  	return true;
+}
+
+function Focus()
+{
+}
+function Blur()
+{
+ 	document.tF.DhcpStartIP1.value=document.tF.lan_ip1.value;
+ 	document.tF.DhcpStartIP2.value=document.tF.lan_ip2.value;
+ 	document.tF.DhcpStartIP3.value=document.tF.lan_ip3.value;
+ 	document.tF.DhcpEndIP1.value=document.tF.lan_ip1.value;
+ 	document.tF.DhcpEndIP2.value=document.tF.lan_ip2.value;
+ 	document.tF.DhcpEndIP3.value=document.tF.lan_ip3.value; 	
+ 	ipcheck();
+}
+
+<% gs_gateway_stauts() ; %>
+//<% exec cmd="Gateway_IsWanConnected" ; %>
+function onApply()
+{
+	document.tF.lan_ipaddr.value=document.tF.lan_ip1.value+"."+
+									document.tF.lan_ip2.value+"."+
+									document.tF.lan_ip3.value+"."+
+									document.tF.lan_ip4.value;
+									
+									
+									
+	document.tF.lan_netmask.value=document.tF.lan_mask1.value+"."+
+									document.tF.lan_mask2.value+"."+
+									document.tF.lan_mask3.value+"."+
+									document.tF.lan_mask4.value;
+
+	document.tF.dhcp_start.value=document.tF.DhcpStartIP1.value+"."+
+									document.tF.DhcpStartIP2.value+"."+
+									document.tF.DhcpStartIP3.value+"."+
+									document.tF.DhcpStartIP4.value;
+									
+	document.tF.dhcp_end.value=document.tF.DhcpEndIP1.value+"."+
+									document.tF.DhcpEndIP2.value+"."+
+									document.tF.DhcpEndIP3.value+"."+
+									document.tF.DhcpEndIP4.value;
+									
+	document.tF.gs_domainName.value = document.tF.domain_name.value;
+	document.tF.lan_domain.value= document.tF.domain_name.value;
+	document.tF.lan_lease.value=document.tF.LeaseTime.value;
+	if(document.tF.dhcp_enable[0].checked==true) document.tF.lan_proto.value="dhcp";
+	else document.tF.lan_proto.value="static";
+										
+}
+
+function onInitial()
+{
+	var lanIp="<% nvram_get("lan_ipaddr"); %>";
+	var lanNetmask="<% nvram_get("lan_netmask"); %>";
+	var dhcpSt="<% nvram_get("dhcp_start"); %>";
+	var dhcpEnd="<% nvram_get("dhcp_end"); %>";
+	var lanLease="<% nvram_get("lan_lease"); %>";
+	var domainName="<% nvram_get("gs_domainName"); %>";
+	
+	var f1 = new Array(); 
+	f1=lanIp.split(".");
+	document.tF.lan_ip1.value=f1[0];
+	document.tF.lan_ip2.value=f1[1];
+	document.tF.lan_ip3.value=f1[2];
+	document.tF.lan_ip4.value=f1[3];
+		
+	var f2 = new Array();
+	f2=lanNetmask.split(".");
+	document.tF.lan_mask1.value=f2[0];
+	document.tF.lan_mask2.value=f2[1];
+	document.tF.lan_mask3.value=f2[2];
+	document.tF.lan_mask4.value=f2[3];
+	
+	var f3=new Array();
+	f3=dhcpSt.split(".");
+	document.tF.DhcpStartIP1.value=f3[0];
+	document.tF.DhcpStartIP2.value=f3[1];
+	document.tF.DhcpStartIP3.value=f3[2];
+	document.tF.DhcpStartIP4.value=f3[3];
+	
+	var f4=new Array();
+	f4=dhcpEnd.split(".");
+	document.tF.DhcpEndIP1.value=f4[0];
+	document.tF.DhcpEndIP2.value=f4[1];
+	document.tF.DhcpEndIP3.value=f4[2];
+	document.tF.DhcpEndIP4.value=f4[3];
+	
+	document.tF.domain_name.value=domainName;
+}
+</script>
+
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="location_page" value="lan_main.stm">
+<input type="hidden" name="num_lan_ifaces" value="1">
+<input type="hidden" name="lan_ipaddr">
+<input type="hidden" name="lan_netmask">
+<input type="hidden" name="dhcp_start">
+<input type="hidden" name="dhcp_end">
+<input type="hidden" name="lan_lease">
+<input type="hidden" name="lan_proto">
+<input type="hidden" name="gs_domainName">
+<input type="hidden" name="lan_domain">
+
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36" height="100%">&nbsp;</td>
+		<td valign="top" width="95%" height="100%">
+		<table width="140" border="0" cellspacing="0" cellpadding="0" align="left">
+		<td valign="top" width="99%" height="100%" class="head_bold">
+		<br>&nbsp;&nbsp;&nbsp;<% Fid_str(369); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<table width="500" border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td width="9" height="18">&nbsp;</td>
+								<td colspan="2" height="18" width="460" class="body">
+									<% Fid_str(370); %> 
+								</td>
+							</tr>
+							<tr>
+								<td height="18" colspan=3>&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="9" height="18">&nbsp;</td>
+								<td width="215" height="18" class="body"><b><% Fid_str(371); %> &gt;</b></td>
+								<td width="245" height="18" class="body">
+	<input maxLength="3" name="lan_ip1" size="3" onBlur="Blur()" onFocus="Focus()" value="0">.
+	<input maxLength="3" name="lan_ip2" size="3" onBlur="Blur()" onFocus="Focus()" value="0">.
+	<input maxLength="3" name="lan_ip3" size="3" onBlur="Blur()" onFocus="Focus()" value="0">.
+	<input maxLength="3" name="lan_ip4" size="3" value="0">
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td colspan="2">
+									<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#lanip");>
+									<font color=#0066FF><b><% Fid_str(47); %></font></b></a></td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td colspan="2">
+									<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b><% Fid_str(372); %> &gt;</b></td>
+								<td width="245" class="body">
+						<input maxLength="3" name="lan_mask1" size="3" Disabled value="0">.
+						<input maxLength="3" name="lan_mask2" size="3" value="0">.
+						<input maxLength="3" name="lan_mask3" size="3" value="0">.
+						<input maxLength="3" name="lan_mask4" size="3" value="0">
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td colspan="2">
+									<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#subnetmask");>
+									<font color=#0066FF><b><% Fid_str(47); %></font></b></a></td>
+							</tr>
+							<tr>
+								<td height="18" width="9">&nbsp;</td>
+								<td height="18" colspan="2">
+									<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b><% Fid_str(373); %>&nbsp;&gt;</b></td>
+								<td width="245" class="body">
+					   				<script language="javascript">
+									{
+									   	//document.write('<font face="Arial">');
+										document.write('<input type="radio" value="1" name="dhcp_enable" onClick="showL();" <% nvram_match("lan_proto", "dhcp", "checked");; %>><% Fid_str(374); %>');
+										document.write('<input type="radio" name="dhcp_enable" value="0" onClick="hideL();" <% nvram_match("lan_proto", "static", "checked");; %>><% Fid_str(375); %>');
+										//document.write('</font>');
+									}
+								</script>
+								</td>
+							</tr>
+						</table>
+						
+						<table id="l1" width="500" border="0" cellspacing="0" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td width="9" height="29">&nbsp;</td>
+								<td colspan="2" height="18" width="460" class="body">
+									<% Fid_str(378); %>
+									<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#dhcpserver");>
+									<font color=#0066FF><b><% Fid_str(47); %></font></b></a>
+								</td>
+							</tr>
+							<tr>
+								<td height="18" width="9">&nbsp;</td>
+								<td colspan="2" height="18">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="9" height="29">&nbsp;</td>
+								<td width="215" height="29" class="body"><b><% Fid_str(379); %> &gt;</b></td>
+								<td width="245" height="29" align="left" class="body">
+		<input TYPE="text" NAME="DhcpStartIP1" MAXLENGTH="3" SIZE="3"  Disabled value="0">.
+		<input TYPE="text" NAME="DhcpStartIP2" MAXLENGTH="3" SIZE="3"  Disabled value="0">.
+		<input TYPE="text" NAME="DhcpStartIP3" MAXLENGTH="3" SIZE="3"  Disabled value="0">.
+		<input TYPE="text" NAME="DhcpStartIP4" MAXLENGTH="3" SIZE="3" value="0">
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b><% Fid_str(380); %>&nbsp;&gt;</b></td>
+								<td width="245" class="body">
+		<input TYPE="text" NAME="DhcpEndIP1"  MAXLENGTH="3" SIZE="3" Disabled value="0">.
+		<input TYPE="text" NAME="DhcpEndIP2"  MAXLENGTH="3" SIZE="3" Disabled value="0">.
+		<input TYPE="text" NAME="DhcpEndIP3"  MAXLENGTH="3" SIZE="3" Disabled value="0">.
+		<input TYPE="text" NAME="DhcpEndIP4" MAXLENGTH="3" SIZE="3" value="0">
+								</td>
+							</tr>
+								
+							<tr>
+								<td height="18" width="9">&nbsp;</td>
+								<td colspan="2" height="18">
+									<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b><% Fid_str(381); %> &gt;</b></td>
+								<td width="245">
+				<select NAME="LeaseTime">
+					<option value="4294967295" <% nvram_match("lan_lease", "4294967295", "selected"); %>><% Fid_str(382); %></option>
+					<option value="1800" <% nvram_match("lan_lease", "1800", "selected"); %>><% Fid_str(383); %></option>
+					<option value="3600" <% nvram_match("lan_lease", "3600", "selected"); %>><% Fid_str(384); %></option>
+					<option value="7200" <% nvram_match("lan_lease", "7200", "selected"); %>><% Fid_str(385); %></option>
+					<option value="43200" <% nvram_match("lan_lease", "43200", "selected"); %>><% Fid_str(386); %></option>
+					<option value="86400" <% nvram_match("lan_lease", "86400", "selected"); %>><% Fid_str(387); %></option>
+					<option value="172800" <% nvram_match("lan_lease", "172800", "selected"); %>><% Fid_str(388); %></option>
+					<option value="604800" <% nvram_match("lan_lease", "604800", "selected"); %>><% Fid_str(389); %></option>
+					<option value="1209600" <% nvram_match("lan_lease", "1209600", "selected"); %>><% Fid_str(390); %></option>											
+				</select>
+								</td>
+							</tr>
+							<tr>
+								<td width="9" height="29">&nbsp;</td>
+								<td colspan="2" height="18" class="body"><% Fid_str(391); %></td>
+							</tr>
+						<tr>
+								<td width="9">&nbsp;</td>
+								<td colspan="2">
+								<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+<!--								
+								<tr>
+								<td width="9" height="29">&nbsp;</td>
+								<td colspan="2" height="18" class="body"><% Fid_str(369); %>
+								<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#local_domain_name");>
+								<font color=#0066FF><b><% Fid_str(47); %><!--</font></b></a>
+								</td>
+								</tr>
+-->							
+								
+								
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b>
+								<% Fid_str(392); %>&nbsp;(<% Fid_str(393); %>)&nbsp;&gt;</b></td>
+								<td width="245">
+		<input TYPE="text" NAME="domain_name" MAXLENGTH="60" SIZE="21" VALUE="domain_name">
+								</td>
+							</tr>
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td  colspan=2 class="body"><% Fid_str(394); %>
+								<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#local_domain_name");>
+								<font color=#0066FF><b><% Fid_str(47); %></font></b></a>
+								</td>
+							</tr>
+							<tr>
+								<td height="18" width="9">&nbsp;</td>
+								<td colspan="2" height="18">
+									<hr noshade size="1" color=#006699>
+								</td>
+							</tr>
+							<!--
+							<tr>
+								<td width="9">&nbsp;</td>
+								<td width="215" class="body"><b><% Fid_str(42); %>&nbsp;&gt;</b></td>
+								<td width="245" class="body">
+									<input type="radio" name="lan_dhcp" value="0" checked><% Fid_str(374); %>
+									<input type="radio" name="lan_dhcp" value="1"><% Fid_str(375); %>
+									<script>
+										var enable = <% nvram_get("lan_dhcp"); %>;
+										if(enable == 1)
+											document.tF.lan_dhcp[1].checked = true;
+										else
+											document.tF.lan_dhcp[0].checked = true;
+									</script>
+								</td>
+							</tr>-->
+								
+						</table>
+					   			<script language="javascript">
+										onload();
+								</script>
+						<table width="500" border="0" cellspacing="2" cellpadding="0" align="center" class="copy_1">
+							<tr>
+								<td colspan="3">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="225">&nbsp;</td>
+								<td>&nbsp;</td>
+								<td nowrap><nobr>
+			<input  type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+			<input type="submit"  name="arc_action"  value="<% Fid_str(49); %>"  style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();"></td>
+								</nobr></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</form>
+</script>
+</table>
+			</td>    
+		</tr>             
+     </table> 
+</body>
+</html>

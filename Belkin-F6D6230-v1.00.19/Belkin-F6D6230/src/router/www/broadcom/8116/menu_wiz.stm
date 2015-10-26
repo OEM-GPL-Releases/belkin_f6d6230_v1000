@@ -1,0 +1,37 @@
+<table width="100%" border="0" argin="0" cellspacing="0" cellpadding="0" height="100%">
+<tr>
+<td style="word-break:break-all;width:142" height="100%">
+
+<script type="text/javascript" language="JavaScript">
+
+var ap_mode= '<!--#exec cmd="device_mode_script" -->';
+var html_array = parent.mainFrame.location.href.split ("/");
+var htmlstr = html_array[3];
+
+function javamagic(srcElement, pageName, pageOpen)
+{
+	var targetId;
+	if (pageOpen == 1){
+  		parent.mainFrame.location.href = pageName;
+	}
+}
+
+</script>
+
+<table width="141" border="0" cellspacing="0" cellpadding="0" height="100%">
+<TBODY>
+	<tr bgcolor='666666'>
+		<td valign="top">
+			<div><a href="wiz_main.stm"><img border="0" src="images/wiz_blue_46.gif"/></a></div>
+			<div><hr style="margin:0px"></div>
+			<div><a href="setup.htm"><img border="0" src="images/man_white_46.gif"/></a></div>
+			<div><hr style="margin:0px"></div>
+		</td>
+	</tr>
+	<tr bgcolor='666666'>
+		<TD style="BACKGROUND-COLOR: #666262" width=1></TD>
+	</tr>
+</TBODY>
+</TABLE>
+</td>
+<td valign="top">

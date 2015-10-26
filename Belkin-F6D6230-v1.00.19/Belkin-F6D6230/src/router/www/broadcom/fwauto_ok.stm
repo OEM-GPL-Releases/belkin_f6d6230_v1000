@@ -1,0 +1,35 @@
+<html>
+<head>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<title></title>
+
+<% char_set(); %>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<style>
+.submitBtn {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;border-color: #666262; background-color: #666262; color: #ffffff}
+</style>
+<script language="JavaScript">
+
+var AUTOFW_QUERRY_SUCCESS = 0;
+var AUTOFW_QUERRY_CONNECT_FAIL = 1;
+var AUTOFW_QUERRY_NO_FW = 2;
+var AUTOFW_QUERRY_NO_RESOURCE = 3;
+
+var sFirmware = "";
+var nStatus = 0;
+var sCurFirmware;
+
+var fw_url_name='<% echo var="fw_server_name"; %><% echo var="fw_file_location"; %>';
+
+</script>
+</head>
+<body text="#000000" bgColor="#eeeeee" leftMargin="10" topMargin="50" marginheight="0" marginwidth="0">
+<form name="tF" method="post" action="/cgi-bin/downloadNewFw.exe">
+<script language="JavaScript">
+document.write('<b><% Fid_str(1353); %><br></b><p><p>');
+document.write('<input type=\"button\" value=\"<% Fid_str(1298); %>\"  class=\"submitBtn\" onClick=\"javascript:window.close();return false\">&nbsp;&nbsp;');
+</script>
+</form>
+</body>
+</html>
+

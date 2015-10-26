@@ -1,0 +1,11 @@
+<html>
+<head>
+
+<% char_set(); %>
+<title></title>
+<script language="JavaScript">
+setTimeout('document.location.href=\"<% exec cmd="Wireless_WEP"; %>\";', 0);
+</script>
+</head>
+<body bgcolor="#eeeeee" text="#000000">
+</body>

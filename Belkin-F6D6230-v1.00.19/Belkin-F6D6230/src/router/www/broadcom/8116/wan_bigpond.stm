@@ -1,0 +1,215 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<title></title>
+<script language="Javascript" src="/br_ver.js"></script>
+
+<% char_set(); %>
+<SCRIPT src="data.js"></SCRIPT>
+<script language="JavaScript">
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+<% File_include("routine.txt"); %>
+
+
+var telstrserver=new Array("61.9.192.13","61.9.128.13","61.9.208.13","61.9.224.13","61.9.128.13","61.9.240.13");
+var stateArray=new Array('NSW','VIC','QLD','SA','TAS','WA');
+
+function setServerIP(){
+	if(document.tF0.bpa_manual_enable_display.checked == false)
+		document.tF0.bigpond_srver.value=telstrserver[document.tF0.bpa_state_display[document.tF0.bpa_state_display.selectedIndex].value -1];
+}
+
+function toggleAutoDLS(){
+	if(document.tF0.bpa_manual_enable_display.checked == true){
+		document.tF0.bpa_state_display.disabled = true;
+		document.tF0.bigpond_srver.disabled = false;
+	}else{
+		document.tF0.bpa_state_display.disabled = false;
+		document.tF0.bigpond_srver.disabled = true;
+	}
+}
+
+function evaltF() 
+{
+	var loginServer = document.tF0.bigpond_srver.value.split(".");
+	if(isBlank(document.tF0.wan_bigpond_user_name.value))
+	{ 
+		alert('<% Fid_str(742); %>'); 
+		return false; 
+	}
+	if(isBlank(document.tF0.wan_bigpond_passwd.value))
+	{ 
+		alert('<% Fid_str(757); %>');
+		return false; 
+	}
+	if(isBlank(document.tF0.wan_bigpond_passwdV.value))
+	{ 
+		alert('<% Fid_str(756); %>');
+		return false; 
+	}
+	if(document.tF0.wan_bigpond_passwd.value!=document.tF0.wan_bigpond_passwdV.value) 
+	{ 
+		alert('<% Fid_str(624); %>'); 
+		return false; 
+	}
+	if(document.tF0.bpa_manual_enable_display.checked == true){	
+		if(loginServer.length != 4) 
+		{ 
+			alert('<% Fid_str(1379); %>'); 
+			return false; 
+		}
+		if(isNValidIP(loginServer[0])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidIP(loginServer[1])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidIP(loginServer[2])) { alert('<% Fid_str(1379); %>'); return false; }
+		if(isNValidLastIP(loginServer[3])) { alert('<% Fid_str(1379); %>'); return false; }
+	}
+	document.tF0.wan_bigpond_sindex.value=document.tF0.bpa_state_display[document.tF0.bpa_state_display.selectedIndex].value;
+
+	if(document.tF0.bpa_manual_enable_display.checked==true)
+		{
+		document.tF0.wan_bigpond_manual.value=1;
+		document.tF0.wan_bigpond_srver.value=telstrserver[document.tF0.bpa_state_display[document.tF0.bpa_state_display.selectedIndex].value -1];								
+		}
+	else
+		{
+		document.tF0.wan_bigpond_manual.value=0;
+		document.tF0.wan_bigpond_srver.value=document.tF0.bigpond_srver.value;
+		}
+
+	return true;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+</script>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF0" method="post" action="apply.cgi">
+<input type="hidden" name="page" value="wan_main.stm">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='location.href="wan_bigpond.stm";'>
+<input type="hidden" name="location_page" value="wan_bigpond.stm">
+<input type="hidden" name="wan_bigpond_sindex" value="<% nvram_get("wan_bigpond_sindex"); %>">
+<input type="hidden" name="wan_bigpond_manual" value="<% nvram_get("wan_bigpond_manual"); %>">
+<input type="hidden" name="wan_bigpond_srver"  value="<% nvram_get("wan_bigpond_srver"); %>" >
+<input type="hidden" name="wan_proto" value="bigpond">
+<input type="hidden" name="wan_pptp_enable" value="0">
+<input type="hidden" name="wan_unit" value="0">
+<input type="hidden" name="wan_ifnames" value="<% nvram_get("wan0_ifnames"); %>">
+<input type="hidden" name="wan_hwaddr" value="<% nvram_get("wan0_hwaddr"); %>">
+
+<table border="0" cellspacing="1" cellpadding="1" align="left" width="100%" height="100%">
+	<tr>		
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br><% Fid_str(770); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>					
+					<td>
+						<table width=600 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr>
+								<td colspan=2 class="body"><% Fid_str(771); %>									
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#bpa");>
+									<b><font color=#0066ff><% Fid_str(47); %></font></b></a><br><br></td>
+							</tr>
+							<tr>
+							<td width="240" class="body"><b><% Fid_str(772); %></b><br><br></td>
+								<td width="335">
+								<select size="1" name="bpa_state_display" class=selectList onchange=setServerIP() >;
+									<option value = 0 selected>--</option>
+									<option value = 1>NSW</option>
+									<option value = 2>VIC</option>
+									<option value = 3>QLD</option>
+									<option value = 4>SA</option>	
+									<option value = 5>TAS</option>
+									<option value = 6>WA</option>	
+								</select>
+								</td>
+							</tr>
+							<tr>								
+								<td width="240" class="body"><b><% Fid_str(731); %> &gt;</b></td>
+								<td width="235">
+									<input type="text" name="wan_bigpond_user_name" size="25" maxlength="63" value="<% nvram_get("wan_bigpond_user_name"); %>" >
+								</td>
+							</tr>
+							<tr>
+								<!--<td width="36" height="18">&nbsp;</td>-->
+								<td height="18" width="240" class="body"><b><% Fid_str(489); %> &gt;</b></td>
+								<td height="18" width="235">
+									<input type="password" name="wan_bigpond_passwd" size="25" maxlength="39" value="<% nvram_get("wan_bigpond_passwd"); %>" >
+								</td>
+							</tr>
+							<tr>
+								<!--<td width="36" height="18">&nbsp;</td>-->
+								<td height="18" width="240" class="body"><b><% Fid_str(732); %>&nbsp;&gt;</b></td>
+								<td height="18" width="235">
+									<input type="password" name="wan_bigpond_passwdV" size="25" maxlength="39" value="<% nvram_get("wan_bigpond_passwd"); %>" >
+								</td>
+							</tr>
+							<tr>
+								<!--<td width="36" height="18">&nbsp;</td>-->
+								<td height="18" width="240" class="body"><b><% Fid_str(773); %>&nbsp;&gt;</b></td>
+								<td height="18" width="235">
+								<input type="checkbox" name="bpa_manual_enable_display" value=1 onClick="toggleAutoDLS()">
+								</td>
+							</tr>
+							
+							<tr>
+								<!--<td width="36">&nbsp;</td>-->
+								<td width="240" class="body"><b><% Fid_str(774); %> &gt;</b></td>
+								<td nowrap><input type="text" name="bigpond_srver" size="25" maxlength="39" value="<% nvram_get("wan_bigpond_srver"); %>" >
+								</td>
+							</tr>
+							
+							<SCRIPT LANGUAGE="JavaScript">
+							var EnableManual = <% nvram_get("wan_bigpond_manual"); %>;
+							var state_index = <% nvram_get("wan_bigpond_sindex"); %>;
+
+							document.tF0.bpa_state_display.selectedIndex = state_index;
+
+							if( EnableManual ) {
+								document.tF0.bpa_manual_enable_display.checked = true;
+								document.tF0.bpa_state_display.disabled = true;
+								document.tF0.bigpond_srver.disabled = false;										
+
+							} else {
+								document.tF0.bpa_manual_enable_display.checked = false;
+								document.tF0.bpa_state_display.disabled = false;
+								document.tF0.bigpond_srver.disabled = true;
+								if(document.tF0.bpa_state_display[document.tF0.bpa_state_display.selectedIndex].value==0)
+								document.tF0.bigpond_srver.value="";
+								else
+								document.tF0.bigpond_srver.value=telstrserver[document.tF0.bpa_state_display[document.tF0.bpa_state_display.selectedIndex].value -1];								
+							}
+							</SCRIPT>						
+							<tr>
+								<!--<td width="36">&nbsp;</td>-->
+								<td align="center" colspan=2>
+									<br><br>
+									<input type="submit" name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

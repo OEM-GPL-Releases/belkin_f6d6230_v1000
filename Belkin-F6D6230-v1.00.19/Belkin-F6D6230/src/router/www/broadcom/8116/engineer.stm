@@ -1,0 +1,148 @@
+<% exec cmd="NdcUpdate"; %>
+<html>
+<head>
+
+<% char_set(); %>
+<title></title>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% include file="my_function.txt"; %>
+<% include file="function.stm"-->
+<% include file="routine.txt"; %>
+// wan interface type:
+var WAN_TYPE_DHCP = 0;
+var WAN_TYPE_FIX = 1;
+var WAN_TYPE_PPPOE = 2;
+var WAN_TYPE_DIALUP = 4;
+var WAN_TYPE_BRIDGE = 3;
+<% gs_gateway_stauts(); %>
+<% exec cmd="Gateway_IsWanConnected"; %>
+
+</script>
+</head>
+<body bgcolor="#DAE3EB">
+<table width="98%" border="0" cellspacing="0" cellpadding="5">
+<tr>
+	<td valign="top" >
+	<font color="#336699" face="Arial" size="1"><b><% Fid_str(35); %></b></font>
+	<p>
+	</td></tr></table><br>
+	<b><font face=Arial color="#336699" size=1><% Fid_str(88); %><% exec cmd="CurrentTime"; %></font></b>
+<form name="tF" method="post" action="/cgi-bin/engineer.exe">
+<input type="hidden" name="restart_time" value="10">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="engineer.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+<table width="80%" border=0>
+	<tr>
+	<td width=33% valign=top>
+		<b><font face=Arial color="#336699" size=1><% Fid_str(89); %></font></b><br>
+		<font face=Arial size=1>
+		<script language="javascript">
+		if(bWanUseModem==1){
+			if(bWanConnected==1)	document.write(' <% Fid_str(1296); %>: &nbsp; <% Fid_str(1297); %><br>');
+			else	document.write(' <% Fid_str(1296); %>: &nbsp; <% Fid_str(1298); %><br>');
+		}
+		else{
+			if(wan_type==WAN_TYPE_BRIDGE)
+				document.write('Cable/DSL: &nbsp;<br>');
+			else if(bWanConnected==1)	document.write('Cable/DSL: &nbsp; <% Fid_str(1297); %><br>');
+			else	document.write('Cable/DSL: &nbsp; <% Fid_str(1298); %><br>');
+		}
+		if(bWanConnected){
+			document.write(' <% Fid_str(968); %>: &nbsp;'+wan_ip+'<br>');
+			document.write(' <% Fid_str(923); %>: &nbsp;'+wan_subnet_mask+'<br>');
+			document.write(' <% Fid_str(1301); %>: &nbsp;'+wan_gateway+'<br>');
+			document.write(' <% Fid_str(1302); %>: &nbsp;'+primary_dns+'<br>');
+			document.write(' <% Fid_str(969); %>: &nbsp;'+secondary_dns+'<br></font><br>');
+		}
+		if(bWanUseModem==1){
+			document.write('<p><input type=submit value="HangUp" name=hangup onClick="return dhcp_release();">');
+			document.write('<img border=0 src="images/PIXEL.GIF" width=20 height=10>');
+			document.write('<input type=submit value="  <% Fid_str(1319); %> " name=dialcon onClick="return dhcp_renew();"></p>');
+		}
+		else{
+			if(wan_type==WAN_TYPE_DHCP){
+				document.write('<p><input type=submit value=Release name=release onClick="return dhcp_release();">');
+				document.write('<img border=0 src="images/PIXEL.GIF" width=24 height=10>');
+				document.write('<input type=submit value=Renew name=renew onClick="return dhcp_renew();"></p>');
+			}
+			else if(wan_type==WAN_TYPE_FIX)
+				document.write('<p><img border=0 src="images/PIXEL.GIF" width=2 height=10></p>');
+			else if(wan_type==WAN_TYPE_PPPOE){
+				document.write('<p><input type=submit value=Disconnect name=disconnect onClick="return dhcp_release();">');
+				document.write('<img border=0 src="images/PIXEL.GIF" width=20 height=10>');
+				document.write('<input type=submit value=" Connect " name=connect onClick="return dhcp_renew();"></p>');
+			}
+		}
+		document.write('</td>');
+		document.write('<td width=33% valign=top><b>');
+		document.write('<font face=Arial size=1 color="#336699">GATEWAY</font></b><br>');
+		document.write('<font face=Arial size=1 color="#0000ff">');
+		document.write('</font><font face=Arial size=1>');
+		document.write(' <% Fid_str(916); %>: &nbsp;'+lan_gateway_ip+'<br>');
+		document.write(' <% Fid_str(923); %>: &nbsp;'+lan_gateway_mask+'<br>');
+		if(dhcp_enable)	document.write(' <% Fid_str(360); %>: &nbsp; <% Fid_str(27); %><br>');
+		else	document.write(' <% Fid_str(360); %>: &nbsp; <% Fid_str(28); %><br>');
+		if(firewall_func){
+			if(firewall_enable)	document.write(' <% Fid_str(1); %>: &nbsp; <% Fid_str(27); %><br>');
+			else	document.write(' <% Fid_str(1); %>: &nbsp; <% Fid_str(28); %><br>');
+		}
+		if(my_upnp)
+		{
+			if(upnp_enable)	document.write('UPnP: &nbsp; <% Fid_str(27); %><br>');
+			else	document.write('UPnP: &nbsp; <% Fid_str(28); %><br>');
+		}
+		if(wireless_func){
+			if(wireless_enable)	document.write(' <% Fid_str(869); %>: &nbsp; <% Fid_str(27); %><br>');
+			else	document.write(' <% Fid_str(869); %>: &nbsp; <% Fid_str(28); %><br>');
+		}
+if(my_printer){
+	if(printer_func){
+		if(printer_ok==0){
+			if(printer_printing)
+				document.write(' <% Fid_str(1320); %>:&nbsp; <% Fid_str(1357); %>');
+			else
+				document.write('<% Fid_str(1320); %>:&nbsp; <% Fid_str(19); %>');
+		}
+		else if(printer_ok==1)
+			document.write('<% Fid_str(1320); %>:&nbsp; <% Fid_str(1322); %>');
+		else if(printer_ok==2)
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1323); %>');
+		else if(printer_ok==3)
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1324); %>');
+		else if(printer_ok==4)
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1325); %>');
+		else if(printer_ok==5)
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1326); %>');
+		else if(printer_ok==0xff)
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1327); %>');
+		else
+			document.write('<% Fid_str(1320); %>:&nbsp;<% Fid_str(1322); %>');
+	}
+}
+		document.write('</font><br></td>');
+		document.write('<td width=34% valign=top><b>');
+		document.write('<font size=1 face=Arial color="#336699"> <% Fid_str(1262); %></font></b>');
+		document.write('<font face=Arial size=1 color="#0000ff"><br>');
+		document.write('</font><font face=Arial size=1>');
+		document.write(' <% Fid_str(1263); %>:&nbsp; '+dhcp_client_num+'<br>');
+		document.write(' <% Fid_str(1328); %>:&nbsp;<br>&nbsp;&nbsp;'+runtime_code_version+'<br>');
+		document.write(' <% Fid_str(1329); %>:&nbsp; '+boot_code_version+'<br>');
+		document.write(' <% Fid_str(1266); %>:&nbsp;&nbsp;&nbsp;'+lan_mac_addr+'<br>');
+		document.write(' <% Fid_str(1267); %>:&nbsp;&nbsp;&nbsp;'+wan_mac_addr+'<br>');
+		if(wireless_func) document.write(' <% Fid_str(1267); %>:&nbsp;<br>&nbsp;&nbsp;'+wlan_mac_addr+'<br>');
+		document.write(' <% Fid_str(964); %> <% Fid_str(566); %>:&nbsp; '+hardware_version+'<br>');
+		document.write(' <% Fid_str(479); %>:&nbsp;&nbsp;&nbsp;'+serial_number+'<br>');
+		document.write('</font><br></td>');
+		document.write('</tr>');
+		</script>
+		<tr>
+			<td colspan="3" width="90%" ><hr size="1" color="#008080"></td>
+		</tr>
+	</table>
+<% exec cmd="engineer"; %>
+	</form>
+	<br>
+	<a href="javascript:document.tF.submit()"><input type="submit"  name="arc_action" value="<% Fid_str(986); %>" style="{;}" class="submitBtn"></a>
+</body>

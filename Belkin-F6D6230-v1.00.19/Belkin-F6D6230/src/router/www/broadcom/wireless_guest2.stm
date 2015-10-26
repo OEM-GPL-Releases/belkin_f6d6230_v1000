@@ -1,0 +1,612 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script type="text/javascript" src="routine_data.js"></script>
+<% File_include("refreshmenu.txt"); %>
+
+<script language="JavaScript">
+<% exec cmd("getWirelessSecurity"); %>
+<% login_timeout(); %>
+
+var wireless_oper_mode=1;//'<% echo var("wireless_oper_mode"); %>';
+var ssidvalue = "<% Fid_str(1201); %>";
+
+var wirelessenable = "<% nvram_get("wl0.1_bss_enabled"); %>"; 
+
+var wl_ssid="<% nvram_js_get("wl0.1_ssid"); %>";
+var wl_wpa_psk="<% nvram_js_get("wl0.1_wpa_psk"); %>";
+if(wl_wpa_psk == "")
+	wl_wpa_psk = gengssid8();
+var wl_guestPSK="<% nvram_js_get("wl_guest_passwd"); %>";
+var wl_guestWEP="<% nvram_js_get("wl0.1_key1"); %>";
+var guest_mode=<% nvram_get("wl_guest_mode"); %>;
+var prekeyerror="<% Fid_str(1814); %>";
+
+
+var obscurepsk=<% nvram_get("obscurePSK"); %>; 
+
+function SSIDisSpecialChar(s)
+{
+	var i;
+	var c,hh;
+	
+	for(i=0;i<s.length;i++)
+	{
+
+	c = s.charAt(i);   hh = c.charCodeAt(0);
+		
+	if((hh > 47 && hh<58) || (hh > 64 && hh<91) || (hh > 96 && hh<123) ||(c=='+') ||(c=='-')||(c=='_') )
+		
+	{
+
+  }
+		
+	else
+	{
+	    ch=c; 
+	    return true;
+	}
+
+	}
+	return false;
+
+}
+
+
+function SSIDisSpace(s)
+{
+	var i;
+	var c,hh;
+	
+	for(i=0;i<s.length;i++)
+	{
+
+		c = s.charAt(i); 
+	        if(c==' ')
+	        return true;
+	}
+	return false;
+
+}
+		
+function evaltF()
+{
+	
+	if (document.tF.ssid.value=='') {
+		alert(ssidvalue);
+		return false;
+	}
+
+	/*if(SSIDisSpecialChar(document.tF.ssid.value)){
+		alert('<% Fid_str(648); %>:'+ch);
+		return false;
+	}*/
+	
+	if(SSIDisSpace(document.tF.ssid.value)){
+		alert('<% Fid_str(648); %>');
+		document.tF.ssid.focus();
+		return false;
+	}
+
+	
+	if (document.tF.wl_guest_mode[0].checked==true) /* hotel style */
+	{
+		if((document.tF.guest_psk.value.length <8 || document.tF.guest_psk.value.length >63))
+		{
+		  alert(prekeyerror);
+			return false;
+		}
+	
+	}
+	else if (document.tF.wl_guest_mode[1].checked==true)	/* normal wpa */
+	{
+		var value;	
+		var len;
+		var maxSize = 63;
+		var minSize = 8;
+			
+		value = document.tF.guest_psk.value;
+		
+		len = value.length;
+		
+		if( len >= minSize && len <= maxSize ){
+			;//return true;
+		}
+		//else if(len == maxSize){
+		//	if (!isHex(value)){
+		//		alert(prekeyerror);
+		//		return false;
+		//	}
+		  //	else
+				//return true;
+		//}
+		else if(len<minSize){
+			alert(prekeyerror);
+			return false;
+		}
+		else{
+			alert(prekeyerror);
+			return false;
+		}
+	}
+	
+	else if (document.tF.wl_guest_mode[2].checked==true)	/* wep */
+	{
+		var value;	
+		var len;
+		
+		value = document.tF.guest_psk.value;		
+		len = value.length;
+		if(len!=10)
+		{
+		  alert("WEP key must be 10 Hex digits!");
+		  return false;
+		}
+		if (!isHex(value))
+		{
+		   alert("WEP key must be 10 Hex digits!");
+		    return false;
+		}
+		
+	}		
+	return onApply();
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function print_view(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=650,height=500,left=150,top=150');
+	win.focus();
+}
+
+function click_obscure_psk(){
+	if(document.tF.obscure_psk.checked == true){
+		document.tF.wpa_key_pass.value = document.tF.wpa_key_text.value;	
+		document.getElementById("pskid").style.display="none";	
+		document.getElementById("pskid1").style.display="";	
+	}
+	else{
+		document.tF.wpa_key_text.value = document.tF.wpa_key_pass.value;
+		document.getElementById("pskid1").style.display="none";	
+		document.getElementById("pskid").style.display="";	
+	}
+}
+
+function gengssid()
+{
+    var tmpsid = "";
+    var math = Math.random();
+    
+    smath = math * 100000000000000000000;
+    smath = smath % 1000000;
+    
+    tmpsid += smath;
+    for(var i = tmpsid.length; i < 6; i++)
+        tmpsid += "1";
+    
+    document.tF.guest_psk.value = tmpsid;
+
+}
+
+function gengssid8()
+{
+    var tmpsid = "";
+    var math = Math.random();
+    
+    smath = math * 100000000000000000000;
+    smath = smath % 100000000;
+    
+    tmpsid += smath;
+    for(var i = tmpsid.length; i < 8; i++)
+        tmpsid += "1";
+    
+    return tmpsid;
+}
+
+
+function show_hide(el,shownow)
+{
+	var showit; //= "block";
+	var hideit = "none";
+
+	if ((navigator.appName == 'Netscape') || (navigator.appName == 'Opera'))
+	{
+		showit = "table-row";
+	}
+	else
+	{
+		showit = "block";
+	}
+	document.getElementById(el).style.display = (shownow) ? showit : hideit ;
+	
+}
+function guest_enable()
+{
+	if(document.tF.radio[0].checked==true)//enable
+	{
+	   document.tF.wl_guest_mode[0].disabled= document.tF.wl_guest_mode[1].disabled= document.tF.wl_guest_mode[2].disabled= document.tF.wl_guest_mode[3].disabled=false;
+	   document.tF.guest_psk.disabled=document.tF.ssid.disabled=false;   
+	}
+	else//disable
+	{
+	   document.tF.wl_guest_mode[0].disabled= document.tF.wl_guest_mode[1].disabled= document.tF.wl_guest_mode[2].disabled= document.tF.wl_guest_mode[3].disabled=true;
+	   document.tF.guest_psk.disabled=document.tF.ssid.disabled=true;   	
+	}
+}
+
+function setDivs()
+{	
+ 	//show_hide("HotelDiv", (document.tF.wl_guest_mode[3].checked==false));
+ 	if(document.tF.wl_guest_mode[0].checked==true)//cafe
+ 	{
+ 	  document.tF.guest_psk.maxLength=63;
+ 	  document.getElementById("passwd_desc").innerHTML="8 to 63 characters"; 	   
+ 	  show_hide("HotelDiv", true);
+ 	}
+ 	else if(document.tF.wl_guest_mode[1].checked==true)//WPA
+ 	{
+	  document.tF.guest_psk.maxLength=63;
+ 	  document.getElementById("passwd_desc").innerHTML="8 to 63 characters"; 
+ 	 show_hide("HotelDiv", true);
+ 	}
+ 	else if(document.tF.wl_guest_mode[2].checked==true)//WEP
+ 	{
+ 	  document.tF.guest_psk.maxLength=10;
+ 	  document.getElementById("passwd_desc").innerHTML="10 hex digits"; 
+ 	  show_hide("HotelDiv", true);
+ 	} 	
+ 	else //open
+ 	{
+ 	  show_hide("HotelDiv", false);
+ 	}
+}
+
+function onApply()
+{
+	if(document.tF.radio[0].checked==true)
+	document.tF.wl_bss_enabled.value=1;
+	 else 
+	document.tF.wl_bss_enabled.value=0;
+
+	document.tF.wl_ssid.value =document.tF.ssid.value;           
+	document.tF.wl_wpa_psk.value="";
+	document.tF.wl_auth_mode.value="none";
+	document.tF.wl_akm_psk.value="disabled";
+	document.tF.wl_akm_psk2.value="disabled";
+	document.tF.wl_akm_wpa.value="disabled";
+	document.tF.wl_akm_wpa2.value="disabled";
+	document.tF.wl_crypto.value = "aes";
+	document.tF.wl_wep.value="disabled";
+	
+	if(document.tF.wl_guest_mode[0].checked==true)
+	{
+		document.tF.wl_guest_passwd.value = document.tF.guest_psk.value;
+	}
+	
+	else if(document.tF.wl_guest_mode[1].checked==true) { // WPA-PSK
+		
+		document.tF.wl_akm_psk.value="enabled";
+		document.tF.wl_akm_psk2.value="enabled";		
+		document.tF.wl_crypto.value = "tkip+aes";
+		document.tF.wl_wpa_psk.value = document.tF.guest_psk.value;
+		document.tF.wl_guest_passwd.value = wl_guestPSK;
+	}
+	
+	else if(document.tF.wl_guest_mode[2].checked==true) { // WEP				
+		document.tF.wl_wep.value="enabled";
+		document.tF.wl_key1.value=document.tF.guest_psk.value;
+		document.tF.wl_key.value="1";
+		document.tF.wl_guest_passwd.value = wl_guestPSK;
+	}
+	else if(document.tF.wl_guest_mode[3].checked==true) { // open mode				
+		
+		document.tF.wl_guest_passwd.value = wl_guestPSK;
+	}
+	
+	return true;	
+}
+
+function formload(i)
+{
+	//var iDOD;
+	//document.form0.client_type.selectedIndex = types[i];
+	setDivs();
+	document.tF.ssid.value =wl_ssid;
+	guest_enable();
+	
+	if(guest_mode==1)
+	document.tF.guest_psk.value=wl_wpa_psk;
+	else if(guest_mode==0)
+	document.tF.guest_psk.value=wl_guestPSK;
+	else if(guest_mode==2)
+	document.tF.guest_psk.value=wl_guestWEP
+	
+	if(wl_ssid=="") document.tF.ssid.value="Belkin_N+_Guest";
+
+}
+<% gs_gateway_status(); %>
+//<% exec cmd("Gateway_IsWanConnected"); %>
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="formload();">
+<% File_include("menu.stm"); %>
+<FORM NAME=tF METHOD=POST ACTION="apply.cgi" onSubmit="return evaltF();">
+<input type="hidden" name="location_page" value="wireless_guest2.stm">
+<!-- <input NAME=wmd TYPE=hidden VALUE=0> -->
+<input type="hidden" name="wl_unit", value="0">
+<input type="hidden" name="wl_bssid", value="1">
+
+<input type="hidden" name="wl_action" value="1">	
+
+<input type="hidden" name="wl_bss_enabled">
+<input type="hidden" name="wl_auth" value="0">	
+<input type="hidden" name="wl_auth_mode" value="none">
+<input type="hidden" name="wl_closed" value="0">
+<input type="hidden" name="wl_ssid">
+<!-- Cafe Style-->
+<input type="hidden" name="obscurePSK">
+<input type="hidden" name="wl_guest_passwd">
+
+<!-- WPA-->
+<input type="hidden" name="wl_crypto">
+<input type="hidden" name="wl_akm">
+<input type="hidden" name="wl_akm_psk">
+<input type="hidden" name="wl_akm_psk2">
+<input type="hidden" name="wl_akm_wpa">
+<input type="hidden" name="wl_akm_wpa2">
+<input type="hidden" name="wl_wpa_psk">
+
+
+<!-- WEP-->
+<input type="hidden" name="wl_wep">
+<input type="hidden" name="wl_key1"> 
+
+<input type="hidden" name="wl_key" value="1"><!-- wep key index-->
+	
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<script language="javascript">
+			if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+			    document.write('<br>&nbsp;&nbsp;<% Fid_str(1615); %>');
+			else //client
+				document.write('<br>&nbsp;<% Fid_str(16); %> &gt; SSID');					
+			</script>
+		       <p align="right" style="text-decoration:underline">
+		       <a href="javascript:void(0);" onClick="print_view('wireless_guest2_print.stm');">
+			<font color=#004263>Print guest access settings</font></a></p>		       	
+			<table border=0  valign="top" class="copy_1">
+				<tr>					
+					<td>
+						<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+							<tr align=left>
+								<td colspan=2 align=left class="body">
+							        <script language="javascript">
+									if((wireless_oper_mode == 1)||(wireless_oper_mode == 2)) //AP or repeater
+									{
+											document.write('<% Fid_str(1614); %>');
+									}
+									else
+									{
+											document.write('<% Fid_str(515); %>');
+											document.write('.&nbsp;<% Fid_str(1670); %>.');
+									}
+									</script>
+									<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#guest_access");>
+									<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+								<br><br></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>	
+			<table border=0 class="copy_1">
+				<tr>					
+					<td>
+						<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">									
+							<tr>
+								<td width="160" class="body"><b><% Fid_str(1613); %>&nbsp;&gt;</b></td>
+								<td width="335" class="body">
+								<input name="radio" type=radio value="1" onclick="guest_enable()"  ><% Fid_str(317); %>&nbsp;
+								<input name="radio" type=radio value="0" onclick="guest_enable()" ><% Fid_str(318); %>
+								</td>
+								<script language="javascript"> 
+									var guest_radio="<% nvram_get("wl0.1_bss_enabled"); %>";
+									if(guest_radio=="1") document.tF.radio[0].checked=true;
+									else document.tF.radio[1].checked=true;
+								</script>
+								</td>
+							</tr>							
+
+							<!--Type-->
+							<tr>
+								<td width="160" class="body"><b>Type&nbsp;&gt;</b></td>
+								<td width="335" class="body">					
+								<input name="wl_guest_mode" type=radio value="0" onclick="setDivs()" >Cafe-style(guest log in via a webpage)								
+								</td>
+							</tr>
+							<tr>
+								<td width="160" class="body">&nbsp;</td>
+								<td width="335" class="body">					
+								<input name="wl_guest_mode" type=radio value="1" onclick="setDivs()" ><% Fid_str(1619); %>
+								</td>
+							</tr>	
+							<tr>
+								<td width="160" class="body">&nbsp;</td>
+								<td width="335" class="body">					
+								<input name="wl_guest_mode" type=radio value="2" onclick="setDivs()" >WEP								
+								</td>
+							</tr>	
+							<tr>
+								<td width="160" class="body">&nbsp;</td>
+								<td width="335" class="body">					
+								<input name="wl_guest_mode" type=radio value="3" onclick="setDivs()" >Open								
+								</td>
+							</tr>		
+							<script language="javascript">
+									
+									 document.tF.wl_guest_mode[guest_mode].checked=true;
+									
+							</script>
+							<!--ssid-->
+							<tr>
+								<td width="160" class="body"><b>Network Name(<% Fid_str(789); %>) &gt;</b></td>
+								<td width="335" class="body">
+									<input type="text" class="textbox" name="ssid" size=27 maxlength=32 value="" >
+								</td>
+							</tr>
+							<tr>
+								<td width="160" class="body">&nbsp;</td>
+								<td width="335" id="ssid_desc" class="body">
+								 maximum 32 characters, no space	
+								</td>
+							</tr>							
+						</table>
+					</td>
+				</tr>
+			</table>
+<!--                     passwd                         -->
+<div id="HotelDiv" style="display:none" >
+	<table border=0 class="copy_1">
+	<tr>					
+	<td>
+		<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+		<tr>
+			<td width="160" class="body"><b><% Fid_str(1617); %>&nbsp;&gt;</b></td>
+			<td width="335" class="body">
+			<input type="text" class="text" name="guest_psk" size=17 maxlength=32 value="">
+			<!--<input type="button" name="Generate" value="<% Fid_str(811); %>"  class="submitBtn" onclick="gengssid()">-->
+			</td>
+		</tr>
+		<tr>
+			<td width="160" class="body">&nbsp;</td>
+			<td width="335" id="passwd_desc" class="body">
+			 
+			</td>
+		</tr>	
+		</table>
+	</td>
+	</tr>							
+	</table>							
+</div>
+<!--                     passwd                          -->
+
+<!--                   WPA PSK                         -->
+<div id="WpaDiv" style="display:none">
+	<table border=0 class="copy_1">
+		<tr>					
+			<td>
+				<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">	
+					<tr>
+						<td width="160" class="body"><b><% Fid_str(842); %> &gt;</b></td>
+						<td width="335">
+							<select size="1" name="authentication" class=selectList >
+								<% authWPAPSK("guest", 1); %>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td width="160" class="body"><b><% Fid_str(845); %> &gt;</b></td>
+						<td width="335" class="body">
+							<select size="1" name="encryption" class=selectList  >
+							<option value="tkip"	<% nvram_match("wl0.1_crypto", "tkip", "selected"); %> >TKIP</option>
+							<option value="aes"	<% nvram_match("wl0.l_crypto", "aes", "selected"); %> >AES</option>
+							<option value="tkip+aes" <% nvram_match("wl0.1_crypto", "tkip+aes", "selected"); %> >TKIP+AES</option>
+							</select>
+							<script language="javascript"> 
+								var selector="<% nvram_get("wl0.1_crypto"); %>";
+								if(selector=="tkip") document.tF.encryption.selectedIndex=0;
+								else if(selector=="aes") document.tF.encryption.selectedIndex=1;
+								else document.tF.encryption.selectedIndex=2;
+							</script>
+						</td>
+					</tr>
+					<tr>
+      					<td width=154 class="body"><b><font color=#004263><% Fid_str(854); %></font> &gt;</b></td>
+						<script>
+							//heyu_20070113 +++ for obscurpsk
+							
+							if(obscurepsk == 1)
+							{
+      							document.write('<td id="pskid" style="display:none" width=320 class="body"><font color=#004263>');
+      							document.write('<input type=text maxLength=64  size=64  name=wpa_key_text ></font>');
+      							document.write('</td>');
+	      						document.write('<td  id="pskid1" style="display:" width=320 class="body"><font color=#004263>');
+	      						document.write('<input type="password" maxLength=64 size=64 name="wpa_key_pass" value="<% nvram_get("wl0.1_wpa_psk"); %>" ></font>');
+	      						document.write('</td>');
+      						}
+      						else
+      						{    							
+      							document.write('<td id="pskid" style="display:" width=320 class="body"><font color=#004263 >');
+      							document.write('<input type=text maxLength=64  size=64  name="wpa_key_text" ></font>');
+      							document.write('</td>');
+	      						document.write('<td  id="pskid1" style="display:none" width=320 class="body"><font color=#004263>');
+	      						document.write('<input type="password" maxLength=64 size=64 name="wpa_key_pass"></font>');
+	      						document.write('</td>');
+      						}
+							</script>
+					</tr>					       
+
+					<tr>
+						<td></td>
+						<td width=320 class="body"> 
+							<input type="checkbox" name="obscure_psk" value="" onClick="click_obscure_psk()">
+						<b><% Fid_str(857); %></b><br>
+						</td>
+					</tr>  
+						<SCRIPT LANGUAGE="JavaScript">
+							<% wirelessWPA_show(); %>      						       
+						</SCRIPT>		       
+					<tr>
+						<td></td>
+						<td width=335 class="body"><br><font color=#004263><b><% Fid_str(855); %>: </b><% Fid_str(856); %>
+							<a href="javascript:void(0);" onClick=moreinfowin("glossary.stm#guest_access");>
+							<b><font color=#0066FF><% Fid_str(47); %></font></b></a>
+							<br><br>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>							
+	</table>						
+</div>
+<!-- WPA -->				
+
+<table border=0 class="copy_1">
+		<tr>					
+			<td>
+				<table width=650 border="0" cellspacing="4" cellpadding="4" align=left class="copy_1">
+						<tr>
+							<td colspan="2" align=center>
+								<input type="button" value="<% Fid_str(48); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="javascript:window.location.reload(true);return false">
+								&nbsp;&nbsp;
+	          					<input type="submit"  name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn">
+							</td>
+						</tr>
+			</table>
+		</td>
+	</tr>							
+
+</table>
+			
+			
+		</td>
+	</tr>
+</table>
+
+
+</form>
+			</td>    
+		</tr>             
+     </table>
+
+</body>
+</html>
+

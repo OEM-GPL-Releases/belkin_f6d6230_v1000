@@ -1,0 +1,563 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)fw_clientip.htm -->
+<!-- saved from url=(0022)http://internet.e-mail --><HTML><HEAD>
+
+<% char_set(); %>
+<META http-equiv=pragma content=no-cache>
+<META http-equiv=Cache-Control content="no-cache, must-revalidate">
+<META http-equiv=expires content=0>
+<LINK href="stylemain.css" type=text/css rel=stylesheet>
+<LINK href="main_router.css" type=text/css rel=stylesheet>
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT language=javascript src=""></SCRIPT>
+
+<SCRIPT language=javascript src="field_check.js"></SCRIPT>
+
+<SCRIPT language=javascript>
+
+<% login_timeout(); %>
+<% gs_gateway_stauts(); %>
+<% File_include("routine.txt"); %>
+
+var lanip = lan_gateway_ip.split("."); 
+var pre_ip = lanip[0] + '.' + lanip[1] + '.' + lanip[2] + '.';
+
+var list = new Array(6);
+for(var i=0; i<6; i++) list[i]=new Array(11); 
+
+var totalCount = 6;
+var BOTH = 0;
+var TCP = 1;
+var UDP = 2;
+var BLOCK = 1;
+var ALWAYS = 0;
+
+function intCheckObject(val, RADIX, minValue, maxValue) {
+	var intVal = parseInt(val,RADIX);
+	var i = 0, j = val.length-1;
+	if (RADIX != 10 && RADIX != 16) {
+		return 1;
+	}
+	/* ignore leading/last spaces */
+	while (val.charAt(i) == ' ' && i <= j) i++;
+	while (val.charAt(j) == ' ' && j >= i) j--;
+	if ((RADIX == 16) && ((j-i) < 1)) {
+		return 2;
+	}
+	/* field check */
+	if (i == ++j) j = -1;
+	if (RADIX == 10)
+	for (; i < j; i++)
+	if (val.charAt(i)<'0' || val.charAt(i)>'9') j = -1;
+	if (RADIX == 16)
+	for (; i < j; i++)
+	if ((val.charAt(i)<'0' || val.charAt(i)>'9')&&(val.charAt(i)<'A' || val.charAt(i)>'F')) j = -1;
+	if (i != j) {
+		return 3;
+	}
+	/* range check */
+	if (intVal < minValue || intVal > maxValue) {
+		return 4;
+	}
+	return 0;
+}
+
+function intCheck(intObject, RADIX, minValue, maxValue) 
+{
+	var val = intObject.toUpperCase();
+  	return intCheckObject(val, RADIX, minValue, maxValue);
+}
+
+
+
+function isValidIpAddress(ip){
+	var args = ip.split('.');
+
+  	if(args.length < 1)
+    		return false;
+  	switch (args.length) {
+    		case 4: // for complete IP address, check for special first and last section
+      			if(intCheck(args[0], 10, 1, 223) != 0) { // first section between 1 and 223
+        			return 1;
+      			}
+      			if(intCheck(args[1], 10, 0, 255) != 0) {
+        			return 2;
+      			}
+			if(intCheck(args[2], 10, 0, 255) != 0) {
+				return 3;
+			}
+			if(intCheck(args[3], 10, 1, 254) != 0) { // last section between 1 and 254
+				return 4;
+			}
+      			break;
+    		default:
+      			for(var i=0; i<args.length; i++) {
+        			if(intCheck(args[i], 10, 0, 255) != 0) {
+          				return (i+1);
+        		}
+      		}
+  	}
+  	return 0;    
+}
+function buildDayList(){
+	with ( document.forms[0] ) {
+  		document.write('\
+			  <option value="1"><% Fid_str(75); %></option>\
+			  <option value="2"><% Fid_str(76); %></option>\
+			  <option value="3"><% Fid_str(77); %></option>\
+			  <option value="4"><% Fid_str(78); %></option>\
+			  <option value="5"><% Fid_str(79); %></option>\
+			  <option value="6"><% Fid_str(80); %></option>\
+			  <option value="7"><% Fid_str(81); %></option>\
+			  ');
+  	}
+}
+function buildTimeList(){
+  	with ( document.forms[0] ) {
+  		document.write('\
+			  <option value="0">12<% Fid_str(83); %></option>\
+			  <option value="1">01<% Fid_str(83); %></option>\
+			  <option value="2">02<% Fid_str(83); %></option>\
+			  <option value="3">03<% Fid_str(83); %></option>\
+			  <option value="4">04<% Fid_str(83); %></option>\
+			  <option value="5">05<% Fid_str(83); %></option>\
+			  <option value="6">06<% Fid_str(83); %></option>\
+			  <option value="7">07<% Fid_str(83); %></option>\
+			  <option value="8">08<% Fid_str(83); %></option>\
+			  <option value="9">09<% Fid_str(83); %></option>\
+			  <option value="10">10<% Fid_str(83); %></option>\
+			  <option value="11">11<% Fid_str(83); %></option>\
+			  <option value="12">12<% Fid_str(82); %></option>\
+			  <option value="13">01<% Fid_str(82); %></option>\
+			  <option value="14">02<% Fid_str(82); %></option>\
+			  <option value="15">03<% Fid_str(82); %></option>\
+			  <option value="16">04<% Fid_str(82); %></option>\
+			  <option value="17">05<% Fid_str(82); %></option>\
+			  <option value="18">06<% Fid_str(82); %></option>\
+			  <option value="19">07<% Fid_str(82); %></option>\
+			  <option value="20">08<% Fid_str(82); %></option>\
+			  <option value="21">09<% Fid_str(82); %></option>\
+			  <option value="22">10<% Fid_str(82); %></option>\
+			  <option value="23">11<% Fid_str(82); %></option>\
+			  ');
+  	}
+}
+function is_same(a,b)
+{
+	b1 = document.getElementsByName('isEnabled' + a);
+	if(b1[0].checked==false) {	return false;}
+    
+	b2 = document.getElementsByName('isEnabled' + b);
+	if(b2[0].checked==false)	{	return false;}
+    p = document.getElementsByName('srcAddr' + a);
+    p2 = document.getElementsByName('srcAddr2' + a);
+    p3 = document.getElementsByName('srcAddr' + b);
+    p4 = document.getElementsByName('srcAddr2' + b);
+	if(p[0].value!=p3[0].value||p2[0].value!=p4[0].value) {	return false;}
+			
+    TM1 = document.getElementsByName("time1" + i);
+    TM2 = document.getElementsByName("time2" + i);
+    TM3 = document.getElementsByName("time1" + j);
+    TM4 = document.getElementsByName("time2" + j);
+	if(TM1[0].value!=TM3[0].value||TM2[0].value!=TM4[0].value)	{	return false;}
+
+    p = document.getElementsByName('dstPort1' + a);
+    p2 = document.getElementsByName('dstPort2' + a);
+    p3 = document.getElementsByName('dstPort1' + b);
+    p4 = document.getElementsByName('dstPort2' + b);
+	if(p[0].value!=p3[0].value||p2[0].value!=p4[0].value)	{	return false;}
+
+    p = document.getElementsByName('protocol' + a);
+    p2 = document.getElementsByName('protocol' + b);
+	if(p[0].value!=p2[0].value)	{	return false;}
+	return true;
+}
+function old_select()
+{
+	for (i=0;i<6;i++)
+	{
+		if(list[i][10]!=0)
+			return true;
+	}
+	return false;
+}
+function checkallemptyvalue(index){
+	var mm,mm1;
+	var pp,pp1;
+
+	with (document.forms[0]){
+		mm=document.getElementsByName('srcAddr' +index);
+		mm1=document.getElementsByName('srcAddr2' + index);
+		pp = document.getElementsByName('dstPort1' + index);
+		pp1 = document.getElementsByName('dstPort2' + index);
+		
+		if((mm[0].value=='')&&(mm1[0].value=='')&&(pp[0].value=='')&&(pp1[0].value=='')){
+			return true;
+		}
+		else return false;
+	}
+}
+function btnApply() {
+	var TM1;
+	var TM2;
+	var D1;
+	var D2;
+	var selecked=false;
+	with (document.forms[0]) {
+    		for (i=0;i<6;i++) {
+	      		b = document.getElementsByName('isEnabled' + i);
+		      	if ((b[0].checked==false)&&(checkallemptyvalue(i)==true)) continue;
+		      	selecked = true;
+	      		for(j=i+1;j<6;j++)
+	      		{
+				p = document.getElementsByName('srcAddr' + i);
+				p2 = document.getElementsByName('srcAddr2' + i);
+				p = document.getElementsByName('srcAddr' + i);
+				p2 = document.getElementsByName('srcAddr2' + i);
+				TM1 = document.getElementsByName("time1" + i);
+				TM2 = document.getElementsByName("time2" + i);
+				D1 = document.getElementsByName("day1" + i);
+				D2 = document.getElementsByName("day2" + i);
+				if (p[0].value == '')
+					p[0].value = p2[0].value; 
+				TM1 = document.getElementsByName("time1" + i);
+				TM2 = document.getElementsByName("time2" + i);
+				D1 = document.getElementsByName("day1" + i);
+				D2 = document.getElementsByName("day2" + i);
+				ip = pre_ip + p[0].value;
+				if( isValidIpAddress(ip) != 0){
+					msg = '<% Fid_str(84); %>';
+					alert(msg);
+					return;
+				}
+				if (p2[0].value == '')
+					p2[0].value = p[0].value;
+
+				ip = pre_ip + p2[0].value
+
+				if( isValidIpAddress(ip) != 0){
+					msg = '<% Fid_str(84); %>';
+					alert(msg);
+					return;
+				}
+
+	      			if (parseInt(p[0].value)>parseInt(p2[0].value))
+	      			{
+					temp =p[0].value;
+					p[0].value=p2[0].value;
+					p2[0].value=temp;
+				}
+				// destination port
+				p = document.getElementsByName('dstPort1' + i);
+				p2 = document.getElementsByName('dstPort2' + i);
+				if ((p[0].value == "") && (p2[0].value != "")) {
+					p[0].value = p2[0].value;
+				}
+				if ( p[0].value != "" && (p[0].value<=0 || p[0].value>65535) ) {
+					msg = '<% Fid_str(85); %><% Fid_str(88); %>';
+					alert(msg);
+					return;
+				}
+
+				if (p[0].value=='' && p2[0].value=='')
+				{
+					msg = '<% Fid_str(85); %>';
+					alert(msg);
+					return;
+				}
+				if (p2[0].value == '')
+					p2[0].value = p[0].value;
+				if (p2[0].value != '')
+					b = p[0].value + ':' + p2[0].value;
+				else
+					b = p[0].value;
+
+				if ( isNValidInt(p[0].value) ) {
+					msg = '<% Fid_str(85); %><% Fid_str(88); %>';
+					alert(msg);
+					return;
+				}	
+
+
+				if ( isNValidInt(p2[0].value) ) {
+					msg = '<% Fid_str(85); %><% Fid_str(88); %>';
+					alert(msg);
+					return;
+				}
+
+				if ( p2[0].value != "" && (p2[0].value<=0 || p2[0].value>65535) ) {
+					msg = '<% Fid_str(85); %><% Fid_str(88); %>';
+					alert(msg);
+					return;
+				}
+
+				if ((p2[0].value != '')&&(parseInt(p2[0].value) < parseInt(p[0].value))) {
+					temp =p[0].value;
+					p[0].value=p2[0].value;
+					p2[0].value=temp;
+				}
+				if ( ( D1[0].value == D2[0].value ) && ( parseInt(TM1[0].value) > parseInt(TM2[0].value) )) {
+					msg = '<% Fid_str(70); %> <% Fid_str(822); %>';
+					alert(msg);
+					return;
+				}
+
+				if (is_same(i,j))
+				{
+					alert('<% Fid_str(1312); %>');return;
+				}
+			}
+		}
+		if( selecked == false && old_select()== false){
+			msg = '<% Fid_str(1311); %>';
+			alert(msg);
+			return;
+		}
+  	} 
+	document.tF.submit(); 
+}
+function clickBlockTime(index) {
+  	with (document.forms[0]) {
+    		obj = document.getElementsByName("blockTime" + index);
+		day1 = document.getElementsByName("day1" + index);
+		day2 = document.getElementsByName("day2" + index);
+		time1 = document.getElementsByName("time1" + index);
+		time2 = document.getElementsByName("time2" + index);
+		if (obj[0].checked == true) {// always
+	  		day1[0].disabled = true;
+	  		day2[0].disabled = true;
+	  		time1[0].disabled = true;
+	  		time2[0].disabled = true;
+		}
+		else {
+			day1[0].disabled = false;
+			day2[0].disabled = false;
+			time1[0].disabled = false;
+			time2[0].disabled = false;	
+		}
+  	}
+}
+function frmLoad() {
+
+ 	for(var i=0; i<6; i++) {
+		list[i][1]='...';
+		list[i][2]='...';
+		list[i][3]=':';
+		list[i][4]=TCP;
+		list[i][5]=BLOCK;
+		for(var j=6; j<11; j++) {
+			list[i][j]=0;
+		}
+	}
+		
+	<% exec cmd="OutAcc_script"; %>
+	<% gs_client_ip_filter(0, 6); %>
+  	with (document.forms[0]) {
+    		for(i=0;i<totalCount;i++) {
+//	  if (isValidIpAddress(list[i][1]) == true ) 
+		  	{
+		    		ip = list[i][1].split('.');
+	      			p = document.getElementsByName('srcAddr' + i);
+		    		p[0].value = ip[3];
+	      		}
+//	  if (isValidIpAddress(list[i][2]) == true ) 
+			{
+				ip = list[i][2].split('.');
+				p = document.getElementsByName('srcAddr2' + i);
+				p[0].value = ip[3];
+			}
+			// port
+			p = list[i][3].split(':');
+			q = document.getElementsByName('dstPort1' + i);
+			q[0].value = p[0];
+			if (p[1])
+				q = document.getElementsByName('dstPort2' + i);
+			q[0].value = p[1]; 
+			//protocol type
+			p = document.getElementsByName('protocol' + i);
+			if (list[i][4]==TCP)
+				p[0].checked = true;
+			else if (list[i][4]==UDP)
+				p[1].checked = true;
+			else
+				p[2].checked = true;
+			//block time
+	  		b = document.getElementsByName('blockTime' + i);
+	  		if (list[i][5]==BLOCK)
+				b[1].checked = true;
+			else
+				b[0].checked = true;
+			//day
+			p = document.getElementsByName('day1' + i);
+			for (j=0;j<7;j++) {
+				if (p[0].options[j].value == list[i][6]) {
+				  	p[0].selectedIndex = j;
+				  	break;
+				}
+			}
+			p = document.getElementsByName('day2' + i);
+			for (j=0;j<7;j++) {
+				if (p[0].options[j].value == list[i][7]) {
+			  		p[0].selectedIndex = j;
+			  		break;
+				}
+			}
+			//Time
+			p = document.getElementsByName('time1' + i);
+			for (j=0;j<24;j++) {
+				if (p[0].options[j].value == list[i][8]) {
+			  		p[0].selectedIndex = j;
+			  		break;
+				}
+			}
+			p = document.getElementsByName('time2' + i);
+			for (j=0;j<24;j++) {
+				if (p[0].options[j].value == list[i][9]) {
+			  		p[0].selectedIndex = j;
+			  		break;
+				}
+			}
+			p = document.getElementsByName('isEnabled' + i);
+			//enabled
+			if (list[i][10]==1)
+				p[0].checked = true;
+			else
+				p[0].checked = false;
+		}
+
+		// update the status of day and time
+		for (i=0;i<6;i++) {
+			clickBlockTime(i);
+		}
+
+	}
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+//-->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY bgColor=#ffffff leftMargin=0 topMargin=0 marginwidth="0" marginheight="0" onload=frmLoad()>
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+ 	<FORM  name="tF" action="/cgi-bin/ac_control.exe" method="post">
+	<% gs_def_filter_items(); %> 		
+	<BR>
+  		<TABLE class=copy_1  cellSpacing=1 cellPadding=0 width=320 border=0>
+    			<TBODY>
+				<tr>
+					<td valign="top" width="99%" height="100%" class="head_bold">
+						<nobr>
+				      		<B><FONT style="{font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 17px; font-weight: bold; color: #0000ff; text-decoration: none}"><% Fid_str(63); %>
+        					</FONT></B>
+				      		</nobr>    	
+			    			</td>
+				</tr>
+		    		<TR>
+		      			<TD colSpan=7 class="body">			      			
+			      			<br>
+			      			<% Fid_str(64); %>			        		 
+			        		<A onclick=moreinfowin("glossary.stm#ip_filter"); href="javascript:void(0);"><B>
+			        		<FONT color=#0066FF><% Fid_str(47); %>
+			        		</FONT></B> 
+			        		</A>
+			        		<BR><BR>
+		        		</TD>
+		        	</TR>
+		    		<TR bgColor=#666262>
+		      			<TD noWrap width=180 height=17 class="body">
+			      			<FONT color=#ffffff><B>
+			        		<CENTER><% Fid_str(65); %></CENTER></B>
+			        		</FONT>
+		        		</TD>
+      					<TD noWrap height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(66); %></CENTER></B>
+						</FONT>
+					</TD>
+					<TD noWrap width=70 height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(67); %></CENTER></B>
+						</FONT>
+					</TD>
+					<TD noWrap width=70 height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(68); %></CENTER></B>
+						</FONT>
+					</TD>
+					<TD noWrap height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(69); %></CENTER></B>
+						</FONT>
+					</TD>
+					<TD noWrap height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(70); %></CENTER></B>
+						</FONT>
+					</TD>
+					<TD noWrap width=40 height=17 class="body">
+						<FONT color=#ffffff><B>
+						<CENTER><% Fid_str(71); %></CENTER></B>
+						</FONT>
+					</TD>
+				</TR>
+				<SCRIPT language=javascript>				
+					var totalCount = 6;
+					for (i =0;i< totalCount;i++)
+					{
+						document.write('<TR bgColor=#cccccc>');
+						document.write(' <TD>');
+						document.write('   <CENTER>');
+						document.write(pre_ip);
+						document.write('<INPUT maxLength=3 size=3 name=srcAddr'+i+'>~<INPUT maxLength=3 size=3 name=srcAddr2'+i+'></CENTER></TD>');
+						document.write('<TD>');
+						document.write('<CENTER>&nbsp;&nbsp;<INPUT maxLength=5 size=5 name=dstPort1'+i+'>~<INPUT maxLength=5 size=5 name=dstPort2'+i+'>&nbsp;</CENTER></TD>');
+						document.write('<TD><INPUT type=radio CHECKED name=protocol'+i+' value=6>TCP<BR>');
+						document.write('<INPUT type=radio name=protocol'+i+' value=17>UDP<BR>');
+						document.write('<INPUT type=radio name=protocol'+i+' value=255><% Fid_str(72); %> </TD>');
+						document.write('<TD><INPUT onclick=clickBlockTime('+i+'); type=radio CHECKED value=0 name=blockTime'+i+'><% Fid_str(73); %><BR>');
+						document.write('<INPUT onclick=clickBlockTime('+i+') type=radio value=1 name=blockTime'+i+'><% Fid_str(74); %> </TD>');
+						document.write(' <TD>');
+						document.write('    <CENTER><SELECT name=day1'+i+'> ');
+							buildDayList();
+						document.write('    </SELECT><BR><SELECT name=day2'+i+'> ');
+							buildDayList();
+						document.write('    </SELECT></CENTER></TD>');
+						document.write('  <TD>');
+						document.write('    <CENTER><SELECT name=time1'+i+'> ');
+							buildTimeList();
+						document.write('    </SELECT><BR><SELECT name=time2'+i+'> ');
+							buildTimeList();
+						document.write('    </SELECT></CENTER></TD>');
+						document.write('  <TD>');
+						document.write('    <CENTER><INPUT type=checkbox name=isEnabled'+i+'></CENTER></TD>');
+						document.write('</TR>');
+					}
+					
+
+				</SCRIPT>
+				<TR>
+					<TD height=20>
+					</TD>
+				</TR>
+				<TR>
+					<TD >&nbsp;</TD>
+					<TD colSpan=6>
+						<INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onClick="javascript:window.location.reload(true);return false" type=button value="<% Fid_str(48); %>"> 
+						&nbsp;&nbsp;<INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onclick=btnApply() type=button value="<% Fid_str(49); %>"> 
+					</TD>
+				</TR>
+      			</TBODY>
+      		</TABLE>
+      </FORM>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table>
+</BODY>
+</HTML>

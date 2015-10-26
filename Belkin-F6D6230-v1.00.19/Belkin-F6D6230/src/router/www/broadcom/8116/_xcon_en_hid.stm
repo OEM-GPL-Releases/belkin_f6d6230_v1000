@@ -1,0 +1,114 @@
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<% exec cmd="my_function"; %>
+function backup_config() {
+	var name = "/cgi-bin/user.conf";
+	document.location.href=name;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="my_function3.css">
+<style type=text/css>
+.subtitleh	{color: #336699;	font-family: Arial; font-size: 13pt;	text-align: left;	font-weight : bold;	height: 10px;}
+</style>
+</head>
+<body onload="clear1()">
+<form name="tF" METHOD="POST" action="/cgi-bin/aadsl.exe">
+<input type=hidden name="hiddenAdsl" value=1>
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+<!--
+	<tr>
+		<td>
+			<p class=subtitleh>ADSL Parameter</p>
+			<p class=normalText>
+			This page allows you to specify the ADSL standards to operate with. You may explicitly set a specific
+			standard, or choose "Automatic" to automatically negotiate with remote DSLAM.
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p class=normalTextb>
+					Operation Mode:&nbsp;
+					<% exec cmd="aAdslInfoHid"; %>
+			</p>
+			<script language="JavaScript">
+				if (operation_func != 0) {
+					var iDOD = 1 - <% echo var="Wireless_PhyEnable_var"; %>;
+
+					document.write('<p class=normalTextb>\n');
+					document.write('Enable or disable wirelessInterface&nbsp;:&nbsp;&nbsp;&nbsp;\n');
+					document.write('<input type="radio" name="Wireless_enable" value=1>Enable&nbsp;&nbsp;\n');
+					document.write('<input type="radio" name="Wireless_enable" value=0>Disable');
+					document.tF.Wireless_enable[iDOD].defaultChecked = true;
+					document.tF.Wireless_enable[iDOD].checked = true;
+					document.write('</p>\n');
+				}
+			</script>
+			<p class=normalTextb>
+					Customer Type : &nbsp;&nbsp;
+					<input type="radio" name="arcorCustomer" value=0>Empty&nbsp;&nbsp;
+					<input type="radio" name="arcorCustomer" value=1>Arcor&nbsp;&nbsp;
+					<input type="radio" name="arcorCustomer" value=2>None Arcor
+					<SCRIPT LANGUAGE="JavaScript">
+						var iDOD = <% echo var="aracr_type_var"; %>;
+						document.tF.arcorCustomer[iDOD].defaultChecked = true;
+						document.tF.arcorCustomer[iDOD].checked = true;
+					</SCRIPT>
+			</p>
+			<p class=normalTextb>
+					PIN config : &nbsp;&nbsp;
+					<input type="radio" name="PIN_type" value=0>No Config&nbsp;&nbsp;
+					<input type="radio" name="PIN_type" value=1>Config&nbsp;&nbsp;
+					<input type="radio" name="PIN_type" value=2>Config OK&nbsp;&nbsp;
+					<SCRIPT LANGUAGE="JavaScript">
+						var iDOD = <% echo var="pingConf_var"; %>;
+						document.tF.PIN_type[iDOD].defaultChecked = true;
+						document.tF.PIN_type[iDOD].checked = true;
+					</SCRIPT>
+			</p>
+-->			
+			<p class=normalTextb>
+					UART RX : &nbsp;&nbsp;
+					<input type="radio" name="uartFunc" value=0>Disable&nbsp;&nbsp;
+					<input type="radio" name="uartFunc" value=1>Enable&nbsp;&nbsp;
+					<SCRIPT LANGUAGE="JavaScript">
+						var iDOD = <% echo var="uartFunc_var"; %>;
+						document.tF.uartFunc[iDOD].defaultChecked = true;
+						document.tF.uartFunc[iDOD].checked = true;
+					</SCRIPT>
+			</p>
+			<p class=normalTextb>		
+					Enable Side Band Option : &nbsp;&nbsp;
+					<input type="radio" name="enalbe_side_band" value=0>Disable&nbsp;&nbsp;
+					<input type="radio" name="enalbe_side_band" value=1>Enable&nbsp;&nbsp;				
+					<script language="JavaScript">
+						var 	enalbe_side_band = <% echo var="enalbe_side_band"; %>	
+						document.tF.enalbe_side_band[enalbe_side_band].defaultChecked = true;
+						document.tF.enalbe_side_band[enalbe_side_band].checked = true;
+					</script>
+			</p>				 	
+         </td>
+	</tr>
+</table>
+<table border="0" cellspacing="0" cellpadding="0" width=80% height=100pt>
+	<tr>
+		<td width=20%>&nbsp;</td>
+		<td width=80% align=right class=mainmsgR>
+			<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td>
+				<input type="button" class="formsbutton" value="BackupConfig"  onclick="return backup_config();">
+				<a href="javascript:document.forms[0].submit()"><input type="submit"  name="arc_action" class="formsbutton" name="savesetting" value="SAVE SETTINGS"></a>
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+</body>
+</html>

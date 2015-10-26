@@ -1,0 +1,307 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="JavaScript" src="/routine_data.js"></script>
+<% File_include("refreshmenu.txt"); %>
+<script language="JavaScript">
+<% File_include("routine.txt"); %>
+var ipm='<% Fid_str(641); %>';
+var ipmLast='<% Fid_str(1360); %>';
+var lastIpError ='<% Fid_str(1360); %>';
+var DNSError='<% Fid_str(1807); %>';
+<% login_timeout(); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+var wan_type="<% nvram_match("wan0_proto", "static", "1"); %>"?1:0;
+
+function isNValidDNS(s) {
+	if((isBlank(s))||(isNaN(s))||(isNValidInt(s))||(isNegInt(s))||(s<1||s>223))
+		return true;
+	else
+		return false;
+}
+function isZero(s) { 
+	var i;
+	var c;
+	for(i=0;i<s.length;i++)
+	{
+		c=s.charAt(i);
+		if((c!='0'))return false; 
+	}
+	if( i == 0 )
+	{
+		return false; 
+	}
+	return true;
+}
+
+
+function isValidIpAddress(address) {
+   var i = 0;
+
+   if ( address == '0.0.0.0' ||
+        address == '255.255.255.255'  || address == '127.0.0.1' )
+      return false;
+
+   addrParts = address.split('.');
+   if ( addrParts.length != 4 ) return false;
+   for (i = 0; i < 4; i++) {
+      if (isNaN(addrParts[i]))
+         return false;
+      num = parseInt(addrParts[i]);
+      if ( num < 0 || num > 255 )
+         return false;
+      if( (i == 0) && ( num >= 224 && num <= 255 )){
+		return false;
+      }
+      if( (i == 3) && ( num == 0) ){
+		return false;
+      }      
+   }
+   return true;
+}
+
+
+function evaltF()
+{
+
+	var dns1 = document.tF.dns1_1.value + "." + document.tF.dns1_2.value + "." + document.tF.dns1_3.value + "." + document.tF.dns1_4.value;
+	var dns2 = document.tF.dns2_1.value + "." + document.tF.dns2_2.value + "." + document.tF.dns2_3.value + "." + document.tF.dns2_4.value;
+	var Specify = '<% Fid_str(780); %>';
+	var Sinvalid = '<% Fid_str(822); %>';
+	var message;
+
+	document.tF.wan_dns_auto.value=(document.tF.auto_from_isp.checked==true)?"1":"0";
+    	if(document.tF.auto_from_isp.checked == false)
+    	{
+		if(!(isBlank_Zero(document.tF.dns1_1.value))||!(isBlank_Zero(document.tF.dns1_2.value))||!(isBlank_Zero(document.tF.dns1_3.value))||!(isBlank_Zero(document.tF.dns1_4.value))){
+			if(isNValidDNS(document.tF.dns1_1.value)) { alert(DNSError); return false; }
+			if(isNValidIP(document.tF.dns1_2.value)) { alert(ipm); return false; }
+			if(isNValidIP(document.tF.dns1_3.value)) { alert(ipm); return false; }
+			if(isNValidLastIP(document.tF.dns1_4.value)) { alert(ipmLast); return false; }
+		}
+		if(!(isBlank_Zero(document.tF.dns2_1.value))||!(isBlank_Zero(document.tF.dns2_2.value))||!(isBlank_Zero(document.tF.dns2_3.value))||!(isBlank_Zero(document.tF.dns2_4.value))){
+			if(isNValidDNS(document.tF.dns2_1.value)) { alert(DNSError); return false; }
+			if(isNValidIP(document.tF.dns2_2.value)) { alert(ipm); return false; }
+			if(isNValidIP(document.tF.dns2_3.value)) { alert(ipm); return false; }
+			if(isNValidLastIP(document.tF.dns2_4.value)) { alert(ipmLast); return false; }
+		}
+		if((isZero(document.tF.dns1_1.value)) && (isZero(document.tF.dns1_2.value)) && (isZero(document.tF.dns1_3.value)) && (isZero(document.tF.dns1_4.value))){
+			alert('<% Fid_str(707); %>');
+			return false;
+		}	
+
+		if( ! isValidIpAddress(dns1)){
+			alert(Specify + " " + dns1 + " " + Sinvalid);
+			return false;
+		}
+		if(document.tF.dns1_1.value.length==0 || document.tF.dns1_2.value.length==0 || document.tF.dns1_3.value.length==0 || document.tF.dns1_4.value.length==0){ alert(ipm); return false; } //Deny empty address.
+
+		if((isZero(document.tF.dns2_1.value)) && (isZero(document.tF.dns2_2.value)) && (isZero(document.tF.dns2_3.value)) && (isZero(document.tF.dns2_4.value))){
+			document.tF.wan_dns0.value=dns1;
+			document.tF.wan_dns1.value="0.0.0.0";
+			document.tF.wan_dns.value=1;
+			return true;
+		}
+	
+		if( ! isValidIpAddress(dns2)){
+			alert(Specify + " " + dns2 + " " + Sinvalid);
+			return false;
+		}
+		
+		for(i=1; i<=4; i++)
+			if(document.tF.elements['dns2_'+i].value.length==0) document.tF.elements['dns2_'+i].value="0";
+		dns2 = document.tF.dns2_1.value + "." + document.tF.dns2_2.value + "." + document.tF.dns2_3.value + "." + document.tF.dns2_4.value;
+		
+
+	        //document.tF.wan_proto.value="static";
+	        //alert("dns1="+dns1+"dns2="+dns2);
+	        document.tF.wan_dns0.value=dns1;
+	        document.tF.wan_dns1.value=dns2;
+    	}
+	
+	document.tF.wan_dns_auto.value=(document.tF.auto_from_isp.checked==false)?"0":"1";
+	//alert( document.tF.wan_dns_auto.value );
+	//document.tF.submit();	
+	//	alert(document.tF.wan_dns.value);
+		
+    	return true;
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+function enableStatic()
+{
+    	if(document.tF.auto_from_isp.checked == true)
+    	{
+		document.tF.dns1_1.disabled = true;
+		document.tF.dns1_2.disabled = true;
+		document.tF.dns1_3.disabled = true;
+		document.tF.dns1_4.disabled = true;
+		document.tF.dns2_1.disabled = true;
+		document.tF.dns2_2.disabled = true;
+		document.tF.dns2_3.disabled = true;
+		document.tF.dns2_4.disabled = true;
+	}
+    	else
+    	{
+		document.tF.dns1_1.disabled = false;
+		document.tF.dns1_2.disabled = false;
+		document.tF.dns1_3.disabled = false;
+		document.tF.dns1_4.disabled = false;
+		document.tF.dns2_1.disabled = false;
+		document.tF.dns2_2.disabled = false;
+		document.tF.dns2_3.disabled = false;
+		document.tF.dns2_4.disabled = false;
+		//if(wan_type==0)
+		//alert("DNS should be automatic because wan connection type is not static.");
+    	}
+}
+
+<% gs_gateway_stauts() ; %>
+
+function onInitial()
+{
+	var dns1="<% nvram_list("wan0_dns", 0); %>";
+	var dns2="<% nvram_list("wan0_dns", 1); %>";
+	
+	var f1 = new Array(0,0,0,0); 
+	var f2 = new Array(0,0,0,0);
+	
+	if(dns1!="")
+	f1=dns1.split(".");
+	
+	document.tF.dns1_1.value=f1[0];
+	document.tF.dns1_2.value=f1[1];
+	document.tF.dns1_3.value=f1[2];
+	document.tF.dns1_4.value=f1[3];
+	
+	if(dns2=="") dns2="0.0.0.0";
+	if(dns2!="")
+	f2=dns2.split(".");
+		
+	document.tF.dns2_1.value=f2[0];
+	document.tF.dns2_2.value=f2[1];
+	document.tF.dns2_3.value=f2[2];
+	document.tF.dns2_4.value=f2[3];	
+}
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="enableStatic();">
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi" >
+<input type="hidden" name="page" value="setup_dns.stm">
+<input type="hidden" name="location_page" value="setup_dns.stm">
+<input type="hidden" name="wan_dns" value="2">
+<input type="hidden" name="wan_dns_auto">
+<input type="hidden" name="wan_dns0" > 
+<input type="hidden" name="wan_dns1" >
+<input type="hidden" name="wan_unit" value="0" >
+<input type="hidden" name="wan_primary" value="1">
+<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;<% Fid_str(701); %><br>
+			<table border=0 class="copy_1">
+				<tr>
+					<td width="5" colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr align=left>
+								
+								<td colspan=3 align=left class="body">
+									<% Fid_str(702); %>
+								<br><br></td>
+							</tr>
+							<tr>
+								
+								<td colspan=2 nowrap=1 width=500 class="body">
+									<input type="checkbox" name="auto_from_isp" value="1" onClick="enableStatic()">
+									<b><% Fid_str(703); %><br><br>
+								</td>
+							</tr>
+							<script language="JavaScript">
+							//var auto = '<% echo var="dns_auto_from_isp" ; %>';
+							/*
+							var auto="<% nvram_get("wan0_proto"); %>";
+							if(auto=="dhcp" || auto=="pppoe"){
+								document.tF.auto_from_isp.defaultChecked = true;
+								document.tF.auto_from_isp.checked = true;
+							}
+							*/
+							var auto=<% nvram_get("wan0_dns_auto"); %>;
+							if(auto){
+								document.tF.auto_from_isp.defaultChecked = true;
+								document.tF.auto_from_isp.checked = true;
+							}
+							</script>
+							<tr>
+								
+								<td width="185" class="body"><b><% Fid_str(704); %> &gt;</b><br><br></td>
+								<td width="335" >
+					<input name="dns1_1" size=3 maxlength=3 value="0">.
+					<input name="dns1_2" size=3 maxlength=3 value="0">.
+					<input name="dns1_3" size=3 maxlength=3 value="0">.
+					<input name="dns1_4" size=3 maxlength=3 value="0">
+									<br><br></td>
+							</tr>
+							<tr>
+								
+								<td width="185" class="body"><b><% Fid_str(705); %> &gt;</b><br><br></td>
+									<td width="335">
+					<input name="dns2_1" size=3 maxlength=3 value="0">. 
+					<input name="dns2_2" size=3 maxlength=3 value="0">.
+					<input name="dns2_3" size=3 maxlength=3 value="0">.
+					<input name="dns2_4" size=3 maxlength=3 value="0">
+										<br><br>							
+										</td>
+								</tr>
+								<tr>
+									
+									<td colspan="2" class="body">
+										<% Fid_str(706); %><% Fid_str(707); %>
+										<a href="javascript:void(0);" class="plaintext_bold" onClick=moreinfowin("glossary.stm#dns");><b><font color=#0066FF><% Fid_str(47); %></font></b></a><br><br></td>
+								</tr>
+								<tr>	
+								<!--<td width="185">&nbsp;</td>; -->
+					<td colspan=2 align=center>
+					<input type="button" value="<% Fid_str(48); %>" 
+							style="{height=22px;width:150px;}" class="submitBtn" 
+							onClick="javascript:window.location.reload(true);return false">								
+              							&nbsp;&nbsp;
+					<input type="submit"  name="arc_action" value="<% Fid_str(49); %>" style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<script>
+/*
+function check_static_dns()
+{
+	if(wan_type==0)//Dynamic
+		{document.tF.auto_from_isp.checked =true;enableStatic();}
+	else if(wan_type==1)//static
+		{document.tF.auto_from_isp.checked =false;enableStatic();}
+}
+check_static_dns();
+*/
+onInitial();
+</script>
+</form>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

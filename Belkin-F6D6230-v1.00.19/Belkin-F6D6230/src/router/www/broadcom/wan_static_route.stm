@@ -1,0 +1,250 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<% File_include("refreshmenu.txt"); %>
+<SCRIPT src="data.js"></SCRIPT>
+
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd("aRouteInfoNew"); %>
+var ap_mode= '<% nvram_get("gs_apMode"); %>';
+
+<% File_include("routine.txt"); %>
+<% exec cmd("PeerMacAddress"); %>
+
+<% exec cmd("gateway_status"); %>
+<% exec cmd("Gateway_IsWanConnected"); %>
+
+var ipm="<% Fid_str(902); %>.";
+var ipmnull = "<% Fid_str(669); %>.";
+var net_ip_err="<% Fid_str(403); %>";
+var sub_mask_f_err="<% Fid_str(396); %>";
+var sub_mask_err=sub_mask_f_err;
+var gw_err="<% Fid_str(1231); %>";
+var net_ip_mask_err="<% Fid_str(1800); %>";
+var firstIpError= '<% Fid_str(2618); %>';
+var lastIpError ='<% Fid_str(2619); %>';
+
+function evaltF(index)
+{
+
+	var ulIP, ulMask, ulMaskedIP, ulGwIP,ulMetric;
+	var ulIP1, ulMask1, ulMaskedIP1, ulGwIP1;
+	var i,j=0,found=0;
+	
+	document.getElementsByName('wan_route_metric'+index)[0].value=1;
+  	ulIP=document.getElementsByName('wan_route_ipaddr'+index)[0].value;
+	ulMask=document.getElementsByName('wan_route_netmask'+index)[0].value;
+	ulGwIP=document.getElementsByName('wan_route_gateway'+index)[0].value;
+	ulMetric=document.getElementsByName('wan_route_metric'+index)[0].value;
+
+
+	
+	if (ulIP.search(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) == -1) {
+		alert(net_ip_err);
+        return false;
+    }
+    
+	var ip_cell=ulIP.split(".");
+	var mask_cell=ulMask.split(".");
+	if(ip_cell[0]>=255 || ip_cell[0]<1) { alert(firstIpError); return false; }
+	else {
+		if(ip_cell[1]>255) { alert(net_ip_err); return false; } 
+		else {
+			if(ip_cell[2]>255) { alert(net_ip_err); return false; }
+			else {
+				if(ip_cell[3]>=255) { alert(lastIpError); return false; }
+			}
+		}
+	}
+  var  gw_cell=ulGwIP.split(".");  
+	//if (!isValidMASK(ulMask)) { alert(sub_mask_f_err); return false;	}
+	var mask_array = ulMask.split(".");
+	if(isNValidSRSubnetMask(mask_array[0], mask_array[1], mask_array[2], mask_array[3])) { alert(sub_mask_f_err); return false; }
+	if (!isValidIP(ulGwIP)) { alert(gw_err); return false;	}
+  if ((1 > gw_cell[0]) || (gw_cell[0] > 223)) { alert(gw_err); return false;	}
+  for(i=0;i<4;i++)
+  {
+   if(ip_cell[i]==0 && mask_cell[i]!=0)  
+   {
+    alert(net_ip_mask_err);
+		return false;
+   }
+  }
+
+ 	ulIP = IpToLong(ulIP);
+	ulMask = IpToLong(ulMask);
+	ulGwIP = IpToLong(ulGwIP);
+/*
+	if (ulMask==0) found=1;
+	else {
+	 	for(i = 31; i > 0; i--) {
+	 		j = j + Math.pow(2,i);
+	 		if (ulMask==j) found=1;
+		}
+	}
+
+ 	if (found==0) { alert(sub_mask_err); return false; }
+*/
+	ulMaskedIP = ulIP & ulMask;
+	
+	if (ulMaskedIP < 0) ulMaskedIP += 0x100000000;
+	if ((ulIP != ulMaskedIP) || (ulIP==0 && ulMask!=0) || (ulIP!=0 && ulMask==0)) {
+		alert(net_ip_mask_err);
+		return false;
+	}
+
+	document.tF.submit();
+	return true;
+}
+
+function fun_l(i)
+{
+	document.write('<tr>');
+	document.write('<td class="tdTextc">',i,'</td>');
+	document.write('<td class="tdTextc">',r_ip[i],'</td>');
+	document.write('<td class="tdTextc">',r_mask[i],'</td>');
+	document.write('<td class="tdTextc">',r_gw[i],'</td>');
+	if (r_vc[i]==0)
+		document.write('<td class="tdTextc"><% Fid_str(1801); %></td>');
+	else
+		document.write('<td class="tdTextc">VC',r_vc[i],'</td>');
+	document.write('<td class="tdTextc"><a href="/route_tbl.stm/',i,'"><font color=#ff0000><% Fid_str(1574); %></font></a>');
+	document.write('&nbsp;&nbsp;<a href="/cgi-bin/ArouteNew.exe/',i+500,'"><font color=#ff0000><% Fid_str(114); %></font></a></td>');
+	document.write('</tr>');
+}
+
+function add_entry(i)
+{
+	document.location.href='/wan_static_route.stm/'+i;
+	return true;
+}
+function clear1() {
+	window.status="";
+}
+
+var aIpaddr=new Array(4);
+var	aNetmask=new Array(4);
+var	aGateway=new Array(4);
+var rowIndex=0;
+
+
+function onLoadStaticRoute()
+{
+	
+	aIpaddr[0]="<% wan_route("ipaddr", 0); %>";
+	aIpaddr[1]="<% wan_route("ipaddr", 1); %>";
+	aIpaddr[2]="<% wan_route("ipaddr", 2; %>";
+	aIpaddr[3]="<% wan_route("ipaddr", 3); %>";
+	
+	aNetmask[0]="<% wan_route("netmask", 0); %>";
+	aNetmask[1]="<% wan_route("netmask", 1); %>";
+	aNetmask[2]="<% wan_route("netmask", 2; %>";
+	aNetmask[3]="<% wan_route("netmask", 3); %>";
+
+	aGateway[0]="<% wan_router("gateway", 0); %>"; 
+	aGateway[1]="<% wan_router("gateway", 1); %>"; 
+	aGateway[2]="<% wan_router("gateway", 2); %>"; 
+	aGateway[3]="<% wan_router("gateway", 3); %>"; 
+	
+	for(var i=0; i<4; i++) {
+		if(aIpaddr[i]=="") continue;
+		rowIndex++;
+		document.write('<tr><td>');
+		document.write(aIpaddr[i],'</td>');
+		document.write('<td>');
+		document.write(aNetmask[i],'</td>');
+		document.write('<td>');
+		document.write(aGateway[i],'</td>');
+		document.write('<td><input type="button" value="Remove"></td></tr>');
+	}		
+}
+
+function onAddStRoute()
+{
+	var routeStr="<% nvram_get("wan0_route"); %>";
+	
+	if(routeStr=="") 
+		routeStr =
+			document.tF.wan_route_ipaddr.value+':'+
+			document.tF.wan_route_netmask.value+':'+
+			document.tF.wan_route_gateway.value+'1';
+	else
+		routeStr = routeStr+' '+
+			document.tF.wan_route_ipaddr.value+':'+
+			document.tF.wan_route_netmask.value+':'+
+			document.tF.wan_route_gateway.value+':1';
+			
+	document.tF.arc_wan_route.value=routeStr;
+	alert(routeStr);
+	document.tF.submit();
+
+	return true;
+}
+
+function onDelet(index)
+{
+	document.getElementsByName('wan_route_ipaddr'+index)[0].value="";
+	document.getElementsByName('wan_route_netmask'+index)[0].value="";
+	document.getElementsByName('wan_route_gateway'+index)[0].value="";
+	document.getElementsByName('wan_route_metric'+index)[0].value="";
+	
+
+	document.getElementById('add_wan_ip').value="";
+	document.getElementById('add_wan_netmask').value="";
+	document.getElementById('add_wan_gateway').value="";
+	document.getElementById('add_wan_metric').value="";
+	
+	document.tF.submit();
+	return true;
+}
+
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="apply.cgi">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="1">
+<input type="hidden" name="restart_page" value='parent.location.href="wan_static_route.stm";'>
+<input type="hidden" name="location_page" value="wan_static_route.stm">
+<input type="hidden" name="QuickSetup">
+<input type="hidden" name="wan_unit" value="0">
+<input type="hidden" name="wan_route" value="5">
+<input type="hidden" name="wan_primary" value="1">
+<input type="hidden" name="arc_action" value="Apply Changes">
+<input type="hidden" name="wan_hwaddr" value="<% nvram_get("wan0_hwaddr"); %>">
+
+<table width="100%" border="0" cellspacing="1" cellpadding="1">
+    <tr>
+    	<td width="36">&nbsp;</td>
+        <td valign="top" width="95%" height="100%" class="head_bold" >
+            <p><b><br>
+            <% Fid_str(358); %> &gt;&nbsp;<% Fid_str(1802); %></b><br>
+            </p>
+            <p class="body" style="padding-top:30px" ><% Fid_str(1803); %></p>
+		</td>
+	</tr>
+	<tr>
+		<td width="36">&nbsp;</td>
+		<td>
+			<table border="0" cellspacing="1" cellpadding="5" width="350" class="copy_1 info_table" style="margin-bottom:20px">
+			<tr height="25">
+					<th align="center"><% Fid_str(1804); %></th>
+					<th align="center"><% Fid_str(336); %></th>
+					<th align="center"><% Fid_str(1805); %></th>														
+					<th align="center"></th>
+				
+			</tr>
+			<% gs_getStRoute(); %>
+			</table>		
+
+        </td>
+    </tr>
+</table>
+</form>     
+</body>
+</html>

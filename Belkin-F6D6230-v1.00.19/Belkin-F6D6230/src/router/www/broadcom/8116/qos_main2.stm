@@ -1,0 +1,1905 @@
+<html>
+<head>
+<title></title>
+<% char_set(); %>
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<style>
+#bm_panel
+{
+	left:210px;
+	top:100px;
+}
+
+#onlinegame_panel
+{
+	left:210px;
+	top:100px;
+}
+
+#rule_panel
+{
+	left:210px;
+	top:400px;
+	width:510px;
+}
+
+</style>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript">
+<% gs_myFunction(); %>
+<% login_timeout(); %>
+<% File_include("routine.txt"); %>
+
+var ipm='<% Fid_str(641); %>.';
+var ipm1='<% Fid_str(675); %>.';
+var Gm='<% Fid_str(395); %>.';
+var Gm1='<% Fid_str(675); %>.';
+var sm='<% Fid_str(766); %>.';
+var wanm="<% Fid_str(1281); %>";
+var ipmUcast = '<% Fid_str(678); %>.';
+var lastIpError ='<% Fid_str(1360); %>';
+var errorIP ='<% Fid_str(403); %>';
+var errorPort='<% Fid_str(1250); %>';
+
+function ShowE(sDivID, bState) {
+    var oDiv = document.getElementById(sDivID);
+    oDiv.style.display = bState;
+}
+
+if(my_qos==1){
+    wan_bw_m='<% Fid_str(1539); %>';
+    minbwm="<% Fid_str(1540); %>\n <% Fid_str(1541); %>";
+    sumbwm='<% Fid_str(1542); %>';
+}
+else{
+    minbwm="<% Fid_str(1540); %>\n <% Fid_str(1543); %>";
+    sumbwm='<% Fid_str(1544); %>';
+}
+
+blockm="<% Fid_str(1545); %>";
+be_dscrpt='<% Fid_str(1546); %>';
+af_dscrpt="<% Fid_str(1547); %>";
+ef_dscrpt='<% Fid_str(1548); %>';
+
+//var i;
+function FWB()
+{
+	this.minbw = "";
+	this.borrow = "";
+}
+function BWM_PROFILE()
+{
+	this.upstream_bw = 0;
+	this.downstream_bw = 0;
+
+	this.fwb_pool = new Array(4);
+	for (var i=0; i<4; i++)
+		this.fwb_pool[i] = new FWB();
+}
+
+var bwm_profiles = new Array(3);
+for(i = 0; i < 3; i++)
+{
+	bwm_profiles[i] = new BWM_PROFILE();
+}
+
+function PORT_RANGE()
+{
+	this.proto = 0; //  6 - TCP, 17 - UDP, 99 - BOTH
+	this.port_start = 0;
+	this.port_end = 0;
+	this.IsDuplicated = function(p)
+	{
+		if(this.port_start == "" || this.port_end == "") return false;
+		
+		if((this.proto == p.proto || this.proto == 99 || p.proto == 99) &&
+			((parseInt(this.port_start) >= parseInt(p.port_start) && parseInt(this.port_start) <= parseInt(p.port_end)) ||
+			(parseInt(this.port_end) >= parseInt(p.port_start) && parseInt(this.port_end) <= parseInt(p.port_end))))
+			return true;
+		return false;
+	}
+}
+
+function CLSFY_RULE()
+{
+	this.name = "";
+	this.category = 0; // APP : 0, MAC : 1, IP : 2, TCP/UDP : 3
+	this.mac_addr = new Array(6);
+	for (i=0; i<6; i++)
+		this.mac_addr[i] = 0;
+	this.saddr_type = 0; // ANY : 0, IP ADDR : 1, IP RANGE : 2
+	this.saddr = new Array(5);
+	for (i=0; i<5; i++)
+		this.saddr[i] = 0;
+	this.daddr_type = 0; // ANY : 0, IP ADDR : 1, IP RANGE : 2
+	this.daddr = new Array(5);
+	for (i=0; i<5; i++)
+		this.daddr[i] = 0;
+	this.port_ranges = new Array(3);
+	for (i=0; i<3; i++)
+		this.port_ranges[i] = new PORT_RANGE();
+	this.ap_type = 0;
+
+	this.priority = 0; // Highest - 5, High - 4, Medium - 3, Normal - 0
+	this.remark_dscp = 1; // Don't Remark : 0x01, BE : 0x00, AF1x : 0x28, AF2x : 0x48, AF3x : 0x68, AF4x : 0x88, EF : 0xB8
+	
+	this.CopyFrom = function(c)
+	{
+		this.name = c.name;
+		this.category = c.category;
+		for (var j=0; j<6; j++)
+			this.mac_addr[j] = c.mac_addr[j];
+		this.saddr_type = c.saddr_type;
+		for (var j=0; j<5; j++)
+			this.saddr[j] = c.saddr[j];
+		this.daddr_type = c.daddr_type;
+		for (var j=0; j<5; j++)
+			this.daddr[j] = c.daddr[j];
+		for (var j=0; j<3; j++)
+		{
+			this.port_ranges[j].proto = c.port_ranges[j].proto;
+			this.port_ranges[j].port_start = c.port_ranges[j].port_start;
+			this.port_ranges[j].port_end = c.port_ranges[j].port_end;
+		}
+		this.ap_type = c.ap_type;
+		this.priority = c.priority;
+		this.remark_dscp = c.remark_dscp;
+	}
+}
+
+function QOS_PROFILE()
+{
+	this.bwm_prof_idx = 0;
+	this.rule_num = 0;
+	this.rule_pool = new Array();
+	this.AddRule = function()
+	{
+		this.rule_pool[this.rule_num] = new CLSFY_RULE();
+		this.rule_num++;
+		return this.rule_pool[this.rule_num-1];
+	}
+	this.DelRule = function(index)
+	{
+		for(var i=index;i<this.rule_num-1;i++)
+		{
+			this.rule_pool[i].name = this.rule_pool[i+1].name;
+			this.rule_pool[i].category = this.rule_pool[i+1].category;
+			for (var j=0; j<6; j++)
+				this.rule_pool[i].mac_addr[j] = this.rule_pool[i+1].mac_addr[j];
+			this.rule_pool[i].saddr_type = this.rule_pool[i+1].saddr_type;
+			for (var j=0; j<5; j++)
+				this.rule_pool[i].saddr[j] = this.rule_pool[i+1].saddr[j];
+			this.rule_pool[i].daddr_type = this.rule_pool[i+1].daddr_type;
+			for (var j=0; j<5; j++)
+				this.rule_pool[i].daddr[j] = this.rule_pool[i+1].daddr[j];
+			for (var j=0; j<3; j++)
+			{
+				this.rule_pool[i].port_ranges[j].proto = this.rule_pool[i+1].port_ranges[j].proto;
+				this.rule_pool[i].port_ranges[j].port_start = this.rule_pool[i+1].port_ranges[j].port_start;
+				this.rule_pool[i].port_ranges[j].port_end = this.rule_pool[i+1].port_ranges[j].port_end;
+			}
+			this.rule_pool[i].ap_type = this.rule_pool[i+1].ap_type;
+			this.rule_pool[i].priority = this.rule_pool[i+1].priority;
+			this.rule_pool[i].remark_dscp = this.rule_pool[i+1].remark_dscp;
+		}
+		delete this.rule_pool[this.rule_num-1];
+		this.rule_num--;
+	}
+	this.CheckDuplicate = function(r1, r2)
+	{
+		if(r1.category == r2.category)
+		{
+			switch(r1.category)
+			{
+				case "0": // app
+					if(r1.ap_type == r2.ap_type && r1.ap_type==0)
+					{
+						for(var i=0; i<3; i++)
+							for(var j=0;j<3;j++)
+								if(r1.port_ranges[i].IsDuplicated(r2.port_ranges[j]))
+								{
+									var name1 = r1.name;
+									var name2 = r2.name;
+									var p1 = r1.port_ranges[i].port_start + "-" + r1.port_ranges[i].port_end;
+									var p2 = r2.port_ranges[j].port_start + "-" + r2.port_ranges[j].port_end;
+									alert("<% Fid_str(1373); %>" + name1 + " (" + p1 + ")" + " <--> " + name2 + " (" + p2 + ")");
+									return -2;
+								}
+					}
+					else if(r1.ap_type == r2.ap_type)
+						return -1;
+					break;	
+				case "1": // mac
+					var m1 = r1.mac_addr[0] + ":" + r1.mac_addr[1] + ":" + r1.mac_addr[2] + ":" + r1.mac_addr[3] + ":" + r1.mac_addr[4] + ":" + r1.mac_addr[5];
+					var m2 = r2.mac_addr[0] + ":" + r2.mac_addr[1] + ":" + r2.mac_addr[2] + ":" + r2.mac_addr[3] + ":" + r2.mac_addr[4] + ":" + r2.mac_addr[5];
+					if(m1 == m2)
+						return -1;
+					break;
+				case "2": // ip
+					var isEqual=0;
+					
+					if(	r1.saddr_type==r2.saddr_type &&
+						r1.daddr_type==r2.daddr_type) {
+						for(var si=0; si<5; si++) {
+							if(r1.saddr[si]!=r2.saddr[si]) break;
+							if(r1.daddr[si]!=r2.daddr[si]) break; 
+						}
+						if(si<5) break;
+						else isEqual=1;
+					}
+					if (isEqual) {						
+						return -1;
+					}
+					
+					break;
+				case "3": // tcp/udp
+					for(var i=0; i<3; i++)
+						for(var j=0;j<3;j++)
+							if(r1.port_ranges[i].IsDuplicated(r2.port_ranges[j]))
+							{
+								var name1 = r1.name;
+								var name2 = r2.name;
+								var p1 = r1.port_ranges[i].port_start + "-" + r1.port_ranges[i].port_end;
+								var p2 = r2.port_ranges[j].port_start + "-" + r2.port_ranges[j].port_end;
+								alert("<% Fid_str(1373); %>" + name1 + " (" + p1 + ")" + " <--> " + name2 + " (" + p2 + ")");
+								return -2;
+							}
+					break;
+			}
+		}
+		return false;
+	}
+}
+
+var qos_profiles = new Array(3);
+for (i=0; i<3; i++)
+{
+	qos_profiles[i] = new QOS_PROFILE();
+}
+
+var qos_prof_idx;
+var online_games_num;
+var online_games_name;
+
+<% qos_profile_script(); %>
+
+function evaltF()
+{
+	var f = document.tF;
+	var f2 = document.tF2;
+	var profile = qos_profiles[f.profile.selectedIndex];
+	var bm = bwm_profiles[f.bw_mgt.selectedIndex]
+	
+	CreateInput(f2, "qos_enable", (f.qos_enable[0].checked)?1:0);
+	CreateInput(f2, "profile", parseInt(f.profile.value)-1);
+	CreateInput(f2, "bw_mgt", f.bw_mgt.value);
+	
+	//bandwidth management
+	var rate;
+	CreateInput(f2, "upstream", bm.upstream_bw);
+	CreateInput(f2, "downstream", bm.downstream_bw);
+	for(var i=0;i<4;i++)
+	{
+		CreateInput(f2, "minbw"+i, bm.fwb_pool[i].minbw);
+		CreateInput(f2, "borrow"+i, bm.fwb_pool[i].borrow);
+	}
+	
+	//classify rule
+	CreateInput(f2, "rule_num", profile.rule_num);
+	
+	for(var i=0;i<profile.rule_num;i++)
+	{
+		var r = profile.rule_pool[i];
+		
+		//name
+		CreateInput(f2, "name_"+i, r.name);
+		
+		//mac address
+		if(r.category == "1")
+		{
+			var mac = "";
+			mac = r.mac_addr[0];
+			for(var j=1;j<6;j++)
+				mac += "-" + r.mac_addr[j];
+			CreateInput(f2, "mac_"+i, mac);
+		}
+		
+		//ip address
+		if(r.category == "2")
+		{
+			var sip = "";
+			var dip = "";
+			
+//chack IP adderss validity
+			if(r.saddr_type!="0")
+			{
+				//if(isNValidIP(r.saddr[0]))
+				//{ alert(ipm); return false; }
+			//else
+				sip = r.saddr[0];
+			}
+			
+			if(r.daddr_type!="0") 
+			{
+				//if(isNValidIP(r.daddr[0]))
+				  //{ alert(ipm); return false; }
+			 //else
+				dip = r.daddr[0];
+			}
+			
+			for(var j=1;j<4;j++)
+			{
+			   if(r.saddr_type!="0")
+		 	   {
+				//if(isNValidIP(r.saddr[j]))
+			  	//{ alert(ipm); return false; }
+				//else
+					sip += "." + r.saddr[j];
+			   }
+
+			  if(r.daddr_type!="0") 
+			  {
+				//if(isNValidIP(r.daddr[j]))
+			  	//{ alert(ipm); return false; }
+				//else
+					dip += "." + r.daddr[j];	
+			  }		
+			}
+
+			CreateInput(f2, "saddr_type_"+i, r.saddr_type);
+			if(r.saddr_type!=0)
+			{
+			  CreateInput(f2, "saddr_"+i, sip);
+			  
+			  //if(isNValidIP(r.saddr[4]))
+			  	//{ alert(ipm); return false; }
+				//else
+				  CreateInput(f2, "saddr_end_"+i, r.saddr[4]);
+			}	
+			else
+			{
+			  CreateInput(f2, "saddr_"+i, "0.0.0.0");
+			 	CreateInput(f2, "saddr_end_"+i,"0");
+			}
+		
+			CreateInput(f2, "daddr_type_"+i, r.daddr_type);
+			if(r.daddr_type!=0)
+			{
+				CreateInput(f2, "daddr_"+i, dip);
+				//if(isNValidIP(r.daddr[4]))
+			  	//{ alert(ipm); return false; }
+				//else
+					CreateInput(f2, "daddr_end_"+i, r.daddr[4]);
+			}
+			else
+			{
+				CreateInput(f2, "daddr_"+i, "0.0.0.0");
+				CreateInput(f2, "daddr_end_"+i, "0");
+			}	
+		}
+		
+		//port range
+		if((r.category == "0" && r.ap_type == "0") || r.category == "3")
+		{
+			for(var j=0;j<3;j++)
+			{
+				CreateInput(f2, "pr_proto_"+i+j, r.port_ranges[j].proto);
+
+				CreateInput(f2, "pr_start_"+i+j, r.port_ranges[j].port_start);
+				CreateInput(f2, "pr_end_"+i+j, r.port_ranges[j].port_end);
+				/*
+				if(r.port_ranges[j].port_start!="" || r.port_ranges[j].port_end!="" )
+				{
+					if(isNValidPortAllowZero(r.port_ranges[j].port_start))
+					{ alert(errorPort); return false; }
+					else
+						CreateInput(f2, "pr_start_"+i+j, r.port_ranges[j].port_start);
+
+					if(isNValidPortAllowZero(r.port_ranges[j].port_end))
+					{ alert(errorPort); return false; }
+					else
+						CreateInput(f2, "pr_end_"+i+j, r.port_ranges[j].port_end);
+				}
+				else
+				{
+					CreateInput(f2, "pr_start_"+i+j, r.port_ranges[j].port_start);
+					CreateInput(f2, "pr_end_"+i+j, r.port_ranges[j].port_end);
+				}
+ 				*/
+			}
+		}
+		
+		//remark_dscp
+		if((r.category == "0" && r.ap_type == "0") || r.category == "2")
+			CreateInput(f2, "remark_dscp_"+i, r.remark_dscp);
+		
+		//ap_type
+		if(r.category == "0")
+			CreateInput(f2, "ap_type_"+i, r.ap_type);
+		
+		//priority
+		CreateInput(f2, "priority_"+i, r.priority);
+		
+		//category
+		CreateInput(f2, "category_"+i, r.category);
+		
+	}
+
+	f2.submit();
+	
+	return true;
+}
+
+function clear1() {
+	window.status="";
+}
+
+var StoR = new Array();
+StoR["128k"] = "128";
+StoR["256k"] = "256";
+StoR["384k"] = "384";
+StoR["512k"] = "512";
+StoR["768k"] = "768";
+StoR["1m"] = "1024";
+StoR["3m"] = "3072";
+StoR["10m"] = "10240";
+
+var RtoS = new Array();
+RtoS["128"] = "128k";
+RtoS["256"] = "256k";
+RtoS["384"] = "384k";
+RtoS["512"] = "512k";
+RtoS["768"] = "768k";
+RtoS["1024"] = "1m";
+RtoS["3072"] = "3m";
+RtoS["10240"] = "10m";
+
+function GetSelectIndexFromValue(s, v)
+{
+	for(var i=0;i<s.options.length;i++)
+	{
+		if(s.options[i].value == v)
+			return i;
+	}
+	return -1;
+}
+
+function SaveBM()
+{
+	var f = document.tF;
+	var profile = bwm_profiles[f.bw_mgt.selectedIndex];
+	var si;
+
+	if (f.upstream.value == "user_defined")
+	{
+		if ((f.upstream_user.value == "") || isNValidInt(f.upstream_user.value) || (eval(f.upstream_user.value)==0))
+		{
+			alert("<% Fid_str(1569); %>");
+			return false;
+		}
+	}
+	if (f.downstream.value == "user_defined")
+	{
+		if ((f.downstream_user.value == "") || isNValidInt(f.downstream_user.value) || (eval(f.downstream_user.value)==0))
+		{
+			alert("<% Fid_str(1570); %>");
+			return false;
+		}
+	}
+	if (isBlank(f.highest_value.value)||isBlank(f.high_value.value)||isBlank(f.medium_value.value)||isBlank(f.normal_value.value))
+	{
+		alert("<% Fid_str(1571); %>");
+		return false;
+	}
+	if (isNValidInt(f.highest_value.value)||isNValidInt(f.high_value.value)||isNValidInt(f.medium_value.value)||isNValidInt(f.normal_value.value))
+	{
+		alert("<% Fid_str(1572); %>");
+		return false;
+	}
+	if (parseInt(f.highest_value.value)<=0||parseInt(f.high_value.value)<=0||parseInt(f.medium_value.value)<=0||parseInt(f.normal_value.value)<=0)
+	{
+		alert("<% Fid_str(1572); %>");
+		return false;
+	}
+	if ((eval(f.highest_value.value)+eval(f.high_value.value)+eval(f.medium_value.value)+eval(f.normal_value.value))>100)
+	{
+		alert("<% Fid_str(1573); %>");
+		return false;
+	}
+		
+	HideBMPanel();
+	si = (StoR[f.upstream.value])?StoR[f.upstream.value]:-1;
+	profile.upstream_bw = (si==-1)?f.upstream_user.value:si;
+	si = (StoR[f.downstream.value])?StoR[f.downstream.value]:-1;
+	profile.downstream_bw = (si==-1)?f.downstream_user.value:si;
+	profile.fwb_pool[3].minbw = f.highest_value.value;
+	profile.fwb_pool[3].borrow = (f.highest_allow.checked)?1:0;
+	profile.fwb_pool[2].minbw = f.high_value.value;
+	profile.fwb_pool[2].borrow = (f.high_allow.checked)?1:0;
+	profile.fwb_pool[1].minbw = f.medium_value.value;
+	profile.fwb_pool[1].borrow = (f.medium_allow.checked)?1:0;
+	profile.fwb_pool[0].minbw = f.normal_value.value;
+	profile.fwb_pool[0].borrow = (f.normal_allow.checked)?1:0;
+}
+
+function LoadBM()
+{
+	var f = document.tF;
+	var profile = bwm_profiles[f.bw_mgt.selectedIndex];
+	var si;
+	si = GetSelectIndexFromValue(f.upstream, RtoS[profile.upstream_bw+""]);
+	f.upstream.selectedIndex = (si==-1)?f.upstream.options.length-1:si;
+	f.upstream_user.value = profile.upstream_bw;
+	si = GetSelectIndexFromValue(f.downstream, RtoS[profile.downstream_bw+""]);
+	f.downstream.selectedIndex = (si==-1)?f.downstream.options.length-1:si;
+	f.downstream_user.value = profile.downstream_bw;
+	f.highest_value.value = profile.fwb_pool[3].minbw;
+	f.highest_allow.checked = (profile.fwb_pool[3].borrow==1)?true:false;
+	f.high_value.value = profile.fwb_pool[2].minbw;
+	f.high_allow.checked = (profile.fwb_pool[2].borrow==1)?true:false;
+	f.medium_value.value = profile.fwb_pool[1].minbw;
+	f.medium_allow.checked = (profile.fwb_pool[1].borrow==1)?true:false;
+	f.normal_value.value = profile.fwb_pool[0].minbw;
+	f.normal_allow.checked = (profile.fwb_pool[0].borrow==1)?true:false;
+}
+
+function ShowBMPanel()
+{
+	LoadBM();
+	ShowUpstreamInfo(false);
+	ShowDownstreamInfo();
+	ShowE("profile", "none"); // for IE display overlap issue
+	ShowE("bw_mgt", "none"); // for IE display overlap issue
+	document.getElementById("popup_base").style.visibility = "visible";
+	ShowE("bm_panel", "block");
+}
+
+function HideBMPanel()
+{
+	ShowE("profile", ""); // for IE display overlap issue
+	ShowE("bw_mgt", ""); // for IE display overlap issue
+	document.getElementById("popup_base").style.visibility = "hidden";
+	ShowE("bm_panel", "none");
+}
+
+function ChangeCategory()
+{
+	document.tF.rule_pri.disabled = false;
+
+	HideAllRulePanel();
+
+	switch(document.tF.rule_type.value)
+	{
+		case "0":
+			document.tF.rule_pri.selectedIndex = 0;
+			break;
+		case "1": case "2": case "3":
+			document.tF.rule_pri.selectedIndex = 1;
+			break;
+		default:
+			document.tF.rule_pri.selectedIndex = 2;
+	}
+	
+	switch(document.tF.rule_type.value)
+	{
+		case "0":
+			ShowE("rule_apps", "block");
+			ShowApplicationPanel();
+			break;
+		case "1":
+			ShowE("rule_name", "block");
+			ShowE("rule_mac", "block");
+			break;
+		case "2":
+			ShowE("rule_name", "block");
+			ShowE("rule_ip_range", "block");
+			ShowE("rule_remark", "block");
+			ShowIPRangeLocalPanel();
+			ShowIPRangeRemotePanel();
+			break;
+		case "3":
+			ShowE("rule_name", "block");
+			ShowE("rule_port_range", "block");
+			break;
+	}
+}
+
+function ShowRuleInput()
+{
+	document.tF.rule_pri.disabled = false;
+
+	HideAllRulePanel();
+
+	switch(document.tF.rule_type.value)
+	{
+		case "0":
+			ShowE("rule_apps", "block");
+			if (document.tF.rule_app.selectedIndex == 0)
+			{
+				ShowE("rule_name", "block");
+				ShowE("rule_port_range", "block");
+				ShowE("rule_remark", "block");
+			}
+			break;
+		case "1":
+			ShowE("rule_name", "block");
+			ShowE("rule_mac", "block");
+			break;
+		case "2":
+			ShowE("rule_name", "block");
+			ShowE("rule_ip_range", "block");
+			ShowIPRangeLocalPanel();
+			ShowIPRangeRemotePanel();
+			ShowE("rule_remark", "block");
+			break;
+		case "3":
+			ShowE("rule_name", "block");
+			ShowE("rule_port_range", "block");
+			break;
+	}
+}
+
+function HideAllRulePanel()
+{
+	ShowE("rule_apps", "none");
+	ShowE("rule_games", "none");
+	ShowE("rule_name", "none");
+	ShowE("rule_mac", "none");
+	ShowE("rule_ip_range", "none");
+	ShowE("rule_port_range", "none");
+	ShowE("rule_remark", "none");
+}
+
+function GetPageHeight() {
+		var xScroll, yScroll;
+		if (window.innerHeight && window.scrollMaxY) {	
+			xScroll = document.body.scrollWidth;
+			yScroll = window.innerHeight + window.scrollMaxY;
+		} else if (document.body.scrollHeight > document.body.offsetHeight){ 
+			xScroll = document.body.scrollWidth;
+			yScroll = document.body.scrollHeight;
+		} else { 
+			xScroll = document.body.offsetWidth;
+			yScroll = document.body.offsetHeight;
+		}
+
+		var windowWidth, windowHeight;
+		if (self.innerHeight) {	
+			windowWidth = self.innerWidth;
+			windowHeight = self.innerHeight;
+		} else if (document.documentElement && document.documentElement.clientHeight) { 
+			windowWidth = document.documentElement.clientWidth;
+			windowHeight = document.documentElement.clientHeight;
+		} else if (document.body) { 
+			windowWidth = document.body.clientWidth;
+			windowHeight = document.body.clientHeight;
+		}	
+
+		if(yScroll < windowHeight){
+			//this.pageDimensions.height = windowHeight;
+			return windowHeight;
+		} else { 
+			//this.pageDimensions.height = yScroll;
+			return yScroll;
+		}
+
+		/*
+		if(xScroll < windowWidth){	
+			this.pageDimensions.width = windowWidth;
+		} else {
+			this.pageDimensions.width = xScroll;
+		}*/
+}
+
+function RefreshRuleTable(tb_id)
+{
+	var AddRow = function(t, name, prio, info, index, show_action)
+	{
+		var r = t.insertRow(-1);
+		var c = r.insertCell(-1);
+		c.innerHTML = name;
+		c = r.insertCell(-1);
+		c.innerHTML = prio;
+		c = r.insertCell(-1);
+		c.innerHTML = info;
+		c = r.insertCell(-1);
+		if (show_action != 0)
+		{
+			c.innerHTML = "<input type='button' class='submitBtn' value='<% Fid_str(1574); %>' onclick='ShowRule(" + index + ")'>" + 
+						  "<input type='button' class='submitBtn' value='<% Fid_str(114); %>' onclick='DelRule(" + index + ")'>";
+		}
+	};
+	
+	var f = document.tF;
+	var profile = qos_profiles[parseInt(f.profile.value)-1];
+	var t = document.getElementById(tb_id);
+
+	for(var i=t.rows.length-1;i>3;i--)
+		t.deleteRow(i);
+
+	for(var i=0;i<profile.rule_num;i++)
+	{
+		var r = profile.rule_pool[i];
+		var info = "";
+		var pri = "";
+		var pri_str = "";
+		
+		//mac address
+		if(r.category == "1")
+		{
+			var mac_str;
+			mac_str = r.mac_addr[0];
+			for(var j=1;j<6;j++)
+				mac_str = mac_str + "-" + r.mac_addr[j];
+			info = "<div><% Fid_str(14); %>: " + mac_str + "</div>";
+		}
+		
+		//ip address
+		if(r.category == "2")
+		{
+			var ip_str = "";
+			switch(r.saddr_type)
+			{
+				case "0":
+					ip_str = "ANY";
+					break;
+				case "1":
+					ip_str = r.saddr[0];
+					for(var j=1;j<4;j++)
+						ip_str = ip_str + "." + r.saddr[j];
+					break;
+				case "2":
+					ip_str = r.saddr[0];
+					for(var j=1;j<4;j++)
+						ip_str = ip_str + "." + r.saddr[j];
+					ip_str = ip_str + " ~ " + r.saddr[4];
+					break;
+			}
+			info = info + "<div><% Fid_str(1520); %>: " + ip_str + "</div>";
+			ip_str = "";
+			switch(r.daddr_type)
+			{
+				case "0":
+					ip_str = "ANY";
+					break;
+				case "1":
+					ip_str = r.daddr[0];
+					for(var j=1;j<4;j++)
+						ip_str = ip_str + "." + r.daddr[j];
+					break;
+				case "2":
+					ip_str = r.daddr[0];
+					for(var j=1;j<4;j++)
+						ip_str = ip_str + "." + r.daddr[j];
+					ip_str = ip_str + " ~ " + r.daddr[4];
+					break;
+			}
+			info = info + "<div><% Fid_str(1525); %>: " + ip_str + "</div>";
+		}
+		
+		//port range
+		if((r.category == "0" && r.ap_type == "0") || r.category == "3")
+		{
+			for(var j=0;j<3;j++)
+			{
+				var p = r.port_ranges[j];
+				var proto_str;
+				switch(p.proto)
+				{
+					case "6":  proto_str = "TCP";break;
+					case "17": proto_str = "UDP";break;
+					case "99": proto_str = "<% Fid_str(72); %>";break;
+				}
+				if(p.port_start != 0 && p.port_end != "")
+					info = info + "<div>" + proto_str + ": " + p.port_start + " - " + p.port_end + "</div>";
+			}
+		}
+		
+		//remark_dscp
+		if((r.category == "0" && r.ap_type == "0") || r.category == "2")
+		{
+			var remark_str;
+			switch(r.remark_dscp)
+			{
+				case "01": remark_str = "<% Fid_str(1534); %>";break;
+				case "BE": remark_str = "BE";break;
+				case "AF11": remark_str = "AF1x";break;
+				case "AF21": remark_str = "AF2x";break;
+				case "AF31": remark_str = "AF3x";break;
+				case "AF41": remark_str = "AF4x";break;
+				case "EF": remark_str = "EF";break;
+			}
+			info = info + "<div><% Fid_str(1533); %>: " + remark_str + "</div>";
+		}
+		
+		//priority
+		switch(r.priority)
+		{
+			case "10": pri_str = "<% Fid_str(1562); %>";break;
+			case "20": pri_str = "<% Fid_str(1561); %>";break;
+			case "30": pri_str = "<% Fid_str(1568); %>";break;
+			case "40": pri_str = "<% Fid_str(1629); %>";break;
+		}
+
+		AddRow(t, r.name, pri_str, info, i, 1);
+	}
+	
+	AddRow(t, "<% Fid_str(1575); %>", "<% Fid_str(1629); %>", "<% Fid_str(1576); %>", i, 0);
+}
+
+var save_rule_idx = -1;
+
+function SaveRuleFromInput()
+{
+	var f = document.tF;
+	var category = f.rule_type.value;
+	var ap_type = f.rule_app.value;
+	var profile = qos_profiles[parseInt(f.profile.value)-1];
+	var r = new CLSFY_RULE();
+	var lanIP="<% nvram_get("lan_ipaddr"); %>";
+	var wanIP="<% nvram_get("wan0_ipaddr"); %>";
+	wanIP=wanIP.replace(" ",'');	//when IP get by dynamic, it will has a space charcter behind wan ip. Romove it here if it exist.
+	var lan_ip = new Array();
+	var wan_ip = new Array();
+	var localip,remoteip;
+	lan_ip=lanIP.split(".");
+	wan_ip=wanIP.split(".");
+
+	//name
+	if(category == 0 && ap_type != 0)
+		r.name = f.rule_app.options[f.rule_app.selectedIndex].innerHTML;
+	else
+		r.name = f.rule_name.value;
+	
+	//mac address
+	if(category == 1)
+	{
+		var macaddresserror = "<% Fid_str(902); %>";
+		var rc= "<% Fid_str(903); %>";
+		var macUsed = f["rule_mac0"].value + ":" + 
+						  f["rule_mac1"].value + ":" +
+						  f["rule_mac2"].value + ":" +
+						  f["rule_mac3"].value + ":" +
+						  f["rule_mac4"].value + ":" +
+						  f["rule_mac5"].value;
+		if ( isValidMacAddress( macUsed ) == false ) {
+			alert( macaddresserror+":"+macUsed+"."+rc);
+			return null;
+		}
+		
+		for(var i=0;i<6;i++)
+			r.mac_addr[i] = f["rule_mac"+i].value;
+	}
+	
+	//ip address
+	if(category == 2)
+	{
+		r.saddr_type = f.ip_range_local_type.value;
+		r.daddr_type = f.ip_range_remote_type.value;
+		if(r.saddr_type == 1)
+		{
+			for(var i=0;i<4;i++)
+			{
+				if(isNValidIP(f["ip_local_"+(i+1)].value))
+			  	{ alert(ipm); return null; }
+				else
+				r.saddr[i] = f["ip_local_"+(i+1)].value;
+			}
+			r.saddr[4] = r.saddr[3];
+			localip=r.saddr[0]+"."+r.saddr[1]+"."+r.saddr[2]+"."+r.saddr[3];
+			if((localip == lanIP)||(localip == wanIP))
+			{ alert(errorIP); return null; }
+			if(isNValidFirstIP(r.saddr[0]))
+			{ alert(ipmUcast); return null; }
+		}
+		else if(r.saddr_type == 2)
+		{
+			for(var i=0;i<4;i++)
+			{
+				if(isNValidIP(f["ip_range_local_"+(i+1)].value))
+			  	{ alert(ipm); return null; }
+				else
+				r.saddr[i] = f["ip_range_local_"+(i+1)].value;
+			}
+			if(isNValidIP(f["ip_range_local_5"].value))
+			  	{ alert(ipm); return null; }
+			else if(f["ip_range_local_4"].value - f["ip_range_local_5"].value > 0)
+				{ alert(ipm); return null; }
+			else
+					r.saddr[4] = f["ip_range_local_5"].value;
+			
+			if((r.saddr[0]==lan_ip[0]) && (r.saddr[1]==lan_ip[1]) && (r.saddr[2]==lan_ip[2]))
+				{
+					if ((lan_ip[3]-r.saddr[3] > 0) && (lan_ip[3]-r.saddr[4] < 0))
+					{ alert(errorIP); return null; }
+				}
+			if((r.saddr[0]==wan_ip[0]) && (r.saddr[1]==wan_ip[1]) && (r.saddr[2]==wan_ip[2]))
+				{
+					if ((wan_ip[3]-r.saddr[3] > 0) && (wan_ip[3]-r.saddr[4] < 0))
+					{ alert(errorIP); return null; }
+				}
+			if(isNValidFirstIP(r.saddr[0]))
+				{ alert(ipmUcast); return null; }
+		}
+		
+		if(r.daddr_type == 1)
+		{
+			for(var i=0;i<4;i++)
+			{
+				if(isNValidIP( f["ip_remote_"+(i+1)].value))
+			  	{ alert(ipm); return null; }
+				else
+				r.daddr[i] = f["ip_remote_"+(i+1)].value;
+			}
+			r.daddr[4] = r.daddr[3];
+			remoteip=r.daddr[0]+"."+r.daddr[1]+"."+r.daddr[2]+"."+r.daddr[3];
+			if((remoteip == lanIP)||(remoteip == wanIP))
+			{ alert(errorIP); return null; }
+			if(isNValidFirstIP(r.daddr[0]))
+			{ alert(ipmUcast); return null; }
+		}
+		else if(r.daddr_type == 2)
+		{
+			for(var i=0;i<4;i++)
+			{
+				if(isNValidIP( f["ip_range_remote_"+(i+1)].value))
+			  	{ alert(ipm); return null; }
+				else				
+					r.daddr[i] = f["ip_range_remote_"+(i+1)].value;
+			}
+		 	if(isNValidIP( f["ip_range_remote_5"].value))
+			  	{ alert(ipm); return null; }
+			else if(f["ip_range_remote_4"].value - f["ip_range_remote_5"].value > 0)
+				{ alert(ipm); return null; }
+			else		
+					r.daddr[4] = f["ip_range_remote_5"].value;
+					
+			if((r.daddr[0]==lan_ip[0]) && (r.daddr[1]==lan_ip[1]) && (r.daddr[2]==lan_ip[2]))
+				{
+					if ((lan_ip[3]-r.daddr[3] > 0) && (lan_ip[3]-r.daddr[4] < 0))
+					{ alert(errorIP); return null; }
+				}
+			if((r.daddr[0]==wan_ip[0]) && (r.daddr[1]==wan_ip[1]) && (r.daddr[2]==wan_ip[2]))
+				{
+					if ((wan_ip[3]-r.daddr[3] > 0) && (wan_ip[3]-r.daddr[4] < 0))
+					{ alert(errorIP); return null; }
+				}
+			if(isNValidFirstIP(r.daddr[0]))
+				{ alert(ipmUcast); return null; }
+		}
+	}
+	
+	//port range
+	if((category == 0 && ap_type == 0) || category ==3)
+	{
+		for(var i=0;i<3;i++)
+		{
+			r.port_ranges[i].proto = f["protocol"+(i+1)].value;
+
+			if(f["pr_from"+(i+1)].value!="" || f["pr_to"+(i+1)].value!="" )
+			{
+
+				if(isNValidPortAllowZero(f["pr_from"+(i+1)].value))
+				{ alert(errorPort); return null; }
+				//else
+					//r.port_ranges[i].port_start = f["pr_from"+(i+1)].value;
+
+				if(isNValidPortAllowZero(f["pr_to"+(i+1)].value))
+				{ alert(errorPort); return null; }
+				//else
+					//r.port_ranges[i].port_end = f["pr_to"+(i+1)].value;
+				
+				if((f["pr_from"+(i+1)].value - f["pr_to"+(i+1)].value) > 0)
+				{ alert(errorPort); return null; }
+				
+				//no error
+				r.port_ranges[i].port_start = f["pr_from"+(i+1)].value;
+				r.port_ranges[i].port_end = f["pr_to"+(i+1)].value;
+			}
+			else
+			{
+				r.port_ranges[i].port_start = f["pr_from"+(i+1)].value;
+				r.port_ranges[i].port_end =  f["pr_to"+(i+1)].value;
+			}
+		}
+		for(var i=0;i<3;i++)
+			for(var j=0;j<3;j++)
+				if(i != j && r.port_ranges[i].IsDuplicated(r.port_ranges[j]))
+				{
+					var name1 = r.name;
+					var name2 = r.name;
+					var p1 = r.port_ranges[i].port_start + "-" + r.port_ranges[i].port_end;
+					var p2 = r.port_ranges[j].port_start + "-" + r.port_ranges[j].port_end;
+					alert("<% Fid_str(1373); %>" + name1 + " (" + p1 + ")" + " <--> " + name2 + " (" + p2 + ")");
+					return null;
+				}
+	}
+	
+	//remark_dscp
+	if((category == "0" && ap_type == 0) || category == "2")
+		r.remark_dscp = f.rule_remark.value;
+	
+	//ap_type
+	if(category == 0)
+		r.ap_type = ap_type;
+	
+	//priority
+	r.priority = f.rule_pri.value;
+	
+	//category
+	r.category = category;
+	
+	return r;
+}
+
+function SaveRule()
+{
+	var f = document.tF;
+	var category = f.rule_type.value;
+	var ap_type = f.rule_app.value;
+	var profile = qos_profiles[parseInt(f.profile.value)-1];
+	var r;
+	var r2;
+
+	r = SaveRuleFromInput();
+	
+	if(r == null) return false;
+
+	for(var i=0;i<profile.rule_num;i++)
+	{
+		if(i == save_rule_idx) continue;
+		
+		var rule2 = profile.rule_pool[i];
+		var ret = profile.CheckDuplicate(r, rule2);
+		if(ret == -1)
+		{
+			alert("Rule existed!");
+			return
+		}
+		else if(ret == -2)
+		{
+			return;
+		}
+	}
+
+	if (save_rule_idx == -1)
+		r2 = profile.AddRule();
+	else
+		r2 = profile.rule_pool[save_rule_idx];
+	
+	r2.CopyFrom(r);
+	
+	RefreshRuleTable("rule_table");
+	ShowE("rule_panel", "none");
+	document.getElementById("popup_base").style.visibility = "hidden";
+}
+
+function DelRule(index)
+{
+	var f = document.tF;
+	var profile = qos_profiles[parseInt(f.profile.value)-1];
+	profile.DelRule(index);
+	RefreshRuleTable("rule_table");
+}
+
+function ShowApplicationPanel()
+{
+	if(document.tF.rule_type.value == "0")
+	{
+		switch(document.tF.rule_app.value)
+		{
+			case "17":
+				document.tF.rule_pri.selectedIndex = 0;
+				break;
+			case "0": case "4": case "13": case "11": case "12": default:
+				document.tF.rule_pri.selectedIndex = 1;
+				break;
+			case "2": case "7": case "8":
+				document.tF.rule_pri.selectedIndex = 2;
+				break;
+			case "14": case "10":
+				document.tF.rule_pri.selectedIndex = 3;
+				break;
+		}
+	}
+	
+	if(document.tF.rule_type.selectedIndex == 0 && document.tF.rule_app.selectedIndex == 0)
+	{
+		//document.getElementById("rule_port_range").style.display = "block";
+		//document.getElementById("rule_name").style.display = "block";
+		ShowE("rule_port_range", "block");
+		ShowE("rule_name", "block");
+		ShowE("rule_remark", "block");
+	}
+	/*
+	else if(document.tF.rule_type.selectedIndex == 0 && document.tF.rule_app.selectedIndex == 1)
+	{
+		//document.getElementById("rule_port_range").style.display = "block";
+		//document.getElementById("rule_name").style.display = "block";
+		//ShowE("rule_games", "block");
+	}*/
+	else
+	{
+		//document.getElementById("rule_port_range").style.display = "none";
+		//document.getElementById("rule_name").style.display = "none";
+		ShowE("rule_port_range", "none");
+		ShowE("rule_name", "none");
+		ShowE("rule_remark", "none");
+	}
+}
+
+function ShowAdvBWM()
+{
+	if(document.tF.bw_mgt.selectedIndex == 0)
+	{
+		//document.getElementById("bm_edit").style.display = "none";
+		ShowE("bm_edit", "none");
+	}
+	else
+	{
+		//document.getElementById("bm_edit").style.display = "";
+		ShowE("bm_edit", "");
+	}
+}
+
+function ChangeBWM()
+{
+	qos_profiles[document.tF.profile.selectedIndex].bwm_prof_idx = document.tF.bw_mgt.selectedIndex;
+	ShowAdvBWM();
+}
+
+function EnabledBWM()
+{
+	if(document.tF.profile.selectedIndex == 0)
+	{
+		document.tF.bw_mgt.selectedIndex = 0;
+		document.tF.bw_mgt.disabled = true;
+		document.tF.add_rule_btn.style.display = "none";
+	}
+	else
+	{
+		document.tF.bw_mgt.selectedIndex = qos_profiles[document.tF.profile.selectedIndex].bwm_prof_idx;
+		document.tF.bw_mgt.disabled = false;
+		document.tF.add_rule_btn.style.display = "";
+	}
+	ShowAdvBWM();
+	RefreshRuleTable("rule_table");
+}
+
+function EnableQoS()
+{
+	if(document.tF.qos_enable[1].checked == true)
+	{
+		//document.getElementById("qos_panel").style.display = "none";
+		ShowE("qos_panel", "none");
+	}
+	else
+	{
+		//document.getElementById("qos_panel").style.display = "block";
+		ShowE("qos_panel", "block");
+	}
+	EnabledBWM();
+}
+
+function Init()
+{
+	EnableQoS();
+	ShowRuleInput();
+	//EnabledBWM();
+	//ShowAdvBWM();
+	clear1();
+}
+
+function ShowIPRangeLocalPanel()
+{
+	if(document.tF.ip_range_local_type.selectedIndex == 0)
+	{
+		ShowE("ip_range_local_panel1", "");
+		ShowE("ip_range_local_panel2", "none");
+	}
+	else if(document.tF.ip_range_local_type.selectedIndex == 1)
+	{
+		ShowE("ip_range_local_panel2", "");
+		ShowE("ip_range_local_panel1", "none");
+	}
+	else
+	{
+		ShowE("ip_range_local_panel1", "none");
+		ShowE("ip_range_local_panel2", "none");
+	}
+}
+
+function ShowIPRangeRemotePanel()
+{
+	if(document.tF.ip_range_remote_type.selectedIndex == 0)
+	{
+		ShowE("ip_range_remote_panel1", "");
+		ShowE("ip_range_remote_panel2", "none");
+	}
+	else if(document.tF.ip_range_remote_type.selectedIndex == 1)
+	{
+		ShowE("ip_range_remote_panel2", "");
+		ShowE("ip_range_remote_panel1", "none");
+	}
+	else
+	{
+		ShowE("ip_range_remote_panel1", "none");
+		ShowE("ip_range_remote_panel2", "none");
+	}
+}
+
+function ShowRule(idx)
+{
+	//document.getElementById("rule_panel").style.display = "block";
+	var f = document.tF;
+	var profile = qos_profiles[parseInt(f.profile.value)-1];
+	var i, rule;
+
+	save_rule_idx = idx;
+
+	// reset to default first	
+	{
+		document.tF.rule_type.selectedIndex = 0;
+		document.tF.rule_app.selectedIndex = 0;
+		document.tF.rule_name.value = "";
+
+		for (i=1; i<=3; i++)
+		{
+			document.tF["pr_from"+i].value = "";
+			document.tF["pr_to"+i].value = "";
+			document.tF["protocol"+i].selectedIndex = 2;
+		}
+
+		document.tF.ip_range_local_type.selectedIndex = 2;
+		for (i=1; i<=4; i++)
+			document.tF["ip_local_"+i].value = "";
+		for (i=1; i<=5; i++)
+			document.tF["ip_range_local_"+i].value = "";
+
+		document.tF.ip_range_remote_type.selectedIndex = 2;
+		for (i=1; i<=4; i++)
+			document.tF["ip_remote_"+i].value = "";
+		for (i=1; i<=5; i++)
+			document.tF["ip_range_remote_"+i].value = "";
+
+		for (i=0; i<=5; i++)
+			document.tF["rule_mac"+i].value = "";
+
+		document.tF.rule_pri.selectedIndex = 1; /* High */
+		document.tF.rule_remark.selectedIndex = 0; /* Don't Remark */
+	}
+
+	if ((idx != -1) && (idx >= profile.rule_num))
+	{
+		idx = -1;
+	}
+
+	if (idx != -1)
+	{
+		rule = profile.rule_pool[idx];
+	
+		document.tF.rule_type.selectedIndex = rule.category;
+		document.tF.rule_name.value = rule.name;
+
+		if (rule.category == "0")
+		{
+			if (rule.ap_type == "0")
+				document.tF.rule_app.selectedIndex = 0;
+			else if (rule.ap_type == "4")
+				document.tF.rule_app.selectedIndex = 1;
+			else if (rule.ap_type == "13")
+				document.tF.rule_app.selectedIndex = 2;
+			else if (rule.ap_type == "17")
+				document.tF.rule_app.selectedIndex = 3;
+			else if (rule.ap_type == "2")
+				document.tF.rule_app.selectedIndex = 4;
+			else if (rule.ap_type == "14")
+				document.tF.rule_app.selectedIndex = 5;
+			else if (rule.ap_type == "7")
+				document.tF.rule_app.selectedIndex = 6;
+			else if (rule.ap_type == "8")
+				document.tF.rule_app.selectedIndex = 7;
+			else if (rule.ap_type == "10")
+				document.tF.rule_app.selectedIndex = 8;
+			else if (rule.ap_type == "11")
+				document.tF.rule_app.selectedIndex = 9;
+			else if (rule.ap_type == "12")
+				document.tF.rule_app.selectedIndex = 10;
+			else
+				document.tF.rule_app.selectedIndex = 0;
+		}
+
+		for (i=1; i<=3; i++)
+		{
+			if(rule.port_ranges[i-1].port_start != "0")
+				document.tF["pr_from"+i].value = rule.port_ranges[i-1].port_start;
+			else
+				document.tF["pr_from"+i].value = "";
+			if(rule.port_ranges[i-1].port_end != "0")
+				document.tF["pr_to"+i].value = rule.port_ranges[i-1].port_end;
+			else
+				document.tF["pr_to"+i].value = "";
+			if (rule.port_ranges[i-1].proto=="6")
+				document.tF["protocol"+i].selectedIndex = 0;
+			else if (rule.port_ranges[i-1].proto=="17")
+				document.tF["protocol"+i].selectedIndex = 1;
+			else
+				document.tF["protocol"+i].selectedIndex = 2;
+		}
+
+		if ((rule.saddr[0]==0)&&(rule.saddr[1]==0)&&(rule.saddr[2]==0)&&(rule.saddr[3]==0)&&(rule.saddr[4]==0))
+			document.tF.ip_range_local_type.selectedIndex = 2;
+		else if (rule.saddr[3] == rule.saddr[4])
+			document.tF.ip_range_local_type.selectedIndex = 0;
+		else
+			document.tF.ip_range_local_type.selectedIndex = 1;
+		for (i=1; i<=4; i++)
+			document.tF["ip_local_"+i].value = rule.saddr[i-1];
+		for (i=1; i<=5; i++)
+			document.tF["ip_range_local_"+i].value = rule.saddr[i-1];
+
+		if ((rule.daddr[0]==0)&&(rule.daddr[1]==0)&&(rule.daddr[2]==0)&&(rule.daddr[3]==0)&&(rule.daddr[4]==0))
+			document.tF.ip_range_remote_type.selectedIndex = 2;
+		else if (rule.daddr[3] == rule.daddr[4])
+			document.tF.ip_range_remote_type.selectedIndex = 0;
+		else
+			document.tF.ip_range_remote_type.selectedIndex = 1;
+		for (i=1; i<=4; i++)
+			document.tF["ip_remote_"+i].value = rule.daddr[i-1];
+		for (i=1; i<=5; i++)
+			document.tF["ip_range_remote_"+i].value = rule.daddr[i-1];
+
+		for (i=0; i<=5; i++)
+			document.tF["rule_mac"+i].value = rule.mac_addr[i];
+
+		if (rule.priority == "10")
+			document.tF.rule_pri.selectedIndex = 0;
+		else if (rule.priority == "20")
+			document.tF.rule_pri.selectedIndex = 1;
+		else if (rule.priority == "30")
+			document.tF.rule_pri.selectedIndex = 2;
+		else
+			document.tF.rule_pri.selectedIndex = 3;
+
+		if (rule.remark_dscp == "EF")
+			document.tF.rule_remark.selectedIndex = 6; 
+		else if (rule.remark_dscp == "AF41")
+			document.tF.rule_remark.selectedIndex = 5; 
+		else if (rule.remark_dscp == "AF31")
+			document.tF.rule_remark.selectedIndex = 4; 
+		else if (rule.remark_dscp == "AF21")
+			document.tF.rule_remark.selectedIndex = 3; 
+		else if (rule.remark_dscp == "AF11")
+			document.tF.rule_remark.selectedIndex = 2; 
+		else if (rule.remark_dscp == "BE")
+			document.tF.rule_remark.selectedIndex = 1; 
+		else
+			document.tF.rule_remark.selectedIndex = 0; 
+	}
+
+	ShowRuleInput();
+	
+	document.getElementById("popup_base").style.visibility = "visible";
+	ShowE("rule_panel", "block");
+}
+
+function HideRulePanel()
+{
+	//document.getElementById("rule_panel").style.display = "none";
+	document.getElementById("popup_base").style.visibility = "hidden";
+	ShowE("rule_panel", "none");
+}
+
+function GTBandwidth(highest, high, medium, normal)
+{
+	this.highest = highest;
+	this.high = high;
+	this.medium = medium;
+	this.normal = normal;
+}
+
+var gt_bandwidth = new Array();
+gt_bandwidth["128k"] = new GTBandwidth(80, 10, 5, 5);
+gt_bandwidth["256k"] = new GTBandwidth(40, 35, 20, 5);
+gt_bandwidth["384k"] = new GTBandwidth(35, 35, 25, 5);
+gt_bandwidth["512k"] = new GTBandwidth(30, 30, 30, 10);
+gt_bandwidth["768k"] = new GTBandwidth(30, 30, 30, 10);
+gt_bandwidth["1m"]   = new GTBandwidth(30, 30, 30, 10);
+gt_bandwidth["3m"]   = new GTBandwidth(30, 30, 30, 10);
+gt_bandwidth["10m"]   = new GTBandwidth(30, 30, 30, 10);
+
+
+function ShowUpstreamInfo(update_priority)
+{
+	if(document.tF.upstream.selectedIndex == document.tF.upstream.options.length-1)
+	{
+		ShowE("user_defined_upstream_panel", "");
+		if(update_priority)
+		{
+			document.tF.highest_value.value = "";
+			document.tF.high_value.value = "";
+			document.tF.medium_value.value = "";
+			document.tF.normal_value.value = "";
+		}
+	}
+	else
+	{
+		ShowE("user_defined_upstream_panel", "none");
+		var v = document.tF.upstream.value;
+		if(update_priority)
+		{
+			document.tF.highest_value.value = gt_bandwidth[v].highest;
+			document.tF.high_value.value = gt_bandwidth[v].high;
+			document.tF.medium_value.value = gt_bandwidth[v].medium;
+			document.tF.normal_value.value = gt_bandwidth[v].normal;
+		}
+	}
+}
+
+function ShowDownstreamInfo()
+{
+	if(document.tF.downstream.selectedIndex == document.tF.downstream.options.length-1)
+	{
+		ShowE("user_defined_downstream_panel", "");
+		/*
+		document.tF.highest_value.value = "";
+		document.tF.high_value.value = "";
+		document.tF.medium_value.value = "";
+		document.tF.normal_value.value = "";
+		*/
+	}
+	else
+	{
+		ShowE("user_defined_downstream_panel", "none");
+		/*
+		var v = document.tF.upstream.value;
+		document.tF.highest_value.value = gt_bandwidth[v].highest;
+		document.tF.high_value.value = gt_bandwidth[v].high;
+		document.tF.medium_value.value = gt_bandwidth[v].medium;
+		document.tF.normal_value.value = gt_bandwidth[v].normal;
+		*/
+	}
+}
+
+function ShowOnlineGamePanel()
+{
+	ShowE("profile", "none"); // for IE display overlap issue
+	ShowE("bw_mgt", "none"); // for IE display overlap issue
+	document.getElementById("popup_base").style.visibility = "visible";
+	ShowE("onlinegame_panel", "block");
+}
+
+function HideOnlineGamePanel()
+{
+	ShowE("profile", ""); // for IE display overlap issue
+	ShowE("bw_mgt", ""); // for IE display overlap issue
+	document.getElementById("popup_base").style.visibility = "hidden";
+	ShowE("onlinegame_panel", "none");
+}
+
+function isValidMacAddress(address) {
+	var c = '';
+	var i = 0, j = 0;
+
+	if ( address.toLowerCase() == 'ff:ff:ff:ff:ff:ff' ) return false;
+	if(address.toLowerCase() == '00:00:00:00:00:00' || address.toLowerCase() == '0:0:0:0:0:0' ) return false;
+
+	addrParts = address.split(':');
+	if ( addrParts.length != 6 ) return false;
+
+	for (i = 0; i < 6; i++) {
+		if(addrParts[i].length != 2) return false;
+		for ( j = 0; j < addrParts[i].length; j++ ) {
+			c = addrParts[i].toLowerCase().charAt(j);
+			if ( (c >= '0' && c <= '9') ||
+				(c >= 'a' && c <= 'f') )
+				continue;
+			else
+				return false;
+		}
+	}
+
+	return true;
+}
+
+function SwapValue(v1, v2)
+{
+	var t = v1.value;
+	v1.value = v2.value;
+	v2.value = t;
+}
+
+function CheckPortRange()
+{
+	for(var i=1;i<=3;i++)
+	{
+		var from_input = document.tF["pr_from"+i];
+		var to_input = document.tF["pr_to"+i];
+		var from = from_input.value;
+		var to = to_input.value;
+		if(!isNValidPortAllowZero(from) && !isNValidPortAllowZero(to) && parseInt(from) > parseInt(to))
+			SwapValue(from_input, to_input);
+	}
+}
+</script>
+</head>
+
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onLoad="Init();">
+<div id="popup_base" class="popup_base"></div>
+<form name="tF" METHOD="POST">
+		<div id="bm_panel" class="popup_panel body" style="display:none">
+			<div class="head_bold2" style="margin-bottom:10px"><% Fid_str(1577); %></div>
+			<div class="caption" style="margin-bottom:10px">
+				<label><b><% Fid_str(1578); %> &gt; </b><font style ="font-size =7pt"><% up_stream(); %></font></label>
+				<select name="upstream" onchange="ShowUpstreamInfo(true)">
+					<option value="128k">128 kbps</option>
+					<option value="256k">256 kbps</option>
+					<option value="384k">384 kbps</option>
+					<option value="512k">512 kbps</option>
+					<option value="768k">768 kbps</option>
+					<option value="1m">1 Mbps</option>
+					<option value="3m">3 Mbps</option>
+					<option value="10m">10 Mbps</option>
+					<option value="user_defined" selected><% Fid_str(1579); %></option>
+				</select>
+				<span id="user_defined_upstream_panel">
+					<input type="text" name="upstream_user" ><span> kbps</span>
+				</span>
+			</div>
+			<div class="caption" style="margin-bottom:10px">
+				<label><b><% Fid_str(1580); %> &gt; </b><font style ="font-size =7pt"><% down_stream(); %></font></label>
+				<select name="downstream" onchange="ShowDownstreamInfo()">
+					<option value="128k">128 kbps</option>
+					<option value="256k">256 kbps</option>
+					<option value="384k">384 kbps</option>
+					<option value="512k">512 kbps</option>
+					<option value="768k">768 kbps</option>
+					<option value="1m">1 Mbps</option>
+					<option value="3m">3 Mbps</option>
+					<option value="10m">10 Mbps</option>
+					<option value="user_defined" selected><% Fid_str(1579); %></option>
+				</select>
+				<span id="user_defined_downstream_panel">
+					<input type="text" name="downstream_user" ><span> kbps</span>
+				</span>
+			</div>
+			<br>
+			<div class="head_bold2"><% Fid_str(1581); %></div>
+			<table width="80%" cellspacing="2" cellpadding="2" border="0" class="body info_table">
+				<tr>
+					<th width="20%"><% Fid_str(1582); %></th>
+					<th width="50%"><% Fid_str(1583); %></th>
+					<th width="30%"><% Fid_str(1558); %></th>
+				</tr>
+				<tr>
+					<td>Highest</td>
+					<td class="ip_panel"><input type="text" name="highest_value"> % </td>
+					<td><input type="checkbox" name="highest_allow" checked></td>
+				</tr>
+				<tr>
+					<td>High</td>
+					<td class="ip_panel"><input type="text" name="high_value"> % </td>
+					<td><input type="checkbox" name="high_allow" checked></td>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td class="ip_panel"><input type="text" name="medium_value"> % </td>
+					<td><input type="checkbox" name="medium_allow" checked></td>
+				</tr>
+				<tr>
+					<td>Normal</td>
+					<td class="ip_panel"><input type="text" name="normal_value"> % </td>
+					<td><input type="checkbox" name="normal_allow" checked></td>
+				</tr>
+			</table>
+			<div style="text-align:right;margin-top:20px">
+				<input type="button" class="submitBtn" onclick="SaveBM()" value="<% Fid_str(49); %>">
+				<input type="button" class="submitBtn" onclick="HideBMPanel()" value="<% Fid_str(1399); %>">
+			</div>
+		</div>
+
+		<div id="onlinegame_panel" class="popup_panel body" style="display:none">
+			<div class="head_bold2" style="display:block;margin-bottom:10px"><% Fid_str(1584); %> &gt;</div>
+			<div class="caption" style="display:block;margin-bottom:10px">
+				<script language="javascript">
+					var i;
+					for (i=0; i<online_games_num; i++)
+						document.write("<label>"+online_games_name[i]+"</label>");
+				</script>
+			</div>
+			<div style="display:block;text-align:right;margin-top:20px">
+				<input type="button" class="submitBtn" onclick="HideOnlineGamePanel()" value="<% Fid_str(1398); %>">
+			</div>
+		</div>
+
+<% File_include("menu.stm"); %>
+	
+	
+<!--<div id="rule_panel" style="margin-top:10px;display:none">-->
+		<div id="rule_panel" class="popup_panel body" style="display:none">
+			<div class="head_bold2"><% Fid_str(1585); %></div>
+			<div class="caption" >
+				<label><b><% Fid_str(1586); %> &gt; </b></label>
+				<select name="rule_type" onchange="ChangeCategory()">
+					<option value="0"><% Fid_str(1587); %></option>
+					<option value="1"><% Fid_str(14); %></option>
+					<option value="2"><% Fid_str(330); %></option>
+					<option value="3">TCP / UDP</option>
+				</select>
+			</div>
+			<div class="caption" id="rule_apps">
+				<label><b><% Fid_str(1587); %> &gt; </b></label>
+				<select name="rule_app" onchange="ShowApplicationPanel()">
+					<option value="0"><% Fid_str(1588); %></option>
+					<!--<option value="3">Voice Device</option>-->
+					<!--<option value="16">Online Games</option>-->
+					<!--<option value="15">Video</option>-->
+					<option value="4">MSN Messenger</option>
+					<option value="13">Yahoo Messenger</option>
+					<option value="17">Skype</option>
+					<option value="2"><% Fid_str(1493); %></option>
+					<option value="14"><% Fid_str(1495); %></option>
+					<option value="7">SNMP</option>
+					<option value="8"><% Fid_str(1496); %></option>
+					<option value="10">WWW</option>
+					<option value="11"><% Fid_str(1497); %></option>
+					<option value="12">IGMP</option>
+				</select>
+			</div>
+			<div class="caption" id="rule_games" style="display:none">
+				<label><b><% Fid_str(1497); %> &gt; </b></label>
+				<select name="rule_game">
+					<option value="1">Counter Strike</option>
+					<option value="2">Age of Empires</option>
+					<option value="3">Diablo II</option>
+					<option value="4">Everquest</option>
+					<option value="5">Halflife</option>
+					<option value="6">Quake 2</option>
+					<option value="7">Quake 3</option>
+					<option value="8">Unreal Tourment</option>
+					<option value="9">Return to Castle</option>
+				</select>
+			</div>
+			<div class="caption" id="rule_name" style="display:none">
+				<label><b><% Fid_str(1590); %> &gt; </b></label><input type="text" maxlength=30 name="rule_name">
+			</div>
+			<div id="rule_ip_range" style="display:none">
+				<div class="caption"><label><b><% Fid_str(1522); %> &gt; </b></label></div>
+				<div class="caption">
+					<label style="margin-left:30px;width:155px"><b><% Fid_str(1520); %> &gt; </b></label>
+					<select name="ip_range_local_type" onchange="ShowIPRangeLocalPanel()">
+						<option value="1"><% Fid_str(330); %></option>
+						<option value="2"><% Fid_str(1522); %></option>
+						<option value="0" selected><% Fid_str(1492); %></option>
+					</select>
+					<span id="ip_range_local_panel1" style="display:none;" class="ip_panel">
+						<input type="text" maxLength=3 name="ip_local_1">.
+						<input type="text" maxLength=3 name="ip_local_2">.
+						<input type="text" maxLength=3 name="ip_local_3">.
+						<input type="text" maxLength=3 name="ip_local_4">
+					</span>
+					<span id="ip_range_local_panel2" style="display:none;" class="ip_panel">
+						<input type="text" maxLength=3 name="ip_range_local_1">.
+						<input type="text" maxLength=3 name="ip_range_local_2">.
+						<input type="text" maxLength=3 name="ip_range_local_3">.
+						<input type="text" maxLength=3 name="ip_range_local_4">~
+						<input type="text" maxLength=3 name="ip_range_local_5">
+					</span>
+				</div>
+				<div class="caption">
+					<label style="margin-left:30px;width:155px"><b><% Fid_str(1525); %> &gt; </b></label>
+					<select name="ip_range_remote_type" onchange="ShowIPRangeRemotePanel()">
+						<option value="1"><% Fid_str(330); %></option>
+						<option value="2"><% Fid_str(1522); %></option>
+						<option value="0" selected><% Fid_str(1492); %></option>
+					</select>
+					<span id="ip_range_remote_panel1" style="display:none;" class="ip_panel">
+						<input type="text" maxLength=3 name="ip_remote_1">.
+						<input type="text" maxLength=3 name="ip_remote_2">.
+						<input type="text" maxLength=3 name="ip_remote_3">.
+						<input type="text" maxLength=3 name="ip_remote_4">
+					</span>
+					<span id="ip_range_remote_panel2" style="display:none;" class="ip_panel">
+						<input type="text" maxLength=3 name="ip_range_remote_1">.
+						<input type="text" maxLength=3 name="ip_range_remote_2">.
+						<input type="text" maxLength=3 name="ip_range_remote_3">.
+						<input type="text" maxLength=3 name="ip_range_remote_4">~
+						<input type="text" maxLength=3 name="ip_range_remote_5">
+					</span>
+				</div>
+			</div>
+			<div class="caption" id="rule_port_range" style="display:none">
+				<label style="height:60px"><b><% Fid_str(1591); %> &gt; </b></label>
+				<div class="ip_panel">
+					<span>1. <% Fid_str(1592); %></span>
+					<input type="text" maxLength=5 name="pr_from1" onblur="CheckPortRange()"> <% Fid_str(1593); %> <input type="text" maxLength=5 name="pr_to1" onblur="CheckPortRange()">
+					<select name="protocol1">
+						<option value="6">TCP</option>
+						<option value="17">UDP</option>
+						<option value="99" selected><% Fid_str(72); %></option>
+					</select>
+				</div>
+				<div class="ip_panel">
+					<span>2. <% Fid_str(1592); %></span>
+					<input type="text" maxLength=5 name="pr_from2" onblur="CheckPortRange()"> <% Fid_str(1593); %> <input type="text" maxLength=5 name="pr_to2" onblur="CheckPortRange()">
+					<select name="protocol2">
+						<option value="6">TCP</option>
+						<option value="17">UDP</option>
+						<option value="99" selected><% Fid_str(72); %></option>
+					</select>
+				</div>
+				<div class="ip_panel">
+					<span>3. <% Fid_str(1592); %></span>
+					<input type="text" maxLength=5 name="pr_from3" onblur="CheckPortRange()"> <% Fid_str(1593); %> <input type="text" maxLength=5 name="pr_to3" onblur="CheckPortRange()">
+					<select name="protocol3">
+						<option value="6">TCP</option>
+						<option value="17">UDP</option>
+						<option value="99" selected><% Fid_str(72); %></option>
+					</select>
+				</div>
+			</div>
+			<div class="caption" id="rule_mac" style="display:none">
+				<label><b><% Fid_str(1594); %> &gt; </b></label>
+				<span class="ip_panel">
+					<input type="text" name="rule_mac0" maxlength="2"> - 
+					<input type="text" name="rule_mac1" maxlength="2"> - 
+					<input type="text" name="rule_mac2" maxlength="2"> - 
+					<input type="text" name="rule_mac3" maxlength="2"> - 
+					<input type="text" name="rule_mac4" maxlength="2"> - 
+					<input type="text" name="rule_mac5" maxlength="2">
+				</span>
+			</div>
+			<div class="caption" id="rule_pris">
+				<label><b><% Fid_str(1555); %> &gt; </b></label>
+				<select name="rule_pri">
+					<option value="10"><% Fid_str(1562); %></option>
+					<option value="20"><% Fid_str(1561); %></option>
+					<option value="30"><% Fid_str(1568); %></option>
+					<option value="40"><% Fid_str(1629); %></option>
+				</select>
+			</div>
+			<div class="caption" id="rule_remark" style="display:none">
+				<label><b><% Fid_str(1533); %> &gt; </b></label>
+				<select name="rule_remark">
+					<option value="01"><% Fid_str(1534); %></option>
+					<option value="BE">BE (000000|00)</option>
+					<option value="AF11">AF1x (001xxx|00)</option>
+					<option value="AF21">AF2x (010xxx|00)</option>
+					<option value="AF31">AF3x (011xxx|00)</option>
+					<option value="AF41">AF4x (100xxx|00)</option>
+					<option value="EF">EF (101110|00)</option>
+					<!--<option value="00">Highest (000000|00)</option>
+					<option value="28">High (001xxx|00)</option>
+					<option value="48">Medium (010xxx|00)</option>
+					<option value="68">Normal (011xxx|00)</option>-->
+				</select>
+				(<% Fid_str(1535); %>) 
+			</div>
+			<div>
+				<input type="button" class="submitBtn" name="rule_add" value="<% Fid_str(1398); %>" onclick="SaveRule()">
+				<input type="button" class="submitBtn" name="rule_cancel" value="<% Fid_str(1538); %>" onclick="HideRulePanel()">
+			</div>
+		</div>
+	
+		<table border="0" cellspacing="0" cellpadding="0" align="left" width="600px" height="100%" style="margin-left:36px">
+			<tr>
+				<td valign="top" width="99%" height="100%" class="head_bold"><br>
+					&nbsp;<% Fid_str(1440); %>&nbsp;&gt;&nbsp;<% Fid_str(1441); %>
+					<br>
+					<table border="0" class="body">
+						<tr>
+							<td width="10" height="25" >&nbsp;</td>
+							<td width="100%" colspan="2" height="25"><b>
+								<% Fid_str(1444); %>
+								&gt;&nbsp;&nbsp;</b>
+								<input type="radio" name=qos_enable value=1 onclick="EnableQoS()" <% nvram_match("qos_enable", "1", "checked"); %>>
+								<% Fid_str(96); %>
+								&nbsp;&nbsp;
+								<input type=radio name=qos_enable value=0 onclick="EnableQoS()" <% nvram_match("qos_enable", "0", "checked"); %>>
+								<% Fid_str(119); %>
+								<div id="qos_panel" style="display:none">
+									<div class="caption" style="margin-top:20px;margin-left:0">
+										<label style="margin-left:0"><% Fid_str(1595); %> &gt;</label>
+										<select name="profile" id="profile" onchange="EnabledBWM()">
+											<option value="1"><% Fid_str(377); %></option>
+											<option value="2"><% Fid_str(1579); %> 1</option>
+											<option value="3"><% Fid_str(1579); %> 2</option>
+										</select>
+										<SCRIPT LANGUAGE="JavaScript">
+											document.tF.profile.selectedIndex = qos_prof_idx;
+										</SCRIPT>
+									</div>
+									<div>
+										<hr noshade size="1" color=#006699>
+									</div>
+									<div class="caption">
+										<label><% Fid_str(1577); %> &gt;</label>
+										<select name="bw_mgt" id="bw_mgt" onchange="ChangeBWM()">
+											<option value="0"><% Fid_str(377); %></option>
+											<option value="1"><% Fid_str(1579); %> 1</option>
+											<option value="2"><% Fid_str(1579); %> 2</option>
+										</select>
+										<SCRIPT LANGUAGE="JavaScript">
+											document.tF.bw_mgt.selectedIndex = qos_profiles[qos_prof_idx].bwm_prof_idx;
+										</SCRIPT>
+										<input type="button" class="submitBtn" name="bm_edit" id="bm_edit" value="<% Fid_str(1574); %>" onclick="ShowBMPanel()">
+									</div>
+									<div class="caption"><label style="float:none"><% Fid_str(1596); %> &gt;</label></div>
+									<table width="100%" cellspacing="2" cellpadding="2" border="0" align="center" class="body info_table" id="rule_table">
+										<tr>
+											<th><% Fid_str(1597); %></th>
+											<th><% Fid_str(1555); %></th>
+											<th><% Fid_str(1598); %></th>
+											<th><% Fid_str(1599); %></th>
+										</tr>
+										<tr>
+											<td><% Fid_str(1487); %></td>
+											<td><% Fid_str(1562); %></td>
+											<td>---</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><% Fid_str(1486); %></td>
+											<td><% Fid_str(1561); %></td>
+											<td><input type="button" class="submitBtn"  name="onlinegame_details" id="onlinegame_details" value="<% Fid_str(1484); %>" onclick="ShowOnlineGamePanel()"></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><% Fid_str(1485); %></td>
+											<td><% Fid_str(1568); %></td>
+											<td>---</td>
+											<td></td>
+										</tr>
+										<!--
+										<tr>
+											<td>Data</td>
+											<td>Normal</td>
+											<td>---</td>
+											<td></td>
+										</tr>
+										-->
+									</table>
+									<div><input type="button" class="submitBtn" name="add_rule_btn" onclick="ShowRule(-1)" value="<% Fid_str(1483); %>"></div>
+									<script language="javascript">											
+										RefreshRuleTable("rule_table");
+									</script>
+								</div>
+								
+								<table border="0" class="body" style="margin-top:20px">
+									<tr>
+										<td width="70">&nbsp;</td>
+										<td colspan="2" >
+											<script language="javascript">
+            				     				if(navigator.appName != "Netscape")
+	                                			{
+			              							document.write('<input type="button" value="<% Fid_str(48); %>" style="{width:150px;}" class="submitBtn" onClick="javascript:window.location.reload();">');
+								 				}
+	                                			else
+	                                			{
+				              						document.write('<input type="button" value="<% Fid_str(48); %>" style="{width:150px;}" class="submitBtn" onClick="javascript:window.location.reload();">');
+						 						}
+						 					</script>
+											&nbsp;&nbsp;
+											<input type="button" name="savesetting" onClick="return evaltF();" value="<% Fid_str(49); %>" style="{width:240px;}" class="submitBtn">
+										</td>
+									</tr>
+								</table>
+								<input NAME="trigger" TYPE="button" VALUE="." maxlength=0 SIZE=0  onclick="return trigging();" style="visibility: hidden">
+							</td>
+							<td width="5" height="25">&nbsp;</td>
+						</tr>
+					</table></td>
+			</tr>
+		</table>
+
+		</td>
+	</tr>
+</table>
+</form>
+<form name="tF2" METHOD="POST" action="apply.cgi">
+<input type="hidden" name="location_page" value="qos_main2.stm">
+<input type="hidden" name="arc_action" value="Apply">
+<input type="hidden" name="page" value="qos_main2.stm">
+</form>
+</body>
+</html>

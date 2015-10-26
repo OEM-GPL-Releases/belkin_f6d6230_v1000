@@ -1,0 +1,598 @@
+<HTML>
+<HEAD>
+
+<% char_set(); %>
+<LINK href="stylemain.css" type="text/css" rel="stylesheet">
+<LINK href="colors.css" type="text/css" rel="stylesheet">
+<LINK href="main_router.css" type="text/css" rel="stylesheet">
+<% File_include("refreshmenu.txt"); %>
+<META http-equiv="Pragma" content="no-cache">
+<SCRIPT src="data.js"></SCRIPT>
+<SCRIPT language="javascript" src="field_check.js"></SCRIPT>
+
+<SCRIPT language="javascript">
+<% File_include("routine.txt"); %>
+<% login_timeout(); %>
+var pid="<% nvram_get("project_id"); %>";
+var pid2="<% nvram_get("project_id2"); %>";
+var MAX_MAC_TABLE = 50;
+if(pid == "00n2")	MAX_MAC_TABLE = 32;
+<% WLANPeerMacAddress();  %>
+
+var macUsed = "";
+var cusMac = "";
+
+var wl_mac=new Array(MAX_MAC_TABLE);
+var login_mac = x[0]+":"+x[1]+":"+x[2]+":"+x[3]+":"+x[4]+":"+x[5];
+<% wl_mac_list();  %>
+
+function Process5G(type)
+{
+      	if(type==1)
+	setTimeout("_process5G1()", 3000);
+	else  
+     {
+	ShowHideProceeding("show");
+	setTimeout("_process5G()", 15000);
+	}
+}
+
+function _process5G()
+{
+	if(pid != "00n1")
+	{
+		document.tF.wl_unit.value = "1";
+		document.tF.submit();
+		setTimeout("ShowHideProceeding('hide')", 15000);		
+	}
+	else
+	{
+		ShowHideProceeding('hide');
+	}
+}
+
+function _process5G1()
+{
+	if(pid != "00n1")
+	{
+		document.tF.wl_unit.value = "1";
+		document.tF.restart_page.value="true";
+		document.tF.submit();
+	}
+	ShowHideProceeding('hide');
+}
+
+function ShowHideProceeding(mode)
+{
+	if(mode=="show")
+	{
+		document.getElementById("msg_table").style.display = "";
+		document.getElementById("cont_table").style.display = "none";
+	}
+	else
+	{
+		document.location.href=document.location.href;
+	}
+}
+
+function isValidMacAddress(address) {
+   var c = '';
+   var i = 0, j = 0;
+
+   if ( address.toLowerCase() == 'ff:ff:ff:ff:ff:ff' ) return false;
+   if(address.toLowerCase() == '00:00:00:00:00:00' || address.toLowerCase() == '0:0:0:0:0:0' ) return false;
+   
+   addrParts = address.split(':');
+   if ( addrParts.length != 6 ) return false;
+   
+   var f_bit = addrParts[0].charAt(1).toLowerCase();
+   if(f_bit == "1" || f_bit == "3" || f_bit == "5" || f_bit == "7" ||
+      f_bit == "9" || f_bit == "b" || f_bit == "d" || f_bit == "f")
+      return false;
+   
+   for (i = 0; i < 6; i++) {      
+      if(addrParts[i].length!=2)
+      return false;
+      
+     	if (isNValid(addrParts[i]))
+		  return false; 
+		
+      for ( j = 0; j < addrParts[i].length; j++ ) {
+         c = addrParts[i].toLowerCase().charAt(j);
+         if ( (c >= '0' && c <= '9') ||
+              (c >= 'a' && c <= 'f') )
+            continue;
+         else
+            return false;
+      }
+   }
+
+   return true;
+}
+
+
+var dup_mac='<% Fid_str(112); %>';
+//var rc= "<% Fid_str(610); %>";
+var mac_array = new Array(35);//(totalCount);	//5*6
+var mac_array1 = new Array(6);	//5*6
+var todEnabled='0';
+var macm='<% Fid_str(904); %>.';
+var macaddresserror = "<% Fid_str(902); %>";
+var rc= "<% Fid_str(903); %>";
+var emptymac = "<% Fid_str(669); %>";
+
+function addClick(place) {
+//	document.tF.action1.value="add";
+	if (totalCount>=MAX_MAC_TABLE) return;
+
+  	with ( document.forms[0] ) {
+      		if ( cusMac0.value == ''|| cusMac1.value == '' || cusMac2.value == '' || cusMac3.value == '' || cusMac4.value == '' ||cusMac5.value == '' ) {
+        		alert(emptymac);
+        		return;
+      		}
+      		cusMac = cusMac0.value +':'+cusMac1.value +':'+cusMac2.value +':'+cusMac3.value +':'+cusMac4.value +':'+cusMac5.value;
+      		macUsed = cusMac.toUpperCase();
+      		if ( isValidMacAddress( macUsed ) == false ) {
+        		alert( macaddresserror+":"+macUsed+"."+rc);
+        		return;
+      		}
+		j=0;
+		for(i=0; i< document.tF.length; i++)
+		{
+			f     = document.tF.elements[i].name;
+			fname = f.substr(0,3);
+			if ( fname == 'MAC') {
+				len = f.length;
+				for(k=0;k<6;k++)
+				{
+					if (len == 6) {
+						row = f.substr(3,1);
+						col = f.substr(5,1);
+						j   = row;
+						mac_array1[k] = document.tF.elements[i].value;
+						if(k ==0)
+							mac_array[j] = mac_array1[k].toUpperCase();
+						else
+							mac_array[j] +=':'+ mac_array1[k].toUpperCase();
+						
+					}
+					
+					else if (len == 7) {
+						row = f.substr(3,2);
+						col = f.substr(6,1);
+						j   = row;
+						mac_array1[k] = document.tF.elements[i].value;
+						if(k ==0)
+							mac_array[j] = mac_array1[k].toUpperCase();
+						else
+	    					mac_array[j] +=':'+ mac_array1[k].toUpperCase();
+					}
+						i++;
+				}
+			}
+		}
+		if (!(isBlank_Zero(cusMac0.value)) || !(isBlank_Zero(cusMac1.value)) || !(isBlank_Zero(cusMac2.value)) || !(isBlank_Zero(cusMac3.value)) || !(isBlank_Zero(cusMac4.value)) || !(isBlank_Zero(cusMac5.value))){
+			if (isNValid(cusMac0.value) || isNValid(cusMac1.value) || isNValid(cusMac2.value) || isNValid(cusMac3.value) || isNValid(cusMac4.value) || isNValid(cusMac5.value))
+ 			{
+ 				alert(macaddresserror+macm+rc); 
+ 				return false;
+ 			}
+		}else{
+			alert(emptymac);
+        		return false;
+		}
+		
+		for(i=0;i<totalCount;i++)
+		if(macUsed ==mac_array[i])
+		{
+			alert( dup_mac );
+			return false;
+		}
+		document.tF.submit();
+		Process5G(0);
+  	}
+}
+
+
+function removeOne(index) {
+	var j=0;
+/*	//check admin mac is not blocked!
+	if( totalCount == 1 && ((document.tF.mac_fil[0].checked == true)||(document.tF.mac_fil[1].checked == true))){
+		for(i=0; i< document.tF.length; i++)
+		{
+			f = document.tF.elements[i].name;
+			fname = f.substr(0,3);
+			if ( fname == 'MAC') {
+				len = f.length;
+				if (len == 6) {
+					row = f.substr(3,1);
+					col = f.substr(5,1);
+				}
+				else if (len == 7) {
+					row = f.substr(3,2);
+					col = f.substr(6,1);
+				}	
+				if( index == row ){
+					if( document.tF.elements[i].value == document.tF.adminmac0.value && 
+						document.tF.elements[i+1].value == document.tF.adminmac1.value && 
+						document.tF.elements[i+2].value == document.tF.adminmac2.value && 
+						document.tF.elements[i+3].value == document.tF.adminmac3.value && 
+						document.tF.elements[i+4].value == document.tF.adminmac4.value && 						
+						document.tF.elements[i+5].value == document.tF.adminmac5.value ){
+							alert("<% Fid_str(1318); %>");
+							return;
+					}
+				}
+			}
+		}
+	}
+*/
+	var mac;	
+	if(document.tF.mac_fil[0].checked==true)
+	document.tF.wl_macmode.value="allow";
+	else if(document.tF.mac_fil[1].checked==true)	
+	document.tF.wl_macmode.value="deny";
+	else
+	document.tF.wl_macmode.value="disabled";
+	
+	if(document.tF.wl_macmode.value!="disabled")
+	{	
+		mac=document.getElementsByName("wl_maclist"+index);
+		if(document.tF.wl_macmode.value=="allow" && mac[0].value==login_mac)
+		{
+		    alert("Admin MAC address should not be removed!");
+		    return false;
+		} 
+		else
+        mac[0].value="";
+	}	
+	document.tF.action.value='Apply';
+	document.tF.restart_page.value='true';	    		
+	document.tF.submit();
+	Process5G(1);
+}
+
+function applyClick(check_mac) {
+	if (totalCount>MAX_MAC_TABLE)
+	{
+		alert("Maximum number of MAC addresses is "+MAX_MAC_TABLE+" !");
+		return false;
+	}
+
+	var mac,add_mac;
+	if(document.tF.mac_fil[0].checked==true)
+		document.tF.wl_macmode.value="allow";
+	else if(document.tF.mac_fil[1].checked==true)	
+		document.tF.wl_macmode.value="deny";
+	else
+		document.tF.wl_macmode.value="disabled";
+
+	if(document.tF.wl_macmode.value!="disabled")
+	{	
+		mac=document.getElementsByName("wl_maclist"+totalCount);
+		add_mac= document.tF.cusMac0.value +':'+document.tF.cusMac1.value +':'+document.tF.cusMac2.value +':'+document.tF.cusMac3.value +':'+document.tF.cusMac4.value +':'+document.tF.cusMac5.value;	
+		if ((check_mac || add_mac!=":::::") && totalCount>=MAX_MAC_TABLE)
+		{
+			alert("Maximum number of MAC addresses is "+MAX_MAC_TABLE+" !");
+			return false;
+		}
+		if (check_mac || add_mac!=":::::")
+		{
+			if(isValidMacAddress(add_mac ) == false)
+			{
+				alert("<% Fid_str(902); %>");
+				return;
+			}
+			for(i=0;i<totalCount;i++)
+			{
+				cur_mac=document.getElementsByName("wl_maclist"+i);
+				if(cur_mac[0].value == add_mac)
+				{
+					alert("<% Fid_str(1312); %>");
+					return;
+				}
+			}
+		}
+		mac[0].value=add_mac;
+	}
+	/* add current wlan authed Admin */
+	if(document.tF.wl_macmode.value=="allow" && totalCount<49 && login_mac!="")
+	{
+		var count=eval(totalCount+1);
+		var y=document.getElementsByName("wl_maclist"+count);
+		var have_login_mac = false;
+		for(i=0;i<totalCount;i++)
+		{
+			cur_mac=document.getElementsByName("wl_maclist"+i);
+			if(cur_mac[0].value == login_mac)
+			{
+				have_login_mac = true;
+				break;
+			}
+		}
+		if(!have_login_mac)
+			y[0].value=login_mac;
+	}  	
+	/* prevent admin clinet in deny list */
+	if(document.tF.wl_macmode.value=="deny" && login_mac!="" )
+	{
+		if(mac[0].value==login_mac)
+		{
+			alert("Admin MAC address should not be denied!");
+			return false;
+		}
+		for(i=0;i<totalCount;i++)
+		{
+			cur_mac=document.getElementsByName("wl_maclist"+i);
+			if(add_mac==cur_mac[0].value)
+			{
+				alert( dup_mac );
+				return false;
+			}
+			if(login_mac==cur_mac[0].value)
+			{
+				alert("Admin MAC address should not be denied!" + " (" + cur_mac[0].value + ")");
+				return false;
+			}
+		}  	
+	}  	
+	/* add current wlan authed client */
+	/*
+	else if(document.tF.wl_macmode.value=="allow" && login_mac!="" )
+	{
+		mac=document.getElementsByName("wl_maclist"+totalCount);
+		mac[0].value=login_mac;    
+	}
+	*/
+	if(check_mac==true)
+	   document.tF.restart_page.value='true';	
+	document.tF.action.value='Apply';	
+	document.tF.submit();
+	if(check_mac==true)
+	Process5G(1);
+	else
+	Process5G(0);
+}
+
+function itemSelectmac(){
+	if ((document.tF.mac_fil[0].checked==true) ||( document.tF.mac_fil[1].checked==true ))
+	{
+		if ((navigator.appName == 'Netscape') || (navigator.appName == 'Opera'))
+		{
+			document.getElementById('mactable').style.display = 'table-row';	
+		}
+		else
+		{
+			document.getElementById('mactable').style.display = 'block';
+		}
+	}
+	else
+	{
+		document.getElementById('mactable').style.display = 'none';
+	}
+}
+
+
+function frmLoad() {
+	itemSelectmac();
+	if(totalCount < MAX_MAC_TABLE)
+		document.getElementById("tr_add").style.display = "";
+}
+
+function moreinfowin(flagip){
+	var win = window.open(flagip,'help','toolbar=0,status=0,menubar=0,scrollbars=1,resizable=1,width=530,height=400,left=150,top=150');
+	win.focus();
+}
+
+
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY onLoad="frmLoad()" bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" height="100%" style="display:none" id="msg_table">
+  <tr>
+	<td width="70">&nbsp;</td>
+	<td class="body"><center>
+		<font color="#FF0000" size="3"><b><% Fid_str(1200); %></b>&nbsp;&nbsp;&nbsp;</font></center>
+	</td>
+ </tr>
+</table>
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+	<TABLE width=600 align=TOP>
+    	<TR>
+		<td valign="top" width="99%" height="100%" class="head_bold">
+		<script>
+		if(pid2=="00n2")
+		document.write("<br><B><% Fid_str(104); %></B>");
+		else
+		document.write("<br><B><% Fid_str(896); %></B>");
+		</script>
+		</td>
+    	</tr>
+    	<tr>
+    		<td class="body">
+		<FONT color=#004263>
+		<br>
+		<% Fid_str(897); %>
+  		</FONT>
+		<A onclick=moreinfowin("glossary.stm#wlan_mac"); href="javascript:void(0);"> 
+		<FONT color=#0066FF>	<B><% Fid_str(47); %></B></FONT><BR></A><BR>
+		</td>
+	</tr>
+</TABLE>
+ <FORM name="tF" action="apply.cgi" method="post" target="hidden_frame" onsubmit="">
+	<input type="hidden" name="location_page" value="wireless_mac.stm">
+	<input type="hidden" name="page" value="wireless_mac.stm">
+  	<input type="hidden" name="arc_action", value="Apply">
+  	<input type="hidden" name="restart_page" value="wireless_mac.stm">
+  	<!--<input type="hidden" name="index">-->  
+	<input type="hidden" name="wl_action" value="1">	  	
+	<input type="hidden" name="wl_bssid", value="0">
+	<input type="hidden" name="wl_unit", value="0">
+	<input type="hidden" name="wl_macmode">
+	<input type="hidden" name="wl_maclist" value="">
+	<script>document.tF.wl_maclist.value=MAX_MAC_TABLE;</script>
+	<input type="hidden" name="wl_maclist0" value="<% nvram_list("wl0_maclist", 0); %>">
+	<input type="hidden" name="wl_maclist1" value="<% nvram_list("wl0_maclist", 1); %>">
+	<input type="hidden" name="wl_maclist2" value="<% nvram_list("wl0_maclist", 2); %>">
+	<input type="hidden" name="wl_maclist3" value="<% nvram_list("wl0_maclist", 3); %>">
+	<input type="hidden" name="wl_maclist4" value="<% nvram_list("wl0_maclist", 4); %>">
+	<input type="hidden" name="wl_maclist5" value="<% nvram_list("wl0_maclist", 5); %>">
+	<input type="hidden" name="wl_maclist6" value="<% nvram_list("wl0_maclist", 6); %>">
+	<input type="hidden" name="wl_maclist7" value="<% nvram_list("wl0_maclist", 7); %>">
+	<input type="hidden" name="wl_maclist8" value="<% nvram_list("wl0_maclist", 8); %>">
+	<input type="hidden" name="wl_maclist9" value="<% nvram_list("wl0_maclist", 9); %>">
+	<input type="hidden" name="wl_maclist10" value="<% nvram_list("wl0_maclist", 10); %>">
+	<input type="hidden" name="wl_maclist11" value="<% nvram_list("wl0_maclist", 11); %>">
+	<input type="hidden" name="wl_maclist12" value="<% nvram_list("wl0_maclist", 12); %>">
+	<input type="hidden" name="wl_maclist13" value="<% nvram_list("wl0_maclist", 13); %>">
+	<input type="hidden" name="wl_maclist14" value="<% nvram_list("wl0_maclist", 14); %>">
+	<input type="hidden" name="wl_maclist15" value="<% nvram_list("wl0_maclist", 15); %>">
+	<input type="hidden" name="wl_maclist16" value="<% nvram_list("wl0_maclist", 16); %>">
+	<input type="hidden" name="wl_maclist17" value="<% nvram_list("wl0_maclist", 17); %>">
+	<input type="hidden" name="wl_maclist18" value="<% nvram_list("wl0_maclist", 18); %>">
+	<input type="hidden" name="wl_maclist19" value="<% nvram_list("wl0_maclist", 19); %>">
+	<input type="hidden" name="wl_maclist20" value="<% nvram_list("wl0_maclist", 20); %>">
+	<input type="hidden" name="wl_maclist21" value="<% nvram_list("wl0_maclist", 21); %>">
+	<input type="hidden" name="wl_maclist22" value="<% nvram_list("wl0_maclist", 22); %>">
+	<input type="hidden" name="wl_maclist23" value="<% nvram_list("wl0_maclist", 23); %>">
+	<input type="hidden" name="wl_maclist24" value="<% nvram_list("wl0_maclist", 24); %>">
+	<input type="hidden" name="wl_maclist25" value="<% nvram_list("wl0_maclist", 25); %>">
+	<input type="hidden" name="wl_maclist26" value="<% nvram_list("wl0_maclist", 26); %>">
+	<input type="hidden" name="wl_maclist27" value="<% nvram_list("wl0_maclist", 27); %>">
+	<input type="hidden" name="wl_maclist28" value="<% nvram_list("wl0_maclist", 28); %>">
+	<input type="hidden" name="wl_maclist29" value="<% nvram_list("wl0_maclist", 29); %>">
+	<input type="hidden" name="wl_maclist30" value="<% nvram_list("wl0_maclist", 30); %>">
+	<input type="hidden" name="wl_maclist31" value="<% nvram_list("wl0_maclist", 31); %>">
+	<input type="hidden" name="wl_maclist32" value="<% nvram_list("wl0_maclist", 32); %>">
+	<input type="hidden" name="wl_maclist33" value="<% nvram_list("wl0_maclist", 33); %>">
+	<input type="hidden" name="wl_maclist34" value="<% nvram_list("wl0_maclist", 34); %>">
+	<input type="hidden" name="wl_maclist35" value="<% nvram_list("wl0_maclist", 35); %>">
+	<input type="hidden" name="wl_maclist36" value="<% nvram_list("wl0_maclist", 36); %>">
+	<input type="hidden" name="wl_maclist37" value="<% nvram_list("wl0_maclist", 37); %>">
+	<input type="hidden" name="wl_maclist38" value="<% nvram_list("wl0_maclist", 38); %>">
+	<input type="hidden" name="wl_maclist39" value="<% nvram_list("wl0_maclist", 39); %>">
+	<input type="hidden" name="wl_maclist40" value="<% nvram_list("wl0_maclist", 40); %>">
+	<input type="hidden" name="wl_maclist41" value="<% nvram_list("wl0_maclist", 41); %>">
+	<input type="hidden" name="wl_maclist42" value="<% nvram_list("wl0_maclist", 42); %>">
+	<input type="hidden" name="wl_maclist43" value="<% nvram_list("wl0_maclist", 43); %>">
+	<input type="hidden" name="wl_maclist44" value="<% nvram_list("wl0_maclist", 44); %>">
+	<input type="hidden" name="wl_maclist45" value="<% nvram_list("wl0_maclist", 45); %>">
+	<input type="hidden" name="wl_maclist46" value="<% nvram_list("wl0_maclist", 46); %>">
+	<input type="hidden" name="wl_maclist47" value="<% nvram_list("wl0_maclist", 47); %>">
+	<input type="hidden" name="wl_maclist48" value="<% nvram_list("wl0_maclist", 48); %>">
+	<input type="hidden" name="wl_maclist49" value="<% nvram_list("wl0_maclist", 49); %>">
+  
+<TABLE width=600>
+	<TR><td class="body">
+  	<B><FONT color=#004263>
+  	<INPUT type=radio name=mac_fil value="0" onClick="itemSelectmac()"> <% Fid_str(898); %>&nbsp;&nbsp;
+  	<INPUT type=radio name=mac_fil value="1" onClick="itemSelectmac()"> <% Fid_str(1293); %>&nbsp;&nbsp;
+  	<INPUT type=radio name=mac_fil value="2" onClick="itemSelectmac()"> <% Fid_str(318); %>
+  	</FONT></B>
+  	</td>
+  	</tr>
+</TABLE>
+	<SCRIPT LANGUAGE="JavaScript">
+
+		var iDOD ="<% nvram_get("wl0_macmode"); %>";
+		if (iDOD=="disabled")
+		{
+			document.tF.mac_fil[2].defaultChecked = true;
+			document.tF.mac_fil[2].checked = true;
+		}
+		else if(iDOD=="deny")
+		{
+			document.tF.mac_fil[1].defaultChecked = true;
+			document.tF.mac_fil[1].checked = true;
+		}else{
+			document.tF.mac_fil[0].defaultChecked = true;
+			document.tF.mac_fil[0].checked = true;			
+		
+		}
+		//document.tF.adminmac0.value =x[0];
+		//document.tF.adminmac1.value =x[1];
+		//document.tF.adminmac2.value =x[2];
+		//document.tF.adminmac3.value =x[3];
+		//document.tF.adminmac4.value =x[4];
+		//document.tF.adminmac5.value =x[5];
+		totalCount=0;
+		var i,x;
+		for(i=0;i<MAX_MAC_TABLE;i++)
+		{
+			x=document.getElementsByName("wl_maclist"+i);
+        	if(x[0].value!=" " && x[0].value!="")
+        	totalCount=i+1;		
+		}
+	</SCRIPT>
+  	<BR><BR>
+ <TABLE id =mactable style="display:none" cellSpacing=1 cellPadding=0 border=0>
+    	<TBODY>
+    	<TR align=middle>
+	      <TD  style="background-color: #666262" borderColor=#ffffff width=10 height=17></TD>
+	      <TD  style="background-color: #666262" borderColor=#ffffff width=300 height=17 class="body">
+	      <FONT color=#ffffff><b><% Fid_str(110); %></b></FONT></TD>
+	      <TD align=center style="background-color: #666262" borderColor=#ffffff width=50></TD>
+	</TR>
+    	<TR id="tr_add" style="display:none">
+      		<TD style="background-color: #cccccc" borderColor=#ffffff class="body"></TD>
+      		<TD style="background-color: #cccccc" borderColor=#ffffff align=middle class="body">
+      		<nobr>
+	        <INPUT maxLength=2 size=3 name=cusMac0 value="">:&nbsp; 
+	        <INPUT maxLength=2 size=3 name=cusMac1 value="">:&nbsp; 
+	        <INPUT maxLength=2 size=3 name=cusMac2 value="">:&nbsp; 
+	        <INPUT maxLength=2 size=3 name=cusMac3 value="">:&nbsp; 
+	        <INPUT maxLength=2 size=3 name=cusMac4 value="">:&nbsp; 
+	        <INPUT maxLength=2 size=3 name=cusMac5 value=""> 
+        	</nobr>
+      		</TD>
+      		<TD style="background-color: #cccccc" borderColor=#ffffff width=50 align=middle>
+      		<INPUT class=submitBtn onclick="applyClick(true);" type=button value="<% Fid_str(113); %>"> 
+      		</TD>
+      	</TR>
+      	<SCRIPT language=javascript>
+  
+	  	var i=0,mac_addr,mac_addr_str;
+
+	  	for (i=0;i<totalCount;i++) {
+	  		mac_addr=document.getElementsByName("wl_maclist"+i);
+	  		mac_addr_str=mac_addr[0].value;
+	    	document.write('<tr align="center"><nobr>');
+	    	document.write('<td style="background-color: #cccccc" bordercolor="#FFFFFF" class="body">');
+			document.write(i+1);
+			document.write('.</font></td>');
+			document.write('<td style="background-color: #cccccc" bordercolor="#FFFFFF" align="center" class="body">');
+			for(j=0;j<=5;j++)
+			{
+				if(j==5)
+					document.write('<input type="text" name="MAC',i,'_',j,'" size="3" maxlength="2" value="'+mac_addr_str.substr(j*3,2)+'"></b>');
+				else
+					document.write('<input type="text" name="MAC',i,'_',j,'" size="3" maxlength="2" value="'+mac_addr_str.substr(j*3,2)+'">:&nbsp;');
+			}
+			document.write('<td style="background-color: #cccccc" bordercolor="#FFFFFF" align="center"><input type="button"  onClick="removeOne('+i+')" value="<% Fid_str(114); %>" class="submitBtn"></td></nobr></tr>');
+	  	}
+	  	
+
+	</SCRIPT>
+        
+    </TBODY>
+</TABLE><BR>
+ <TABLE width=520>
+    <TBODY>
+    <TR align="center">
+      		<TD><INPUT class=submitBtn style="height=22px;width:150px;" onclick=javascript:window.location.reload(true); type=button value="<% Fid_str(48); %>"> 
+      		&nbsp;&nbsp;
+		<INPUT class=submitBtn style="height=22px;width:150px;" onclick=applyClick(false) type=button value="<% Fid_str(49); %>"> 
+      		</TD>
+      </TR>
+</TBODY>
+</TABLE>
+</FORM>
+</BLOCKQUOTE>
+			</td>    
+		</tr>             
+     </table>
+<iframe name="hidden_frame" id="hidden_frame" src="#" width="0" height="0" frameborder="0"></iframe>
+</BODY>
+</HTML>

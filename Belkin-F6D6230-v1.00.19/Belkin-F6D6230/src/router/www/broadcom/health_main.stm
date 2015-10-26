@@ -1,0 +1,281 @@
+<HTML>
+<HEAD>
+<title></title>
+
+<% char_set(); %>
+<LINK href="stylemain.css" type="text/css" rel="stylesheet">
+<LINK href="colors.css" type="text/css" rel="stylesheet">
+<LINK href="main_router.css" type="text/css" rel="stylesheet">
+<% File_include("refreshmenu.txt"); %>
+
+<SCRIPT language="javascript">
+<% File_include("routine.txt"); %>
+<% login_timeout(); %>
+
+function enable_heal(mode)
+{
+var f=document.tF;
+if(mode==1)
+{
+f.day0.disabled=f.day1.disabled=f.day2.disabled=f.day3.disabled=f.day4.disabled=f.day5.disabled=f.day6.disabled=false;
+f.start_hour.disabled=false;
+//f.fw_auto_update.disabled=false;
+//f.dayall.disabled=false;
+return 1;
+}
+else
+{
+f.day0.disabled=f.day1.disabled=f.day2.disabled=f.day3.disabled=f.day4.disabled=f.day5.disabled=f.day6.disabled=true;
+f.start_hour.disabled=true;
+//f.fw_auto_update.disabled=true;
+//f.dayall.disabled=true;
+return 0;
+}
+}
+
+function day_all()
+{
+var f=document.tF;
+if(f.dayall.checked==true)
+{
+f.day0.checked=f.day1.checked=f.day2.checked=f.day3.checked=f.day4.checked=f.day5.checked=f.day6.checked=true;
+f.day0.disabled=f.day1.disabled=f.day2.disabled=f.day3.disabled=f.day4.disabled=f.day5.disabled=f.day6.disabled=true;
+}
+else
+{
+if(f.healing_enable[0].checked==true)
+{
+f.day0.checked=f.day1.checked=f.day2.checked=f.day3.checked=f.day4.checked=f.day5.checked=f.day6.checked=false;
+f.day0.disabled=f.day1.disabled=f.day2.disabled=f.day3.disabled=f.day4.disabled=f.day5.disabled=f.day6.disabled=false;
+}
+}
+return 1;
+}
+
+function evaltF()
+{
+ 	var f=document.tF;
+ 	//if(f.wifi_scan[0].checked==true)
+	//    f.scan_enable.value=1;
+	//else
+	 //   f.scan_enable.value=0;
+
+	//if(f.p2p_control[0].checked==true)
+	//    f.p2p_enable.value=1;
+	//else
+	//    f.p2p_enable.value=0;
+
+	if(f.healing_enable[1].checked==true)
+	{
+		f.health_enable.value=0;
+		f.health_update.value=0;
+	}	
+	else if(f.healing_enable[0].checked==true)
+	{
+		f.health_enable.value=1;
+		
+		f.health_time.value=f.start_hour.selectedIndex;
+		//f.health_update.value=(f.fw_auto_update.checked==true)?"1":"0";
+	//  if(f.dayall.checked==true)
+  	//{
+    	//f.health_week.value=1;
+    	//f.health_days0.value=f.health_days1.value=f.health_days2.value=f.health_days3.value=f.health_days4.value=f.health_days5.value=f.health_days6.value=1;
+  	//}
+  	//else
+  	//{
+  		f.health_week.value=0;
+  		f.health_days0.value=(f.day0.checked==true)?"1":"0";
+  		f.health_days1.value=(f.day1.checked==true)?"1":"0";
+  		f.health_days2.value=(f.day2.checked==true)?"1":"0";
+  		f.health_days3.value=(f.day3.checked==true)?"1":"0";
+  		f.health_days4.value=(f.day4.checked==true)?"1":"0";
+  		f.health_days5.value=(f.day5.checked==true)?"1":"0";
+  		f.health_days6.value=(f.day6.checked==true)?"1":"0";
+  	//}
+  	
+  }
+  //alert("health-OK!"); 
+  return true;
+}
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<FORM name="tF" action="apply.cgi" method="post">
+	<input type="hidden" name="location_page" value="health_main.stm">
+	<input type="hidden" name="page" value="health_main.stm">
+	<INPUT type="hidden" name="health_enable" value="<% nvram_get("health_enable"); %>">
+	<INPUT type="hidden" name="scan_enable" value="<% nvram_get("scan_enable"); %>">
+	<INPUT type="hidden" name="p2p_enable" value="<% nvram_get("p2p_enable"); %>">
+	<INPUT type="hidden" name="health_time" value="<% nvram_get("health_time"); %>">
+	<INPUT type="hidden" name="health_week" value="0">
+	<INPUT type="hidden" name="health_update" value="<% nvram_get("health_update"); %>">
+	<input type="hidden" name="health_days" value="7">
+	<INPUT type="hidden" name="health_days0" value="<% nvram_list("health_days", 0); %>">
+	<INPUT type="hidden" name="health_days1" value="<% nvram_list("health_days", 1); %>">
+	<INPUT type="hidden" name="health_days2" value="<% nvram_list("health_days", 2); %>">
+	<INPUT type="hidden" name="health_days3" value="<% nvram_list("health_days", 3); %>">
+	<INPUT type="hidden" name="health_days4" value="<% nvram_list("health_days", 4); %>">
+	<INPUT type="hidden" name="health_days5" value="<% nvram_list("health_days", 5); %>">
+	<INPUT type="hidden" name="health_days6" value="<% nvram_list("health_days", 6); %>">
+ 	
+ 	
+	<table border="0" cellspacing="0" cellpadding="0" align="left" width="100%" height="100%">
+	<tr>
+		<td width="36">&nbsp;</td>
+		  <td valign="top" width="95%" height="100%" class="head_bold">
+			<br>&nbsp;Self Healing >Regular Maintenance<br>
+			<table border=0 class="copy_1">
+				<td>
+						<table width=550 border="0" cellspacing="0" cellpadding="0" align=left class="copy_1">
+							<tr align=left>								
+								<td colspan=3 align=left class="body">
+									<% Fid_str(2630); %>
+								<br><br></td>
+	<!--						</tr>
+	<tr>								
+	<td width="250" class="body">									
+	<b>Auto set wireless channel daily ></b></td>
+	<td width="335" class="body">
+	<input type="radio" name="wifi_scan" value="1" >Enabled&nbsp;
+	<input type="radio" name="wifi_scan" value="0" >Disabled&nbsp;
+	</td>
+      	</tr>
+      	<tr>								
+	<td width="250" class="body">									
+	<b>Auto manage routing table ></b></td>
+	<td width="335" class="body">
+	<input type="radio" name="p2p_control" value="1" >Enabled&nbsp;
+	<input type="radio" name="p2p_control" value="0" >Disabled&nbsp;
+	</td>
+      	</tr>-->
+							<tr>								
+								<td width="250" class="body">									
+									<b><% Fid_str(2631); %> ></b></td>
+									<td width="335" class="body">
+									<input type="radio" name="healing_enable" value="1" onClick="enable_heal(1);"><% Fid_str(317); %>&nbsp;
+									<input type="radio" name="healing_enable" value="0" onClick="enable_heal(0);"><% Fid_str(318); %>&nbsp;
+								</td>
+							</tr>
+	
+	     <tr><td>&nbsp;&nbsp;</td></tr>
+       <tr>
+       <td width="250" align=left class="body"><b><% Fid_str(2632); %>></b></td><td width="335" class="body">&nbsp;</td>
+       </tr>
+ 				  <!--<tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="dayall" value="1" onClick="day_all();" >Everyday</td></tr>
+ 				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body">&nbsp;</td></tr>-->
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day0" value="1" <% nvram_indexmatch("health_days",0, "1", "checked"); %>><% Fid_str(2634); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day1" value="1" <% nvram_indexmatch("health_days",1, "1", "checked"); %>><% Fid_str(2635); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day2" value="1" <% nvram_indexmatch("health_days",2, "1", "checked"); %>><% Fid_str(2636); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day3" value="1" <% nvram_indexmatch("health_days",3, "1", "checked"); %>><% Fid_str(2637); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day4" value="1" <% nvram_indexmatch("health_days",4, "1", "checked"); %>><% Fid_str(2638); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day5" value="1" <% nvram_indexmatch("health_days",5, "1", "checked"); %>><% Fid_str(2639); %></td></tr>
+				  <tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="day6" value="1" <% nvram_indexmatch("health_days",6, "1", "checked"); %>><% Fid_str(2640); %></td></tr>
+				  <br>
+				  <tr><td width="250" align=left class="body"><b><% Fid_str(2633); %>></b></td><td width="335" class="body">&nbsp;</td></tr>
+				       <tr>
+				       <td width="250" class="body">&nbsp;</td>
+                 <td width="350">
+                <SELECT style="COLOR: #000000" size="1" name="start_hour">
+                  <option value="0:0" selected>12:00 AM</option>
+                  <option value="0:30">12:30 AM</option>
+                  <option value="1:0">01:00 AM</option>
+                  <option value="1:30">01:30 AM</option>
+                  <option value="2:0">02:00 AM</option>
+                  <option value="2:30">02:30 AM</option>
+                  <option value="3:0">03:00 AM</option>
+                  <option value="3:30">03:30 AM</option>
+                  <option value="4:0">04:00 AM</option>
+                  <option value="4:30">04:30 AM</option>
+                  <option value="5:0">05:00 AM</option>
+                  <option value="5:30">05:30 AM</option>
+                  <option value="6:0">06:00 AM</option>
+                  <option value="6:30">06:30 AM</option>
+                  <option value="7:0">07:00 AM</option>
+                  <option value="7:30">07:30 AM</option>
+                  <option value="8:0">08:00 AM</option>
+                  <option value="8:30">08:30 AM</option>
+                  <option value="9:0">09:00 AM</option>
+                  <option value="9:30">09:30 AM</option>
+                  <option value="10:0">10:00 AM</option>
+                  <option value="10:30">10:30 AM</option>
+                  <option value="11:0">11:00 AM</option>
+                  <option value="11:30">11:30 AM</option>
+		  <option value="12:0">12:00 PM</option>
+		  <option value="12:30">12:30 PM</option>
+		  <option value="13:0">01:00 PM</option>
+                  <option value="13:30">01:30 PM</option>
+                  <option value="14:0">02:00 PM</option>
+                  <option value="14:30">02:30 PM</option>
+                  <option value="15:0">03:00 PM</option>
+                  <option value="15:30">03:30 PM</option>
+                  <option value="16:0">04:00 PM</option>
+                  <option value="16:30">04:30 PM</option>
+                  <option value="17:0">05:00 PM</option>
+                  <option value="17:30">05:30 PM</option>
+                  <option value="18:0">06:00 PM</option>
+                  <option value="18:30">06:30 PM</option>
+                  <option value="19:0">07:00 PM</option>
+                  <option value="19:30">07:30 PM</option>
+                  <option value="20:0">08:00 PM</option>
+                  <option value="20:30">08:30 PM</option>
+                  <option value="21:0">09:00 PM</option>
+                  <option value="21:30">09:30 PM</option>
+                  <option value="22:0">10:00 PM</option>
+                  <option value="22:30">10:30 PM</option>
+                  <option value="23:0">11:00 PM</option>
+                  <option value="23:30">11:30 PM</option></td>
+      </tr>	
+          <tr><td>&nbsp;&nbsp;</td></tr>
+      	<!--<tr><td width="250" class="body">&nbsp;</td><td width="350" class="body"><input type="checkbox" name="fw_auto_update" value="1" <% nvram_match("health_update","1", "checked"); %> >Also check firmware update at this time</td></tr>-->
+      <tr><td>&nbsp;&nbsp;</td></tr>
+ 
+      
+      	<SCRIPT LANGUAGE="JavaScript">
+	if(<% nvram_get("health_enable"); %>==1)	
+    {
+     document.tF.healing_enable[0].checked=true;
+      enable_heal(1);
+     }
+  else
+    {
+    document.tF.healing_enable[1].checked=true;
+    enable_heal(0);
+    }
+    
+
+      
+     //  if( <% nvram_get("health_update"); %>==1)	
+       //document.tF.fw_auto_update.checked=true;
+    //else
+      //document.tF.fw_auto_update.checked=false;			
+    	
+var start_time=<% nvram_get("health_time"); %>;
+document.tF.start_hour.options[start_time].selected=true;
+
+</Script>
+       <tr>	
+					<td colspan=2 align=center>
+					<input type="button" value="<% Fid_str(48); %>" 
+							style="{height=22px;width:150px;}" class="submitBtn" 
+							onClick="javascript:window.location.reload(true);return false">								
+              							&nbsp;&nbsp;
+					<input type="submit" name="arc_action" value="<% Fid_str(49); %>" 
+						style="{height=22px;width:150px;}" class="submitBtn" onClick="return evaltF();">
+									</td>
+								</tr>
+           </table>
+						</td>
+					</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</FORM>
+</table>
+			</td>    
+		</tr>             
+     </table>
+</BODY>
+</HTML>

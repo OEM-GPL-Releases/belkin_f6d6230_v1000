@@ -1,0 +1,88 @@
+<html debug="true">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rel="stylesheet" href="main_router.css" type="text/css">
+<script language="javascript" type="text/javascript" src="./firebug/firebug.js"></script>
+<!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
+<script language="javascript" type="text/javascript" src="jquery.js"></script>
+<script language="javascript" type="text/javascript" src="jquery_flot.js"></script>
+<script language="JavaScript">
+<!--#exec cmd="LoginTimeout" -->
+
+var fwb_num=6;
+var max_stats_num = 144;
+var max_outbytes, max_dropbytes;
+var fwb_stats=new Array(fwb_num);
+var i, j;
+function STATS_ENTRY()
+{
+	this.outbytes = 0;
+	this.dropbytes = 0;
+}
+for(i=0; i<fwb_num; i++)
+{
+    fwb_stats[i]= new Array(max_stats_num);
+    for(j=0; j<max_stats_num; j++)
+	    fwb_stats[i][j] = new STATS_ENTRY();
+}
+
+var cur_time_lab=new Array(4);
+function TIME_LAB()
+{
+	this.hour = 0;
+	this.min = 0;
+}
+for(i=0; i<4; i++)
+{
+    cur_time_lab[i]=new TIME_LAB();
+}
+<!--#exec cmd="OutFwbStats_script"-->
+
+function evaltF() {
+	return true;
+}
+
+function clear1() {
+	window.status="";
+}
+</script>
+</head>
+<BODY bgcolor="#FFFFFF" topmargin="0" leftmargin="0"  marginheight="0" marginwidth="0" onload="clear1()">
+
+<div class="copy_1" id="placeholder_egress" style="width:600px;height:220px;"></div>
+<script id="source" language="javascript" type="text/javascript">
+$(function () {
+    var d1 = [];
+    var x_str = [];
+    var d = new Date();
+    for (var i = 143; i >= 0; i--)
+    {
+        //fwb_stats[0][i].outbytes = Math.random()*10000;
+        //fwb_stats[0][i].outbytes = 0;
+        //d1.push([i, fwb_stats[0][i].outbytes]);
+        d1.push([i, 0]);
+	}
+	for(var i=0;i<4;i++)
+		x_str[i] = cur_time_lab[i].hour + ":" + cur_time_lab[i].min;
+	
+    $.plot($("#placeholder_egress"), [{ label: "test",  data: d1}],
+    {
+        lines: { show: true, fill: false, lineWidth: 1},
+        shadowSize: 0,
+        xaxis: {
+				ticks: [[0, x_str[0]], [47, x_str[1]], [95, x_str[2]], [143, x_str[3]]]
+        },
+        yaxis: {
+            //min: 0
+        },
+        grid: {
+            backgroundColor: "#fffaff"
+        }
+    });
+});
+</script>
+			 
+
+</body>
+</html>

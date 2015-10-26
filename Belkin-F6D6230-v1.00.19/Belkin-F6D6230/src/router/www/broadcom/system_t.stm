@@ -1,0 +1,153 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="disp_time_zone_array"; %>
+
+var i;
+var time_server1, time_server2;
+var time_server = new Array(9);
+time_server[0]="132.163.4.102";
+time_server[1]="192.5.41.41";
+time_server[2]="192.5.41.209";
+time_server[3]="207.200.81.113";
+time_server[4]="208.184.49.9";
+time_server[5]="129.132.2.21";
+time_server[6]="130.149.17.8";
+time_server[7]="128.250.36.3";
+time_server[8]="137.189.8.174";
+
+function evaltF()
+{
+	document.tF.server1.value = time_server[document.tF.time1.selectedIndex];
+	document.tF.server2.value = time_server[document.tF.time2.selectedIndex];
+    if ( document.tF.server1.value == document.tF.server2.value)
+        { alert (dup_1_2_srv); return false;}
+	return true;
+}
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body onload="clear1()" bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<form name="tF" method="post" action="/cgi-bin/ntp_setting.exe">
+<input type="hidden" name="restart_time" value="0">
+<input type="hidden" name="reload" value="0">
+<input type="hidden" name="restart_page" value='document.location.href="system_p.stm";'>
+<input type="hidden" name="location_page" value="wait.stm">
+
+<input type="hidden" name="server1" value="">
+<input type="hidden" name="server2" value="">
+<table width="100%" border="0" cellspacing="0" cellpadding="10" height="90%">
+	<tr>
+		<td valign="top" height="251">
+            <p><b class=subtitle><% Fid_str(546); %></b></p>
+		    <p><b class=normalText><% Fid_str(944); %></b></p>
+		    <p class=normalText>
+	        <% Fid_str(544); %>
+            </p>
+			<p>
+			<select name="time_zone" class=selectList>
+				<script language="javascript">
+				var i;
+					for(i=0;i<ntp_zone_array.length;i++){
+					if (i == ntp_zone)
+						document.write('<option value=',i,' selected>',ntp_zone_array[i],'</option>');
+					else
+						document.write('<option value=',i,'>',ntp_zone_array[i],'</option>');
+					}
+				</script>
+			</select>
+			</p>
+            <p class=normalText><b><input type="checkbox" name="daylight" value="1" <% exec cmd="daylight"; %>><% Fid_str(547); %></b></p>
+			<br><br>
+			<p class=normalText><b><% Fid_str(550); %></b></p>
+			<p class=normalText>
+	      <% Fid_str(551); %>
+	        </p>
+            <br>
+			<p class=normalText><input type="checkbox" name="enable_ntp" value="1">
+            <b><% Fid_str(552); %></b></p>
+         	<p class=normalText><% Fid_str(553); %></p>
+			<table>
+				<tr>
+					<td><b class=normalText><% Fid_str(554); %></b></td>
+					<td class=normalText><select name="time1" class=selectList>
+						<option>132.163.4.102  - North America</option>
+						<option>192.5.41.41    - North America</option>
+						<option>192.5.41.209   - North America</option>
+						<option>207.200.81.113 - North America</option>
+						<option>208.184.49.9   - North America</option>
+						<option>129.132.2.21   - Europe</option>
+						<option>130.149.17.8   - Europe</option>
+						<option>128.250.36.3   - Australia</option>
+						<option>137.189.8.174  - Asia Pacific</option>
+						</select></td>
+				</tr>
+				<tr>
+					<td><b class=normalText><% Fid_str(555); %></b></td>
+					<td class=normalText><select name="time2" class=selectList>
+						<option>132.163.4.102  - North America</option>
+						<option>192.5.41.41    - North America</option>
+						<option>192.5.41.209   - North America</option>
+						<option>207.200.81.113 - North America</option>
+						<option>208.184.49.9   - North America</option>
+						<option>129.132.2.21   - Europe</option>
+						<option>130.149.17.8   - Europe</option>
+						<option>128.250.36.3   - Australia</option>
+						<option>137.189.8.174  - Asia Pacific</option>
+						</select></td>
+   				</tr>
+   			</table>
+<% exec cmd="ntp_setting_script"; %>
+<script language="JavaScript">
+var i;
+for(i=0;i<9;i++)
+{
+	if(time_server1==time_server[i])
+	{
+		document.tF.time1.options[i].selected = true;
+		break;
+	}
+}
+for(i=0;i<9;i++)
+{
+	if(time_server2==time_server[i])
+	{
+		document.tF.time2.options[i].selected = true;
+		break;
+	}
+}
+</script>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td>
+						<div align="right">
+						<input type="button" class="formsbutton" name="helpb" value="<% Fid_str(32); %>" onClick="MM_openBrWindow('help.stm#time','help','scrollbars=yes,width=600,height=500')">
+						<input type="submit" name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(30); %>" onClick="return evaltF();">
+                        <script language="javascript">
+                            if(navigator.appName != "Netscape")
+                                document.write('<input type="button" class="formsbutton" value="<% Fid_str(20); %>" onClick="javascript:window.location.reload(true)">');
+                            else
+                                document.write('<a href="/system_t.stm"><input type="button" class="formsbutton" value="<% Fid_str(20); %>"></a>');
+                        </script>
+						</div>
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+</form>
+			</td>    
+		</tr>             
+     </table>
+</body>
+</html>

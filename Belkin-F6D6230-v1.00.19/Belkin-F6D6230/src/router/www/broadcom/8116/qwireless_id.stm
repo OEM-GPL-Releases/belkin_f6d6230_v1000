@@ -1,0 +1,96 @@
+<html>
+<head>
+<title></title>
+
+<% char_set(); %>
+<script language="JavaScript" src="/routine_data.js"></script>
+<script language="JavaScript" type="text/javascript" src="/msg.js"></script>
+<script language="JavaScript">
+<% login_timeout(); %>
+<% exec cmd="my_function"; %>
+function evaltF()
+{
+	if (isBlank(document.tF.ssid.value)) {
+		alert(ssid_blank);
+		return false;
+	}
+	return true;
+}
+
+</script>
+<link rel="stylesheet" type="text/css" media="screen" href="/my_function3.css">
+</head>
+<body>
+<FORM NAME=tF METHOD=POST ACTION="/cgi-bin/qwireless_ssid.exe">
+<input type="hidden" name="burst_enable" value="0">
+<input NAME=wmd TYPE=hidden VALUE=0>
+<% exec cmd="wireopt"; %>
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+    <tr>
+	    <td>
+            <p class=subtitleR>2. <% Fid_str(925); %></p>
+            <p class=normalText>
+			<% Fid_str(515); %>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table border="0" cellspacing="1" cellpadding="5" align="center">
+				<tr>
+					<td width=200 class=tdTitler>SSID</td>
+					<td width=350 class=tdText>
+						<input type="text" name="ssid" size=32 maxlength=32 value="<% exec cmd="ssidname"; %>">
+					</td>
+				</tr>
+            	<tr>
+					<td width=200 class=tdTitler>SSID Broadcast</td>
+					<td class=tdText>
+                    	<input type="radio" name="hidessid" value=0><% Fid_str(103); %>&nbsp;&nbsp;
+                    	<input type="radio" name="hidessid" value=1><% Fid_str(104); %>
+                    	<SCRIPT LANGUAGE="JavaScript">
+                        	var iDOD = <% echo var="hidessid"; %>;
+                        	document.forms[0].hidessid[iDOD].defaultChecked = true;
+                        	document.forms[0].hidessid[iDOD].checked = true;
+                    	</SCRIPT>
+                	</td>
+                </tr>
+				<tr>
+					<td width=200 class=tdTitler>Wireless Mode</td>
+					<td class=tdText>
+						<select size="1" name="wbr">
+						<% exec cmd="wbr"; %>
+						</select>
+					</td>
+				</tr>
+<!--							<tr>
+					<td width=200 class=tdTitler>Transmission Rate</td>
+					<td width=350 class=tdText>
+						<select size="1" name="wtr">
+						<% exec cmd="wtr"; %>
+						</select></font>
+					</td>
+				</tr>
+-->
+				<tr>
+					<td width=200 class=tdTitler>Channel</td>
+					<td width=350 class=tdText>
+						<select size="1" name="wchan">
+						<% exec cmd="wchan"; %>
+						</select>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="mainmsgR">
+            <input type="button" class="formsbutton" name="back" value="<% Fid_str(521); %>" onClick="javascript:top.parent.location.href='setupw.stm';" target="main1">
+			<input type="submit"  name="arc_action" class="formsbutton" name="savesetting" value="<% Fid_str(522); %>" onClick="return evaltF();">
+			<!--<input type="submit"  name="arc_action" class="formsbutton" name="savesetting" value="NEXT"  onClick="javascript:if(evaltF()){ document.forms[0].submit()};">-->
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>

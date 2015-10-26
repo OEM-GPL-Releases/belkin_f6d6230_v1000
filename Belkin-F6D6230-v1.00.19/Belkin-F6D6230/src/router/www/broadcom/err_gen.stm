@@ -1,0 +1,44 @@
+<html>
+
+<head>
+
+<% char_set(); %>
+<title>Input Error</title>
+
+<!--
+	a:link{
+		font-family: Times, Arial;
+		font-weight: bold;
+		color: #008080
+	}
+	
+	.bodycopy{
+		font-family: Times, Arial;
+		color: #333399
+	}
+-->
+</style>
+
+</head>
+
+<body text="#003366" bgcolor="#FFFFFF" link="#d8ff3c" vlink="#d8ff3c" alink="#6600cc">
+
+<div align="center">
+  <center>
+
+<table width="70%" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+	<tr><td><font color="#333399" FACE="Arial" size= 2>
+			<font  face="Arial" size="4" color="#333333"><strong>
+				<% Fid_str(90); %></strong></font><br>
+			<p class="bodycopy"><font size=3><% exec cmd="ErrMsg"; %></p></font>
+				<br></td></tr>
+	<tr><td><p><br><br><br></p>
+			<p align="right">
+				<a href="javascript:history.go(-1)">
+				<img src="/images/back1.gif" border=0></a></p>
+		</td></tr>
+	</table>
+  </center>
+</div>
+</body>
+</html>

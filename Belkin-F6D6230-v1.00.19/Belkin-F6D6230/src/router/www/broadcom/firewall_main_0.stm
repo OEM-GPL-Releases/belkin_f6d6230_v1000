@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0032)natcfg.htm -->
+<HTML><HEAD>
+
+<% char_set(); %>
+<META http-equiv=Pragma content=no-cache>
+<script language="JavaScript" type="text/javascript" src="overlib.js"></script>
+<LINK href="stylemain.css" type=text/css rel=stylesheet>
+<LINK href="colors.css" type=text/css rel=stylesheet>
+<LINK href="main_router.css" type=text/css rel=stylesheet>
+<% include file="refreshmenu.txt"; %>
+<SCRIPT language=javascript>
+<% login_timeout(); %>
+
+var prtcl = 'PPPoE';
+
+function frmLoad() {
+
+   with ( document.forms[0] ) {
+
+   }
+}
+
+function btnNext() {
+
+   var loc;
+
+//   with ( document.forms[0] ) {
+//      if ( (enblFirewall[0].checked == true) /*&& (enblNAT[0].checked == true)*/)
+  // 		 loc = 'wancfg.cmd?action=efwenat';
+  //    else
+  //    if ( (enblFirewall[0].checked == true) /*&& (enblNAT[1].checked == true)*/)
+  // 		 loc = 'wancfg.cmd?action=efwdnat';
+  // 	  else
+  //    if ( (enblFirewall[1].checked == true) /*&& (enblNAT[0].checked == true)*/)
+  // 		 loc = 'wancfg.cmd?action=dfwenat';
+  // 	  else
+  //    if ( (enblFirewall[1].checked == true) /*&& (enblNAT[1].checked == true)*/)
+  // 		 loc = 'wancfg.cmd?action=dfwdnat';
+  // }
+
+//   window.location.href = loc;
+	//document.tF.submit();
+}
+
+  </SCRIPT>
+
+<META content="MSHTML 6.00.2900.2873" name=GENERATOR></HEAD>
+<BODY onload=frmLoad() bgcolor="#ffffff" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<% File_include("menu.stm"); %>
+<BLOCKQUOTE>
+  <FORM name="tF" method="post" action="apply.cgi" onsubmit="btnNext()">
+  <input type="hidden" name="location_page" value="firewall_main_0.stm">
+  <FONT color=#0000ff><B>
+      <TABLE width=600>
+    	<TR>
+	<td valign="top" width="99%" height="100%" class="head_bold">
+		<br><% Fid_str(116); %>              
+	</td>
+    	</tr>
+    <tr>
+    	<td class="body">
+  	<FONT color=#004263><BR>
+  	<BR><% Fid_str(117); %>
+	  <BR>
+	  <BR>
+	  <BR>
+	  <BR>
+  </FONT></FONT>  
+	
+  <TABLE cellSpacing=0 cellPadding=0 border=0 class="copy_1">
+    <TBODY>
+    <TR>
+      <TD width=150 height=30 class="body">
+	<nobr>     
+      <FONT color=#004263 >
+      <B><% Fid_str(118); %></B></FONT> </TD>
+      <TD width=20 class="body">
+      <FONT color=#004263 ></FONT> 
+      </TD>
+      <TD width=80 class="body">
+      <FONT color=#004263 >
+      <INPUT type=radio value=0 name=fw_disable><% Fid_str(96); %></FONT>
+      </TD>
+      <TD height=30 class="body">
+      <FONT color=#004263>
+      <INPUT type=radio value=1 name=fw_disable><% Fid_str(119); %></FONT>
+      </TD></nobr></TR></TBODY></TABLE>
+	<SCRIPT LANGUAGE="JavaScript">
+	var iDOD = <% nvram_get("fw_disable"); %>;
+	document.tF.fw_disable[iDOD].defaultChecked = true;
+	document.tF.fw_disable[iDOD].checked = true;
+	</SCRIPT>
+      <BR>
+  <TABLE>
+    <TBODY>
+    <TR align="center">
+      <TD height=30>
+      <INPUT class=submitBtn style=" HEIGHT: 22px;width:150px;" onClick="javascript:window.location.reload(true);return false" type=button value="<% Fid_str(48); %>">
+ 	&nbsp;&nbsp;<INPUT type="submit" name="arc_action" value="Apply" class=submitBtn style=" HEIGHT: 22px;width:150px;">
+      </TD></TR></TBODY></TABLE></FORM></BLOCKQUOTE>
+      </td>    
+      </tr>             
+     </table>      
+      </BODY></HTML>
